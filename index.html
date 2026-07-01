@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מחשבון תכסית ואחוזי בנייה</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rubik', sans-serif;
+            background: #fff;
+            color: #1a1a1a;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 32px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #1a1a1a;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            font-family: 'Rubik', sans-serif;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 0;
+            outline: none;
+            background: #fff;
+            color: #1a1a1a;
+            -moz-appearance: textfield;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input:focus {
+            border-color: #666;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 36px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-label {
+            font-size: 0.875rem;
+            color: #555;
+        }
+
+        .result-value {
+            font-size: 1rem;
+            font-weight: 500;
+            direction: ltr;
+        }
+
+        .bar-container {
+            margin-top: 24px;
+            margin-bottom: 8px;
+        }
+
+        .bar-label {
+            font-size: 0.875rem;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        .bar-track {
+            width: 100%;
+            height: 28px;
+            background: #eee;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: #888;
+            transition: width 0.2s ease, background 0.2s ease;
+            min-width: 0;
+        }
+
+        .bar-fill.overflow {
+            background: #800020;
+        }
+
+        .bar-percent {
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-top: 4px;
+            text-align: left;
+            direction: ltr;
+        }
+
+        .bar-percent.overflow {
+            color: #800020;
+        }
+
+        .warning {
+            margin-top: 20px;
+            padding: 12px;
+            border: 1px solid #800020;
+            color: #800020;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: none;
+        }
+
+        .warning.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>מחשבון תכסית ואחוזי בנייה</h1>
+
+        <div class="input-group">
+            <label for="plotArea">שטח מגרש (מ"ר)</label>
+            <input type="number" id="plotArea" min="0" step="any" placeholder="0">
+        </div>
+
+        <div class="input-group">
+            <label for="coveragePercent">תכסית מותרת (%)</label>
+            <input type="number" id="coveragePercent" min="0" max="100" step="any" placeholder="0">
+        </div>
+
+        <div class="input-group">
+            <label for="buildingPercent">אחוזי בנייה מותרים (%)</label>
+            <input type="number" id="buildingPercent" min="0" step="any" placeholder="0">
+        </div>
+
+        <div class="input-group">
+            <label for="floors">מספר קומות מבוקש</label>
+            <input type="number" id="floors" min="1" step="1" placeholder="1">
+        </div>
+
+        <div class="input-group">
+            <label for="parkingArea">שטח חניון תת-קרקעי (מ"ר)</label>
+            <input type="number" id="parkingArea" min="0" step="any" placeholder="0">
+        </div>
+
+        <div class="section-title">תוצאות</div>
+
+        <div class="result-row">
+            <span class="result-label">שטח תכסית מקסימלי</span>
+            <span class="result-value" id="maxCoverage">0 מ"ר</span>
+        </div>
+
+        <div class="result-row">
+            <span class="result-label">סה"כ שטח בנייה מותר (עילי)</span>
+            <span class="result-value" id="totalBuilding">0 מ"ר</span>
+        </div>
+
+        <div class="result-row">
+            <span class="result-label">שטח ממוצע לקומה</span>
+            <span class="result-value" id="avgPerFloor">0 מ"ר</span>
+        </div>
+
+        <div class="result-row">
+            <span class="result-label">שטח שנותר לניצול</span>
+            <span class="result-value" id="remaining">0 מ"ר</span>
+        </div>
+
+        <div class="result-row">
+            <span class="result-label">שטח חניון תת-קרקעי</span>
+            <span class="result-value" id="parkingDisplay">0 מ"ר</span>
+        </div>
+
+        <div class="bar-container">
+            <div class="bar-label">אחוז ניצול</div>
+            <div class="bar-track">
+                <div class="bar-fill" id="barFill" style="width: 0%"></div>
+            </div>
+            <div class="bar-percent" id="barPercent">0%</div>
+        </div>
+
+        <div class="warning" id="warning">
+            חריגה: שטח הבנייה המבוקש חורג מאחוזי הבנייה המותרים.
+        </div>
+    </div>
+
+    <script>
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => input.addEventListener('input', calculate));
+
+        function getVal(id) {
+            return parseFloat(document.getElementById(id).value) || 0;
+        }
+
+        function fmt(n) {
+            return n.toLocaleString('he-IL', { maximumFractionDigits: 1 }) + ' מ"ר';
+        }
+
+        function calculate() {
+            const plotArea = getVal('plotArea');
+            const coveragePercent = getVal('coveragePercent');
+            const buildingPercent = getVal('buildingPercent');
+            const floors = getVal('floors') || 1;
+            const parkingArea = getVal('parkingArea');
+
+            const maxCoverage = plotArea * (coveragePercent / 100);
+            const totalBuilding = plotArea * (buildingPercent / 100);
+            const avgPerFloor = floors > 0 ? totalBuilding / floors : 0;
+            const usedArea = maxCoverage * floors;
+            const remaining = totalBuilding - usedArea;
+            const utilization = totalBuilding > 0 ? (usedArea / totalBuilding) * 100 : 0;
+            const isOverflow = remaining < 0 && totalBuilding > 0;
+
+            document.getElementById('maxCoverage').textContent = fmt(maxCoverage);
+            document.getElementById('totalBuilding').textContent = fmt(totalBuilding);
+            document.getElementById('avgPerFloor').textContent = fmt(avgPerFloor);
+            document.getElementById('remaining').textContent = fmt(Math.abs(remaining));
+            document.getElementById('parkingDisplay').textContent = fmt(parkingArea);
+
+            const remainingEl = document.getElementById('remaining');
+            if (isOverflow) {
+                remainingEl.textContent = '-' + fmt(Math.abs(remaining));
+                remainingEl.style.color = '#800020';
+            } else {
+                remainingEl.style.color = '#1a1a1a';
+            }
+
+            const barFill = document.getElementById('barFill');
+            const barPercent = document.getElementById('barPercent');
+            const displayPercent = Math.min(utilization, 100);
+
+            barFill.style.width = displayPercent + '%';
+            barPercent.textContent = utilization.toLocaleString('he-IL', { maximumFractionDigits: 1 }) + '%';
+
+            if (isOverflow) {
+                barFill.classList.add('overflow');
+                barPercent.classList.add('overflow');
+            } else {
+                barFill.classList.remove('overflow');
+                barPercent.classList.remove('overflow');
+            }
+
+            const warning = document.getElementById('warning');
+            if (isOverflow) {
+                warning.classList.add('visible');
+            } else {
+                warning.classList.remove('visible');
+            }
+        }
+
+        calculate();
+    </script>
+</body>
+</html>
