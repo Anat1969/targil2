@@ -22,7 +22,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1300px;
             margin: 0 auto;
         }
 
@@ -141,29 +141,50 @@
             color: #800020;
         }
 
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+
         .results-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 12px;
-            font-size: 0.825rem;
+            font-size: 0.75rem;
+            min-width: 1200px;
         }
 
-        .results-table th {
+        .results-table thead th {
             background: #f5f5f5;
             font-weight: 600;
-            text-align: right;
-            padding: 8px 10px;
-            border: 1px solid #ddd;
-            white-space: nowrap;
+            text-align: center;
+            padding: 6px 8px;
+            border: 1px solid #ccc;
+            white-space: normal;
+            vertical-align: middle;
+            line-height: 1.4;
+        }
+
+        .results-table thead tr:first-child th {
+            background: #eaeaea;
+        }
+
+        .results-table thead tr:nth-child(2) th {
+            background: #f0f0f0;
+        }
+
+        .results-table thead tr:nth-child(3) th {
+            background: #f5f5f5;
         }
 
         .results-table td {
-            padding: 8px 10px;
-            border: 1px solid #eee;
-            text-align: right;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
         }
 
-        .results-table tr:hover {
+        .results-table tbody tr:hover {
             background: #fafafa;
         }
 
@@ -285,6 +306,46 @@
         const pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs');
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
 
+        const LEAF_COLUMNS = [
+            { id: 'designation', label: 'ייעוד' },
+            { id: 'use', label: 'שימוש' },
+            { id: 'areaCells', label: 'תאי שטח' },
+            { id: 'buildingLocation', label: 'בניין/\nמיקום' },
+            { id: 'plotSize', label: 'גודל מגרש\nמוחלט' },
+            { id: 'buildAboveMain', label: 'עיקרי' },
+            { id: 'buildAboveService', label: 'שירות' },
+            { id: 'buildBelowMain', label: 'עיקרי' },
+            { id: 'buildBelowService', label: 'שירות' },
+            { id: 'buildTotal', label: 'סה"כ שטחי\nבנייה' },
+            { id: 'buildPercent', label: 'אחוזי בנייה\nכוללים (%)' },
+            { id: 'coverage', label: 'תכסית (%)\nמותר שטח' },
+            { id: 'unitsPerDunam', label: 'מספר\nיח"ד לדונם' },
+            { id: 'density', label: 'צפיפות\nיח"ד' },
+            { id: 'height', label: 'גובה מבנה\nמעל הכניסה\nהקובעת (מטר)' },
+            { id: 'floorsAllowed', label: 'מותרות' },
+            { id: 'floorsAbove', label: 'מעל הכניסה\nהקובעת' },
+        ];
+
+        const HEADER_KEYWORDS_BY_COLUMN = {
+            designation: ['ייעוד', 'יעוד'],
+            use: ['שימוש'],
+            areaCells: ['תאי שטח', 'תאי'],
+            buildingLocation: ['בניין', 'בנין', 'מיקום'],
+            plotSize: ['גודל מגרש', 'מגרש מוחלט', 'גודל'],
+            buildAboveMain: ['עיקרי'],
+            buildAboveService: ['שירות'],
+            buildBelowMain: ['עיקרי'],
+            buildBelowService: ['שירות'],
+            buildTotal: ['סה"כ', 'סהכ'],
+            buildPercent: ['אחוזי בנייה', 'אחוזי בניה', 'אחוזי'],
+            coverage: ['תכסית'],
+            unitsPerDunam: ['יח"ד', 'לדונם'],
+            density: ['צפיפות'],
+            height: ['גובה'],
+            floorsAllowed: ['קומות', 'מותרות'],
+            floorsAbove: ['הכניסה', 'הקובעת'],
+        };
+
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
         const fileName = document.getElementById('fileName');
@@ -372,11 +433,11 @@
                 rawText.textContent = allText;
                 rawToggle.style.display = 'block';
 
-                const { headers, rows } = extractTable(allItems, allText);
+                const { rows } = extractTable(allItems);
 
                 resultsTitle.style.display = 'block';
 
-                if (headers.length === 0) {
+                if (rows.length === 0) {
                     status.textContent = 'לא נמצאה טבלה בקובץ. נסי להציג את הטקסט הגולמי לבדיקה.';
                     status.className = 'status error';
                     return;
@@ -401,7 +462,7 @@
                     status.className = 'status';
                 }
 
-                renderTable(headers, filteredRows);
+                renderTable(filteredRows);
 
             } catch (err) {
                 status.textContent = 'שגיאה בעיבוד ה-PDF: ' + err.message;
@@ -458,55 +519,89 @@
             return lines;
         }
 
-        function extractTable(lines, fullText) {
+        function extractTable(lines) {
             const headerKeywords = [
                 'מגרש', 'ייעוד', 'יעוד', 'תכסית', 'שטח', 'בנייה', 'בניה',
-                'קומות', 'גובה', 'בניין', 'בנין', 'קדמי', 'צדדי', 'אחורי',
-                'דיור', 'יח"ד', 'הערות', 'שימוש', 'מותר', 'מקסימ', 'עיקרי',
-                'שירות', 'מרתף', 'חניה', 'חניון', 'מסחר', 'מגורים'
+                'קומות', 'גובה', 'בניין', 'בנין', 'דיור', 'יח"ד', 'שימוש',
+                'עיקרי', 'שירות', 'מגורים', 'צפיפות', 'אחוזי', 'סה"כ',
+                'הכניסה', 'הקובעת', 'מותרות', 'תאי'
             ];
 
-            let headerLineIndex = -1;
+            let headerBlockStart = -1;
+            let headerBlockEnd = -1;
             let maxKeywordCount = 0;
 
             for (let i = 0; i < lines.length; i++) {
+                let combinedCount = 0;
+                const windowSize = Math.min(5, lines.length - i);
+                for (let j = 0; j < windowSize; j++) {
+                    const text = lines[i + j].text;
+                    for (const kw of headerKeywords) {
+                        if (text.includes(kw)) combinedCount++;
+                    }
+                }
+                if (combinedCount > maxKeywordCount) {
+                    maxKeywordCount = combinedCount;
+                    headerBlockStart = i;
+                }
+            }
+
+            if (headerBlockStart === -1 || maxKeywordCount < 4) {
+                return { rows: [] };
+            }
+
+            headerBlockEnd = headerBlockStart;
+            for (let i = headerBlockStart; i < Math.min(headerBlockStart + 6, lines.length); i++) {
                 const text = lines[i].text;
-                let count = 0;
+                let kwCount = 0;
                 for (const kw of headerKeywords) {
-                    if (text.includes(kw)) count++;
+                    if (text.includes(kw)) kwCount++;
                 }
-                if (count > maxKeywordCount) {
-                    maxKeywordCount = count;
-                    headerLineIndex = i;
+                const hasDigitOnly = lines[i].cells.every(c => /^\d+[\d.,]*$/.test(c.str));
+                if (kwCount > 0 && !hasDigitOnly) {
+                    headerBlockEnd = i;
+                } else if (hasDigitOnly && lines[i].cells.length >= 5) {
+                    break;
                 }
             }
 
-            if (headerLineIndex === -1 || maxKeywordCount < 2) {
-                return { headers: [], rows: [] };
+            const allHeaderCells = [];
+            for (let i = headerBlockStart; i <= headerBlockEnd; i++) {
+                allHeaderCells.push(...lines[i].cells);
             }
 
-            const headerLine = lines[headerLineIndex];
-            const headerCells = headerLine.cells;
-            const headers = headerCells.map(c => c.str);
+            allHeaderCells.sort((a, b) => b.x - a.x);
 
-            const colPositions = headerCells.map(c => c.x).sort((a, b) => b - a);
+            const leafPositions = [];
+            const usedPositions = new Set();
+            for (const cell of allHeaderCells) {
+                const x = Math.round(cell.x / 5) * 5;
+                if (!usedPositions.has(x)) {
+                    usedPositions.add(x);
+                    leafPositions.push(cell.x);
+                }
+            }
+            leafPositions.sort((a, b) => b - a);
 
             const rows = [];
-            for (let i = headerLineIndex + 1; i < lines.length; i++) {
+            for (let i = headerBlockEnd + 1; i < lines.length; i++) {
                 const line = lines[i];
 
                 if (line.text.includes('---')) continue;
+                if (line.text.includes('טבלת זכויות')) continue;
+                if (line.text.includes('מועד הפקה')) continue;
+                if (line.text.includes('תוכנית מס')) continue;
 
                 const isDataRow = line.cells.some(c => /\d/.test(c.str));
                 if (!isDataRow) continue;
 
-                const row = assignCellsToColumns(line.cells, colPositions);
+                const row = assignCellsToColumns(line.cells, leafPositions);
                 if (row.some(cell => cell !== '')) {
                     rows.push(row);
                 }
             }
 
-            return { headers, rows };
+            return { rows };
         }
 
         function assignCellsToColumns(cells, colPositions) {
@@ -534,27 +629,61 @@
             return row;
         }
 
-        function renderTable(headers, rows) {
+        function renderTable(rows) {
             if (rows.length === 0) {
                 resultsContainer.innerHTML = '<div class="no-results">לא נמצאו שורות בטבלה.</div>';
                 return;
             }
 
-            let html = '<table class="results-table"><thead><tr>';
-            for (const h of headers) {
-                html += `<th>${escapeHtml(h)}</th>`;
-            }
-            html += '</tr></thead><tbody>';
+            const numCols = rows.reduce((max, row) => Math.max(max, row.length), 0);
+
+            let html = '<div class="table-wrapper">';
+            html += `<table class="results-table">`;
+            html += '<thead>';
+
+            html += '<tr>';
+            html += '<th rowspan="3">ייעוד</th>';
+            html += '<th rowspan="3">שימוש</th>';
+            html += '<th rowspan="3">תאי שטח</th>';
+            html += '<th rowspan="3">בניין/<br>מיקום</th>';
+            html += '<th rowspan="2">גודל מגרש<br>(מ"ר)</th>';
+            html += '<th colspan="5">שטחי בנייה (מ"ר)</th>';
+            html += '<th rowspan="3">אחוזי בנייה<br>כוללים (%)</th>';
+            html += '<th rowspan="3">תכסית (%)<br>מותר שטח</th>';
+            html += '<th rowspan="3">מספר<br>יח"ד לדונם</th>';
+            html += '<th rowspan="3">צפיפות<br>יח"ד</th>';
+            html += '<th rowspan="3">גובה מבנה<br>מעל הכניסה<br>הקובעת (מטר)</th>';
+            html += '<th colspan="2">מספר קומות</th>';
+            html += '</tr>';
+
+            html += '<tr>';
+            html += '<th colspan="2">מעל הכניסה הקובעת</th>';
+            html += '<th colspan="2">מתחת לכניסה הקובעת</th>';
+            html += '<th rowspan="2">סה"כ שטחי<br>בנייה</th>';
+            html += '<th rowspan="2">מותרות</th>';
+            html += '<th rowspan="2">מעל הכניסה<br>הקובעת</th>';
+            html += '</tr>';
+
+            html += '<tr>';
+            html += '<th>גודל מגרש<br>מוחלט</th>';
+            html += '<th>עיקרי</th>';
+            html += '<th>שירות</th>';
+            html += '<th>עיקרי</th>';
+            html += '<th>שירות</th>';
+            html += '</tr>';
+
+            html += '</thead>';
+            html += '<tbody>';
 
             for (const row of rows) {
                 html += '<tr>';
-                for (let i = 0; i < headers.length; i++) {
+                for (let i = 0; i < 17; i++) {
                     html += `<td>${escapeHtml(row[i] || '')}</td>`;
                 }
                 html += '</tr>';
             }
 
-            html += '</tbody></table>';
+            html += '</tbody></table></div>';
             resultsContainer.innerHTML = html;
         }
 
