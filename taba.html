@@ -433,7 +433,7 @@
                 rawText.textContent = allText;
                 rawToggle.style.display = 'block';
 
-                const { rows } = extractTable(allItems);
+                const { rows, colCount } = extractTable(allItems);
 
                 resultsTitle.style.display = 'block';
 
@@ -458,7 +458,7 @@
                     status.textContent = `נמצאו ${filteredRows.length} שורות עבור מגרש ${plotNumber}.`;
                     status.className = 'status';
                 } else {
-                    status.textContent = `נמצאו ${rows.length} שורות בטבלה.`;
+                    status.textContent = `נמצאו ${rows.length} שורות בטבלה (${colCount || '?'} עמודות זוהו).`;
                     status.className = 'status';
                 }
 
@@ -565,20 +565,27 @@
                 }
             }
 
-            const skipPatterns = ['---', 'טבלת זכויות', 'מועד הפקה', 'תוכנית מס', 'הערות', 'סה"כ', 'סיכום'];
+            const skipPatterns = ['---', 'טבלת זכויות', 'מועד הפקה', 'תוכנית מס', 'הערות', 'סיכום'];
             const candidateDataLines = [];
             for (let i = headerBlockEnd + 1; i < lines.length; i++) {
                 const line = lines[i];
                 if (skipPatterns.some(p => line.text.includes(p))) continue;
                 const isDataRow = line.cells.some(c => /\d/.test(c.str));
                 if (!isDataRow) continue;
-                if (line.cells.length >= 10) {
+                if (line.cells.length >= 5) {
                     candidateDataLines.push(line);
                 }
             }
 
             const NUM_COLS = 17;
             const colPositions = detectColumnPositions(candidateDataLines, NUM_COLS);
+
+            console.log('Data lines found:', candidateDataLines.length);
+            console.log('Cells per line:', candidateDataLines.map(l => l.cells.length));
+            console.log('Column positions detected:', colPositions?.length, colPositions?.map(p => Math.round(p)));
+            if (candidateDataLines.length > 0) {
+                console.log('Sample line X positions:', candidateDataLines[0].cells.map(c => ({ x: Math.round(c.x), str: c.str })));
+            }
 
             if (!colPositions || colPositions.length === 0) {
                 return { rows: [] };
@@ -592,7 +599,7 @@
                 }
             }
 
-            return { rows };
+            return { rows, colCount: colPositions.length };
         }
 
         function detectColumnPositions(dataLines, expectedCols) {
@@ -607,36 +614,63 @@
 
             allX.sort((a, b) => b - a);
 
-            const clusters = [];
-            const threshold = 15;
-            for (const x of allX) {
-                let found = false;
-                for (const cluster of clusters) {
-                    if (Math.abs(cluster.sum / cluster.count - x) < threshold) {
-                        cluster.sum += x;
-                        cluster.count++;
-                        found = true;
-                        break;
+            function clusterWithThreshold(values, thresh) {
+                const cls = [];
+                for (const x of values) {
+                    let found = false;
+                    for (const c of cls) {
+                        if (Math.abs(c.sum / c.count - x) < thresh) {
+                            c.sum += x;
+                            c.count++;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        cls.push({ sum: x, count: 1 });
                     }
                 }
-                if (!found) {
-                    clusters.push({ sum: x, count: 1 });
-                }
+                return cls;
             }
 
-            clusters.sort((a, b) => (b.sum / b.count) - (a.sum / a.count));
+            let bestClusters = null;
+            for (let thresh = 5; thresh <= 25; thresh += 2) {
+                const cls = clusterWithThreshold(allX, thresh);
+                if (cls.length <= expectedCols) {
+                    bestClusters = cls;
+                    break;
+                }
+                bestClusters = cls;
+            }
 
-            const positions = clusters.map(c => c.sum / c.count);
+            if (!bestClusters || bestClusters.length === 0) return null;
 
-            if (positions.length > expectedCols) {
-                const scored = clusters.map((c, i) => ({ pos: c.sum / c.count, count: c.count, idx: i }));
+            bestClusters.sort((a, b) => (b.sum / b.count) - (a.sum / a.count));
+
+            if (bestClusters.length > expectedCols) {
+                const scored = bestClusters.map(c => ({ pos: c.sum / c.count, count: c.count }));
                 scored.sort((a, b) => b.count - a.count);
                 const top = scored.slice(0, expectedCols);
                 top.sort((a, b) => b.pos - a.pos);
                 return top.map(t => t.pos);
             }
 
-            return positions;
+            if (bestClusters.length < expectedCols) {
+                const positions = bestClusters.map(c => c.sum / c.count);
+                positions.sort((a, b) => b - a);
+                while (positions.length < expectedCols) {
+                    let maxGap = 0, maxIdx = 0;
+                    for (let i = 0; i < positions.length - 1; i++) {
+                        const gap = positions[i] - positions[i + 1];
+                        if (gap > maxGap) { maxGap = gap; maxIdx = i; }
+                    }
+                    if (maxGap < 10) break;
+                    positions.splice(maxIdx + 1, 0, (positions[maxIdx] + positions[maxIdx + 1]) / 2);
+                }
+                return positions;
+            }
+
+            return bestClusters.map(c => c.sum / c.count);
         }
 
         function assignCellsToColumns(cells, colPositions) {
