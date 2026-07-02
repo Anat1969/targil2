@@ -565,43 +565,78 @@
                 }
             }
 
-            const allHeaderCells = [];
-            for (let i = headerBlockStart; i <= headerBlockEnd; i++) {
-                allHeaderCells.push(...lines[i].cells);
-            }
-
-            allHeaderCells.sort((a, b) => b.x - a.x);
-
-            const leafPositions = [];
-            const usedPositions = new Set();
-            for (const cell of allHeaderCells) {
-                const x = Math.round(cell.x / 5) * 5;
-                if (!usedPositions.has(x)) {
-                    usedPositions.add(x);
-                    leafPositions.push(cell.x);
-                }
-            }
-            leafPositions.sort((a, b) => b - a);
-
-            const rows = [];
+            const skipPatterns = ['---', 'טבלת זכויות', 'מועד הפקה', 'תוכנית מס', 'הערות', 'סה"כ', 'סיכום'];
+            const candidateDataLines = [];
             for (let i = headerBlockEnd + 1; i < lines.length; i++) {
                 const line = lines[i];
-
-                if (line.text.includes('---')) continue;
-                if (line.text.includes('טבלת זכויות')) continue;
-                if (line.text.includes('מועד הפקה')) continue;
-                if (line.text.includes('תוכנית מס')) continue;
-
+                if (skipPatterns.some(p => line.text.includes(p))) continue;
                 const isDataRow = line.cells.some(c => /\d/.test(c.str));
                 if (!isDataRow) continue;
+                if (line.cells.length >= 10) {
+                    candidateDataLines.push(line);
+                }
+            }
 
-                const row = assignCellsToColumns(line.cells, leafPositions);
+            const NUM_COLS = 17;
+            const colPositions = detectColumnPositions(candidateDataLines, NUM_COLS);
+
+            if (!colPositions || colPositions.length === 0) {
+                return { rows: [] };
+            }
+
+            const rows = [];
+            for (const line of candidateDataLines) {
+                const row = assignCellsToColumns(line.cells, colPositions);
                 if (row.some(cell => cell !== '')) {
                     rows.push(row);
                 }
             }
 
             return { rows };
+        }
+
+        function detectColumnPositions(dataLines, expectedCols) {
+            if (dataLines.length === 0) return null;
+
+            const allX = [];
+            for (const line of dataLines) {
+                for (const cell of line.cells) {
+                    allX.push(cell.x);
+                }
+            }
+
+            allX.sort((a, b) => b - a);
+
+            const clusters = [];
+            const threshold = 15;
+            for (const x of allX) {
+                let found = false;
+                for (const cluster of clusters) {
+                    if (Math.abs(cluster.sum / cluster.count - x) < threshold) {
+                        cluster.sum += x;
+                        cluster.count++;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    clusters.push({ sum: x, count: 1 });
+                }
+            }
+
+            clusters.sort((a, b) => (b.sum / b.count) - (a.sum / a.count));
+
+            const positions = clusters.map(c => c.sum / c.count);
+
+            if (positions.length > expectedCols) {
+                const scored = clusters.map((c, i) => ({ pos: c.sum / c.count, count: c.count, idx: i }));
+                scored.sort((a, b) => b.count - a.count);
+                const top = scored.slice(0, expectedCols);
+                top.sort((a, b) => b.pos - a.pos);
+                return top.map(t => t.pos);
+            }
+
+            return positions;
         }
 
         function assignCellsToColumns(cells, colPositions) {
