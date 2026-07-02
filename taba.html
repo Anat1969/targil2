@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מחשבון תב"ע — טבלה 5</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rubik', sans-serif;
+            background: #fff;
+            color: #1a1a1a;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 32px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #1a1a1a;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            font-size: 0.875rem;
+            color: #555;
+            text-decoration: none;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .nav-link:hover {
+            color: #1a1a1a;
+            border-color: #1a1a1a;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            font-family: 'Rubik', sans-serif;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 0;
+            outline: none;
+            background: #fff;
+            color: #1a1a1a;
+            -moz-appearance: textfield;
+        }
+
+        input:focus {
+            border-color: #666;
+        }
+
+        .drop-zone {
+            margin-top: 8px;
+            padding: 32px;
+            border: 2px dashed #ccc;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: #666;
+        }
+
+        .drop-zone p {
+            font-size: 0.875rem;
+            color: #777;
+            margin-bottom: 8px;
+        }
+
+        .drop-zone .file-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .drop-zone input[type="file"] {
+            display: none;
+        }
+
+        .mavat-link {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 0.8rem;
+            color: #777;
+            text-decoration: none;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .mavat-link:hover {
+            color: #1a1a1a;
+            border-color: #1a1a1a;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 36px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .status {
+            font-size: 0.875rem;
+            color: #777;
+            margin-bottom: 16px;
+        }
+
+        .status.error {
+            color: #800020;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 0.825rem;
+        }
+
+        .results-table th {
+            background: #f5f5f5;
+            font-weight: 600;
+            text-align: right;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            white-space: nowrap;
+        }
+
+        .results-table td {
+            padding: 8px 10px;
+            border: 1px solid #eee;
+            text-align: right;
+        }
+
+        .results-table tr:hover {
+            background: #fafafa;
+        }
+
+        .no-results {
+            font-size: 0.875rem;
+            color: #999;
+            padding: 20px 0;
+        }
+
+        .raw-text-toggle {
+            margin-top: 24px;
+            font-size: 0.8rem;
+            color: #999;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .raw-text {
+            display: none;
+            margin-top: 12px;
+            padding: 12px;
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            font-size: 0.75rem;
+            white-space: pre-wrap;
+            direction: rtl;
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.8;
+        }
+
+        .raw-text.visible {
+            display: block;
+        }
+
+        .upgrade-link {
+            display: inline-block;
+            margin-top: 28px;
+            padding: 10px 24px;
+            font-family: 'Rubik', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            background: none;
+            border: 1px solid #1a1a1a;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .upgrade-link:hover {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .action-btn {
+            margin-top: 16px;
+            padding: 10px 24px;
+            font-family: 'Rubik', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #fff;
+            background: #1a1a1a;
+            border: 1px solid #1a1a1a;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: #333;
+        }
+
+        .action-btn:disabled {
+            background: #ccc;
+            border-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a class="nav-link" href="index.html">מחשבון תכסית ואחוזי בנייה</a>
+
+        <h1>מחשבון תב"ע — טבלה 5</h1>
+
+        <div class="input-group">
+            <label for="planNumber">מספר תב"ע</label>
+            <input type="text" id="planNumber" placeholder='לדוגמה: רע/1/1א'>
+        </div>
+
+        <div class="input-group">
+            <label for="plotNumber">מספר מגרש</label>
+            <input type="text" id="plotNumber" placeholder='לדוגמה: 101'>
+        </div>
+
+        <div class="input-group">
+            <label>קובץ PDF של טבלה 5</label>
+            <div class="drop-zone" id="dropZone">
+                <p>גררי קובץ PDF לכאן או לחצי לבחירה</p>
+                <span class="file-name" id="fileName"></span>
+                <input type="file" id="fileInput" accept=".pdf">
+            </div>
+            <a class="mavat-link" href="https://mavat.iplan.gov.il/SV3" target="_blank" rel="noopener">הורדת טבלה 5 מאתר מאב"ת</a>
+        </div>
+
+        <button class="action-btn" id="parseBtn" disabled>חלץ נתונים</button>
+
+        <div class="section-title" id="resultsTitle" style="display:none">תוצאות</div>
+
+        <div class="status" id="status"></div>
+
+        <div id="resultsContainer"></div>
+
+        <div class="raw-text-toggle" id="rawToggle" style="display:none">הצג טקסט גולמי מה-PDF</div>
+        <div class="raw-text" id="rawText"></div>
+
+        <a class="upgrade-link" href="https://claude.ai/code/session_01Mw5VYGDmVwrjCKpx6c6WJu" target="_blank" rel="noopener">שדרוג</a>
+    </div>
+
+    <script type="module">
+        const pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs');
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const parseBtn = document.getElementById('parseBtn');
+        const status = document.getElementById('status');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const resultsTitle = document.getElementById('resultsTitle');
+        const rawToggle = document.getElementById('rawToggle');
+        const rawText = document.getElementById('rawText');
+
+        let pdfFile = null;
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === 'application/pdf') {
+                setFile(file);
+            }
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files[0]) {
+                setFile(fileInput.files[0]);
+            }
+        });
+
+        function setFile(file) {
+            pdfFile = file;
+            fileName.textContent = file.name;
+            parseBtn.disabled = false;
+            status.textContent = '';
+            resultsContainer.innerHTML = '';
+            resultsTitle.style.display = 'none';
+        }
+
+        rawToggle.addEventListener('click', () => {
+            rawText.classList.toggle('visible');
+            rawToggle.textContent = rawText.classList.contains('visible')
+                ? 'הסתר טקסט גולמי'
+                : 'הצג טקסט גולמי מה-PDF';
+        });
+
+        parseBtn.addEventListener('click', async () => {
+            if (!pdfFile) return;
+
+            const plotNumber = document.getElementById('plotNumber').value.trim();
+
+            status.textContent = 'מעבד את ה-PDF...';
+            status.className = 'status';
+            resultsContainer.innerHTML = '';
+            resultsTitle.style.display = 'none';
+
+            try {
+                const arrayBuffer = await pdfFile.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+                let allText = '';
+                const allItems = [];
+
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    const items = content.items;
+
+                    let pageLines = groupItemsToLines(items);
+                    allText += `--- עמוד ${i} ---\n`;
+                    pageLines.forEach(line => {
+                        allText += line.text + '\n';
+                        allItems.push(line);
+                    });
+                }
+
+                rawText.textContent = allText;
+                rawToggle.style.display = 'block';
+
+                const { headers, rows } = extractTable(allItems, allText);
+
+                resultsTitle.style.display = 'block';
+
+                if (headers.length === 0) {
+                    status.textContent = 'לא נמצאה טבלה בקובץ. נסי להציג את הטקסט הגולמי לבדיקה.';
+                    status.className = 'status error';
+                    return;
+                }
+
+                let filteredRows = rows;
+                if (plotNumber) {
+                    filteredRows = rows.filter(row =>
+                        row.some(cell => cell.includes(plotNumber))
+                    );
+                }
+
+                if (filteredRows.length === 0 && plotNumber) {
+                    status.textContent = `לא נמצאו שורות עבור מגרש "${plotNumber}". מציג את כל הטבלה.`;
+                    status.className = 'status error';
+                    filteredRows = rows;
+                } else if (plotNumber && filteredRows.length > 0) {
+                    status.textContent = `נמצאו ${filteredRows.length} שורות עבור מגרש ${plotNumber}.`;
+                    status.className = 'status';
+                } else {
+                    status.textContent = `נמצאו ${rows.length} שורות בטבלה.`;
+                    status.className = 'status';
+                }
+
+                renderTable(headers, filteredRows);
+
+            } catch (err) {
+                status.textContent = 'שגיאה בעיבוד ה-PDF: ' + err.message;
+                status.className = 'status error';
+                console.error(err);
+            }
+        });
+
+        function groupItemsToLines(items) {
+            if (items.length === 0) return [];
+
+            const lines = [];
+            let currentLine = [];
+            let lastY = null;
+
+            const sorted = [...items].sort((a, b) => {
+                const dy = b.transform[5] - a.transform[5];
+                if (Math.abs(dy) > 3) return dy;
+                return a.transform[4] - b.transform[4];
+            });
+
+            for (const item of sorted) {
+                const y = Math.round(item.transform[5]);
+                const x = item.transform[4];
+                const str = item.str;
+
+                if (str.trim() === '') continue;
+
+                if (lastY !== null && Math.abs(y - lastY) > 5) {
+                    if (currentLine.length > 0) {
+                        currentLine.sort((a, b) => b.x - a.x);
+                        lines.push({
+                            y: lastY,
+                            text: currentLine.map(c => c.str).join(' '),
+                            cells: currentLine
+                        });
+                    }
+                    currentLine = [];
+                }
+
+                currentLine.push({ str: str.trim(), x, y });
+                lastY = y;
+            }
+
+            if (currentLine.length > 0) {
+                currentLine.sort((a, b) => b.x - a.x);
+                lines.push({
+                    y: lastY,
+                    text: currentLine.map(c => c.str).join(' '),
+                    cells: currentLine
+                });
+            }
+
+            return lines;
+        }
+
+        function extractTable(lines, fullText) {
+            const headerKeywords = [
+                'מגרש', 'ייעוד', 'יעוד', 'תכסית', 'שטח', 'בנייה', 'בניה',
+                'קומות', 'גובה', 'בניין', 'בנין', 'קדמי', 'צדדי', 'אחורי',
+                'דיור', 'יח"ד', 'הערות', 'שימוש', 'מותר', 'מקסימ', 'עיקרי',
+                'שירות', 'מרתף', 'חניה', 'חניון', 'מסחר', 'מגורים'
+            ];
+
+            let headerLineIndex = -1;
+            let maxKeywordCount = 0;
+
+            for (let i = 0; i < lines.length; i++) {
+                const text = lines[i].text;
+                let count = 0;
+                for (const kw of headerKeywords) {
+                    if (text.includes(kw)) count++;
+                }
+                if (count > maxKeywordCount) {
+                    maxKeywordCount = count;
+                    headerLineIndex = i;
+                }
+            }
+
+            if (headerLineIndex === -1 || maxKeywordCount < 2) {
+                return { headers: [], rows: [] };
+            }
+
+            const headerLine = lines[headerLineIndex];
+            const headerCells = headerLine.cells;
+            const headers = headerCells.map(c => c.str);
+
+            const colPositions = headerCells.map(c => c.x).sort((a, b) => b - a);
+
+            const rows = [];
+            for (let i = headerLineIndex + 1; i < lines.length; i++) {
+                const line = lines[i];
+
+                if (line.text.includes('---')) continue;
+
+                const isDataRow = line.cells.some(c => /\d/.test(c.str));
+                if (!isDataRow) continue;
+
+                const row = assignCellsToColumns(line.cells, colPositions);
+                if (row.some(cell => cell !== '')) {
+                    rows.push(row);
+                }
+            }
+
+            return { headers, rows };
+        }
+
+        function assignCellsToColumns(cells, colPositions) {
+            const row = new Array(colPositions.length).fill('');
+
+            for (const cell of cells) {
+                let bestCol = 0;
+                let minDist = Infinity;
+
+                for (let c = 0; c < colPositions.length; c++) {
+                    const dist = Math.abs(cell.x - colPositions[c]);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        bestCol = c;
+                    }
+                }
+
+                if (row[bestCol] === '') {
+                    row[bestCol] = cell.str;
+                } else {
+                    row[bestCol] += ' ' + cell.str;
+                }
+            }
+
+            return row;
+        }
+
+        function renderTable(headers, rows) {
+            if (rows.length === 0) {
+                resultsContainer.innerHTML = '<div class="no-results">לא נמצאו שורות בטבלה.</div>';
+                return;
+            }
+
+            let html = '<table class="results-table"><thead><tr>';
+            for (const h of headers) {
+                html += `<th>${escapeHtml(h)}</th>`;
+            }
+            html += '</tr></thead><tbody>';
+
+            for (const row of rows) {
+                html += '<tr>';
+                for (let i = 0; i < headers.length; i++) {
+                    html += `<td>${escapeHtml(row[i] || '')}</td>`;
+                }
+                html += '</tr>';
+            }
+
+            html += '</tbody></table>';
+            resultsContainer.innerHTML = html;
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
