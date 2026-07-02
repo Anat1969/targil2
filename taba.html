@@ -322,8 +322,8 @@
             { id: 'unitsPerDunam', label: 'מספר\nיח"ד לדונם' },
             { id: 'density', label: 'צפיפות\nיח"ד' },
             { id: 'height', label: 'גובה מבנה\nמעל הכניסה\nהקובעת (מטר)' },
-            { id: 'floorsAllowed', label: 'מותרות' },
             { id: 'floorsAbove', label: 'מעל הכניסה\nהקובעת' },
+            { id: 'floorsAllowed', label: 'מותרות' },
         ];
 
         const HEADER_KEYWORDS_BY_COLUMN = {
@@ -572,7 +572,7 @@
                 if (skipPatterns.some(p => line.text.includes(p))) continue;
                 const isDataRow = line.cells.some(c => /\d/.test(c.str));
                 if (!isDataRow) continue;
-                if (line.cells.length >= 5) {
+                if (line.cells.length >= 2) {
                     candidateDataLines.push(line);
                 }
             }
@@ -612,52 +612,38 @@
                 }
             }
 
-            allX.sort((a, b) => b - a);
+            if (allX.length === 0) return null;
 
-            function clusterWithThreshold(values, thresh) {
-                const cls = [];
-                for (const x of values) {
-                    let found = false;
-                    for (const c of cls) {
-                        if (Math.abs(c.sum / c.count - x) < thresh) {
-                            c.sum += x;
-                            c.count++;
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        cls.push({ sum: x, count: 1 });
-                    }
+            allX.sort((a, b) => a - b);
+
+            const clusters = [];
+            for (const x of allX) {
+                const last = clusters[clusters.length - 1];
+                if (!last || x - last.max > 8) {
+                    clusters.push({ sum: x, count: 1, min: x, max: x });
+                } else {
+                    last.sum += x;
+                    last.count++;
+                    last.max = x;
                 }
-                return cls;
             }
 
-            let bestClusters = null;
-            for (let thresh = 5; thresh <= 25; thresh += 2) {
-                const cls = clusterWithThreshold(allX, thresh);
-                if (cls.length <= expectedCols) {
-                    bestClusters = cls;
-                    break;
+            let positions = clusters.map(c => c.sum / c.count);
+            positions.sort((a, b) => b - a);
+
+            console.log('Raw clusters:', positions.length, 'expected:', expectedCols);
+
+            if (positions.length > expectedCols) {
+                while (positions.length > expectedCols) {
+                    let minGap = Infinity, minIdx = 0;
+                    for (let i = 0; i < positions.length - 1; i++) {
+                        const gap = positions[i] - positions[i + 1];
+                        if (gap < minGap) { minGap = gap; minIdx = i; }
+                    }
+                    const merged = (positions[minIdx] + positions[minIdx + 1]) / 2;
+                    positions.splice(minIdx, 2, merged);
                 }
-                bestClusters = cls;
-            }
-
-            if (!bestClusters || bestClusters.length === 0) return null;
-
-            bestClusters.sort((a, b) => (b.sum / b.count) - (a.sum / a.count));
-
-            if (bestClusters.length > expectedCols) {
-                const scored = bestClusters.map(c => ({ pos: c.sum / c.count, count: c.count }));
-                scored.sort((a, b) => b.count - a.count);
-                const top = scored.slice(0, expectedCols);
-                top.sort((a, b) => b.pos - a.pos);
-                return top.map(t => t.pos);
-            }
-
-            if (bestClusters.length < expectedCols) {
-                const positions = bestClusters.map(c => c.sum / c.count);
-                positions.sort((a, b) => b - a);
+            } else if (positions.length < expectedCols) {
                 while (positions.length < expectedCols) {
                     let maxGap = 0, maxIdx = 0;
                     for (let i = 0; i < positions.length - 1; i++) {
@@ -667,31 +653,32 @@
                     if (maxGap < 10) break;
                     positions.splice(maxIdx + 1, 0, (positions[maxIdx] + positions[maxIdx + 1]) / 2);
                 }
-                return positions;
             }
 
-            return bestClusters.map(c => c.sum / c.count);
+            return positions;
         }
 
         function assignCellsToColumns(cells, colPositions) {
             const row = new Array(colPositions.length).fill('');
 
-            for (const cell of cells) {
-                let bestCol = 0;
-                let minDist = Infinity;
+            const boundaries = [];
+            for (let i = 0; i < colPositions.length - 1; i++) {
+                boundaries.push((colPositions[i] + colPositions[i + 1]) / 2);
+            }
 
-                for (let c = 0; c < colPositions.length; c++) {
-                    const dist = Math.abs(cell.x - colPositions[c]);
-                    if (dist < minDist) {
-                        minDist = dist;
-                        bestCol = c;
+            for (const cell of cells) {
+                let col = colPositions.length - 1;
+                for (let i = 0; i < boundaries.length; i++) {
+                    if (cell.x >= boundaries[i]) {
+                        col = i;
+                        break;
                     }
                 }
 
-                if (row[bestCol] === '') {
-                    row[bestCol] = cell.str;
+                if (row[col] === '') {
+                    row[col] = cell.str;
                 } else {
-                    row[bestCol] += ' ' + cell.str;
+                    row[col] += ' ' + cell.str;
                 }
             }
 
@@ -729,8 +716,8 @@
             html += '<th colspan="2">מעל הכניסה הקובעת</th>';
             html += '<th colspan="2">מתחת לכניסה הקובעת</th>';
             html += '<th rowspan="2">סה"כ שטחי<br>בנייה</th>';
-            html += '<th rowspan="2">מותרות</th>';
             html += '<th rowspan="2">מעל הכניסה<br>הקובעת</th>';
+            html += '<th rowspan="2">מותרות</th>';
             html += '</tr>';
 
             html += '<tr>';
