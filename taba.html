@@ -323,7 +323,7 @@
             { id: 'density', label: 'צפיפות\nיח"ד' },
             { id: 'height', label: 'גובה מבנה\nמעל הכניסה\nהקובעת (מטר)' },
             { id: 'floorsAbove', label: 'מעל הכניסה\nהקובעת' },
-            { id: 'floorsAllowed', label: 'מותרות' },
+            { id: 'floorsBelow', label: 'מתחת לכניסה\nהקובעת' },
         ];
 
         const HEADER_KEYWORDS_BY_COLUMN = {
@@ -342,8 +342,8 @@
             unitsPerDunam: ['יח"ד', 'לדונם'],
             density: ['צפיפות'],
             height: ['גובה'],
-            floorsAllowed: ['קומות', 'מותרות'],
             floorsAbove: ['הכניסה', 'הקובעת'],
+            floorsBelow: ['מתחת', 'לכניסה'],
         };
 
         const dropZone = document.getElementById('dropZone');
@@ -474,49 +474,63 @@
         function groupItemsToLines(items) {
             if (items.length === 0) return [];
 
+            const sorted = [...items]
+                .filter(item => item.str.trim() !== '')
+                .sort((a, b) => {
+                    const dy = b.transform[5] - a.transform[5];
+                    if (Math.abs(dy) > 3) return dy;
+                    return a.transform[4] - b.transform[4];
+                });
+
             const lines = [];
             let currentLine = [];
-            let lastY = null;
-
-            const sorted = [...items].sort((a, b) => {
-                const dy = b.transform[5] - a.transform[5];
-                if (Math.abs(dy) > 3) return dy;
-                return a.transform[4] - b.transform[4];
-            });
+            let lineRefY = null;
 
             for (const item of sorted) {
-                const y = Math.round(item.transform[5]);
+                const y = item.transform[5];
                 const x = item.transform[4];
-                const str = item.str;
+                const str = item.str.trim();
 
-                if (str.trim() === '') continue;
-
-                if (lastY !== null && Math.abs(y - lastY) > 5) {
+                if (lineRefY !== null && Math.abs(y - lineRefY) > 8) {
                     if (currentLine.length > 0) {
-                        currentLine.sort((a, b) => b.x - a.x);
-                        lines.push({
-                            y: lastY,
-                            text: currentLine.map(c => c.str).join(' '),
-                            cells: currentLine
-                        });
+                        lines.push(finalizeLine(currentLine, lineRefY));
                     }
                     currentLine = [];
+                    lineRefY = null;
                 }
 
-                currentLine.push({ str: str.trim(), x, y });
-                lastY = y;
+                currentLine.push({ str, x, y });
+                if (lineRefY === null) lineRefY = y;
             }
 
             if (currentLine.length > 0) {
-                currentLine.sort((a, b) => b.x - a.x);
-                lines.push({
-                    y: lastY,
-                    text: currentLine.map(c => c.str).join(' '),
-                    cells: currentLine
-                });
+                lines.push(finalizeLine(currentLine, lineRefY));
             }
 
             return lines;
+        }
+
+        function finalizeLine(cells, refY) {
+            cells.sort((a, b) => b.x - a.x);
+
+            const merged = [];
+            for (const cell of cells) {
+                const last = merged[merged.length - 1];
+                if (last) {
+                    const gap = last.x - cell.x;
+                    if (gap >= 0 && gap < 25) {
+                        last.str = last.str + ' ' + cell.str;
+                        continue;
+                    }
+                }
+                merged.push({ str: cell.str, x: cell.x, y: cell.y });
+            }
+
+            return {
+                y: refY,
+                text: merged.map(c => c.str).join(' '),
+                cells: merged
+            };
         }
 
         function extractTable(lines) {
@@ -524,7 +538,7 @@
                 'מגרש', 'ייעוד', 'יעוד', 'תכסית', 'שטח', 'בנייה', 'בניה',
                 'קומות', 'גובה', 'בניין', 'בנין', 'דיור', 'יח"ד', 'שימוש',
                 'עיקרי', 'שירות', 'מגורים', 'צפיפות', 'אחוזי', 'סה"כ',
-                'הכניסה', 'הקובעת', 'מותרות', 'תאי'
+                'הכניסה', 'הקובעת', 'מתחת', 'תאי'
             ];
 
             let headerBlockStart = -1;
@@ -605,8 +619,11 @@
         function detectColumnPositions(dataLines, expectedCols) {
             if (dataLines.length === 0) return null;
 
+            const sortedByDensity = [...dataLines].sort((a, b) => b.cells.length - a.cells.length);
+            const anchorLines = sortedByDensity.slice(0, Math.min(5, sortedByDensity.length));
+
             const allX = [];
-            for (const line of dataLines) {
+            for (const line of anchorLines) {
                 for (const cell of line.cells) {
                     allX.push(cell.x);
                 }
@@ -619,7 +636,7 @@
             const clusters = [];
             for (const x of allX) {
                 const last = clusters[clusters.length - 1];
-                if (!last || x - last.max > 8) {
+                if (!last || x - last.max > 12) {
                     clusters.push({ sum: x, count: 1, min: x, max: x });
                 } else {
                     last.sum += x;
@@ -631,7 +648,10 @@
             let positions = clusters.map(c => c.sum / c.count);
             positions.sort((a, b) => b - a);
 
+            console.log('Anchor lines used:', anchorLines.length,
+                'cells:', anchorLines.map(l => l.cells.length));
             console.log('Raw clusters:', positions.length, 'expected:', expectedCols);
+            console.log('Cluster positions:', positions.map(p => Math.round(p)));
 
             if (positions.length > expectedCols) {
                 while (positions.length > expectedCols) {
@@ -640,8 +660,8 @@
                         const gap = positions[i] - positions[i + 1];
                         if (gap < minGap) { minGap = gap; minIdx = i; }
                     }
-                    const merged = (positions[minIdx] + positions[minIdx + 1]) / 2;
-                    positions.splice(minIdx, 2, merged);
+                    const m = (positions[minIdx] + positions[minIdx + 1]) / 2;
+                    positions.splice(minIdx, 2, m);
                 }
             } else if (positions.length < expectedCols) {
                 while (positions.length < expectedCols) {
@@ -650,7 +670,7 @@
                         const gap = positions[i] - positions[i + 1];
                         if (gap > maxGap) { maxGap = gap; maxIdx = i; }
                     }
-                    if (maxGap < 10) break;
+                    if (maxGap < 15) break;
                     positions.splice(maxIdx + 1, 0, (positions[maxIdx] + positions[maxIdx + 1]) / 2);
                 }
             }
@@ -717,7 +737,7 @@
             html += '<th colspan="2">מתחת לכניסה הקובעת</th>';
             html += '<th rowspan="2">סה"כ שטחי<br>בנייה</th>';
             html += '<th rowspan="2">מעל הכניסה<br>הקובעת</th>';
-            html += '<th rowspan="2">מותרות</th>';
+            html += '<th rowspan="2">מתחת לכניסה<br>הקובעת</th>';
             html += '</tr>';
 
             html += '<tr>';
