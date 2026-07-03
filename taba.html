@@ -194,6 +194,40 @@
             padding: 20px 0;
         }
 
+        .footnote-ref {
+            color: #800020;
+            font-weight: 600;
+            cursor: default;
+        }
+
+        .footnotes-section {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: #fafafa;
+            border: 1px solid #eee;
+            border-right: 3px solid #800020;
+        }
+
+        .footnotes-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .footnote-item {
+            font-size: 0.8rem;
+            color: #444;
+            margin-bottom: 4px;
+            line-height: 1.6;
+        }
+
+        .footnote-num {
+            font-weight: 600;
+            color: #800020;
+            margin-left: 4px;
+        }
+
         .raw-text-toggle {
             margin-top: 24px;
             font-size: 0.8rem;
@@ -433,7 +467,7 @@
                 rawText.textContent = allText;
                 rawToggle.style.display = 'block';
 
-                const { rows, colCount } = extractTable(allItems);
+                const { rows, colCount, footnotes } = extractTable(allItems);
 
                 resultsTitle.style.display = 'block';
 
@@ -462,7 +496,7 @@
                     status.className = 'status';
                 }
 
-                renderTable(filteredRows);
+                renderTable(filteredRows, footnotes);
 
             } catch (err) {
                 status.textContent = 'שגיאה בעיבוד ה-PDF: ' + err.message;
@@ -579,11 +613,25 @@
                 }
             }
 
-            const skipPatterns = ['---', 'טבלת זכויות', 'מועד הפקה', 'תוכנית מס', 'הערות', 'סיכום'];
+            const skipPatterns = ['---', 'טבלת זכויות', 'מועד הפקה', 'תוכנית מס', 'סיכום'];
             const candidateDataLines = [];
+            const footnoteLines = [];
+            let foundFootnoteSection = false;
             for (let i = headerBlockEnd + 1; i < lines.length; i++) {
                 const line = lines[i];
                 if (skipPatterns.some(p => line.text.includes(p))) continue;
+
+                const isFootnoteMarker = /^\s*\(\d+\)/.test(line.text) || line.text.includes('הערות');
+                if (isFootnoteMarker) foundFootnoteSection = true;
+
+                if (foundFootnoteSection) {
+                    const fnMatch = line.text.match(/\((\d+)\)\s*(.+)/);
+                    if (fnMatch) {
+                        footnoteLines.push({ num: fnMatch[1], text: fnMatch[2].trim() });
+                    }
+                    continue;
+                }
+
                 const isDataRow = line.cells.some(c => /\d/.test(c.str));
                 if (!isDataRow) continue;
                 if (line.cells.length >= 2) {
@@ -613,7 +661,7 @@
                 }
             }
 
-            return { rows, colCount: colPositions.length };
+            return { rows, colCount: colPositions.length, footnotes: footnoteLines };
         }
 
         function detectColumnPositions(dataLines, expectedCols) {
@@ -705,7 +753,7 @@
             return row;
         }
 
-        function renderTable(rows) {
+        function renderTable(rows, footnotes) {
             if (rows.length === 0) {
                 resultsContainer.innerHTML = '<div class="no-results">לא נמצאו שורות בטבלה.</div>';
                 return;
@@ -754,12 +802,27 @@
             for (const row of rows) {
                 html += '<tr>';
                 for (let i = 0; i < 17; i++) {
-                    html += `<td>${escapeHtml(row[i] || '')}</td>`;
+                    const cellText = row[i] || '';
+                    const highlighted = escapeHtml(cellText).replace(
+                        /\((\d+)\)/g,
+                        '<sup class="footnote-ref">($1)</sup>'
+                    );
+                    html += `<td>${highlighted}</td>`;
                 }
                 html += '</tr>';
             }
 
             html += '</tbody></table></div>';
+
+            if (footnotes && footnotes.length > 0) {
+                html += '<div class="footnotes-section">';
+                html += '<div class="footnotes-title">הערות</div>';
+                for (const fn of footnotes) {
+                    html += `<div class="footnote-item"><span class="footnote-num">(${escapeHtml(fn.num)})</span> ${escapeHtml(fn.text)}</div>`;
+                }
+                html += '</div>';
+            }
+
             resultsContainer.innerHTML = html;
         }
 
