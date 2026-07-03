@@ -613,31 +613,50 @@
                 }
             }
 
-            const skipPatterns = ['---', 'טבלת זכויות', 'מועד הפקה', 'תוכנית מס', 'סיכום', 'הוראות טבלה'];
+            const skipPatterns = ['---', 'טבלת זכויות', 'מועד הפקה', 'תוכנית מס', 'סיכום'];
             const candidateDataLines = [];
             const footnoteLines = [];
             let foundFootnoteSection = false;
+
+            const instructionPatterns = ['הוראות טבלה', 'הוראות בנייה'];
+            let inInstructionSection = false;
+
             for (let i = headerBlockEnd + 1; i < lines.length; i++) {
                 const line = lines[i];
+                const txt = line.text;
 
                 if (!foundFootnoteSection) {
-                    const hasHearot = line.text.includes('הערות') || line.text.includes('הערה');
-                    const startsWithFnRef = /\(\d+\)/.test(line.text);
-                    const isSparseFootnote = line.cells.length <= 3 && startsWithFnRef;
-                    if (hasHearot || isSparseFootnote) foundFootnoteSection = true;
+                    const hasHearot = txt.includes('הערות') || txt.includes('הערה');
+                    if (hasHearot) {
+                        console.log('Footnote section triggered at line', i, ':', txt.substring(0, 80));
+                        foundFootnoteSection = true;
+                    }
                 }
 
                 if (foundFootnoteSection) {
-                    const fnMatch = line.text.match(/\((\d+)\)\s*(.+)/);
+                    const fnMatch = txt.match(/\((\d+)\)\s*(.+)/);
                     if (fnMatch) {
                         footnoteLines.push({ num: fnMatch[1], text: fnMatch[2].trim() });
-                    } else if (footnoteLines.length > 0 && !/^\s*\(?\d+\)?$/.test(line.text.trim()) && line.text.trim().length > 2) {
-                        footnoteLines[footnoteLines.length - 1].text += ' ' + line.text.trim();
+                        console.log('Footnote captured:', fnMatch[1], fnMatch[2].substring(0, 60));
+                    } else if (footnoteLines.length > 0 && !/^\s*\(?\d+\)?$/.test(txt.trim()) && txt.trim().length > 2) {
+                        footnoteLines[footnoteLines.length - 1].text += ' ' + txt.trim();
                     }
                     continue;
                 }
 
-                if (skipPatterns.some(p => line.text.includes(p))) continue;
+                if (instructionPatterns.some(p => txt.includes(p))) {
+                    inInstructionSection = true;
+                    continue;
+                }
+
+                if (inInstructionSection) {
+                    const looksLikeInstruction = /^[א-ת]{1,2}[\-\.\s]/.test(txt.trim()) ||
+                        (line.cells.length <= 2 && txt.length > 40);
+                    if (looksLikeInstruction) continue;
+                    if (txt.trim().length < 5) continue;
+                }
+
+                if (skipPatterns.some(p => txt.includes(p))) continue;
 
                 const isDataRow = line.cells.some(c => /\d/.test(c.str));
                 if (!isDataRow) continue;
@@ -645,6 +664,20 @@
                     candidateDataLines.push(line);
                 }
             }
+
+            if (footnoteLines.length === 0) {
+                console.log('No footnotes found via section detection, trying fallback scan...');
+                for (let i = headerBlockEnd + 1; i < lines.length; i++) {
+                    const txt = lines[i].text;
+                    const fnMatch = txt.match(/\((\d+)\)\s+(.{10,})/);
+                    if (fnMatch && lines[i].cells.length <= 4 && !lines[i].cells.some(c => /^\d{4,}$/.test(c.str))) {
+                        footnoteLines.push({ num: fnMatch[1], text: fnMatch[2].trim() });
+                        console.log('Fallback footnote captured:', fnMatch[1], fnMatch[2].substring(0, 60));
+                    }
+                }
+            }
+
+            console.log('Total footnotes extracted:', footnoteLines.length, footnoteLines);
 
             const NUM_COLS = 17;
             const colPositions = detectColumnPositions(candidateDataLines, NUM_COLS);
@@ -832,15 +865,16 @@
 
             html += '</tbody></table></div>';
 
-            const relevantFootnotes = footnotes
-                ? footnotes.filter(fn => referencedNums.has(fn.num))
-                : [];
+            console.log('Footnotes passed to render:', footnotes);
+            console.log('Referenced nums from cells:', [...referencedNums]);
 
-            if (relevantFootnotes.length > 0) {
+            if (footnotes && footnotes.length > 0) {
                 html += '<div class="footnotes-section">';
                 html += '<div class="footnotes-title">הערות</div>';
-                for (const fn of relevantFootnotes) {
-                    html += `<div class="footnote-item"><span class="footnote-num">(${escapeHtml(fn.num)})</span> ${escapeHtml(fn.text)}</div>`;
+                for (const fn of footnotes) {
+                    const isReferenced = referencedNums.has(fn.num);
+                    const highlightClass = isReferenced ? ' style="font-weight:600;"' : '';
+                    html += `<div class="footnote-item"${highlightClass}><span class="footnote-num">(${escapeHtml(fn.num)})</span> ${escapeHtml(fn.text)}</div>`;
                 }
                 html += '</div>';
             }
