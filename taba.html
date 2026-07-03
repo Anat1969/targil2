@@ -613,17 +613,16 @@
                 }
             }
 
-            const skipPatterns = ['---', 'טבלת זכויות', 'מועד הפקה', 'תוכנית מס', 'סיכום'];
+            const skipPatterns = ['---', 'טבלת זכויות', 'מועד הפקה', 'תוכנית מס', 'סיכום', 'הוראות טבלה'];
             const candidateDataLines = [];
             const footnoteLines = [];
             let foundFootnoteSection = false;
             for (let i = headerBlockEnd + 1; i < lines.length; i++) {
                 const line = lines[i];
-                if (skipPatterns.some(p => line.text.includes(p))) continue;
 
                 if (!foundFootnoteSection) {
                     const hasHearot = line.text.includes('הערות') || line.text.includes('הערה');
-                    const startsWithFnRef = /^\s*\(\d+\)/.test(line.text);
+                    const startsWithFnRef = /\(\d+\)/.test(line.text);
                     const isSparseFootnote = line.cells.length <= 3 && startsWithFnRef;
                     if (hasHearot || isSparseFootnote) foundFootnoteSection = true;
                 }
@@ -632,11 +631,13 @@
                     const fnMatch = line.text.match(/\((\d+)\)\s*(.+)/);
                     if (fnMatch) {
                         footnoteLines.push({ num: fnMatch[1], text: fnMatch[2].trim() });
-                    } else if (footnoteLines.length > 0 && line.cells.length <= 2 && !/^\s*\(?\d+\)?$/.test(line.text.trim())) {
+                    } else if (footnoteLines.length > 0 && !/^\s*\(?\d+\)?$/.test(line.text.trim()) && line.text.trim().length > 2) {
                         footnoteLines[footnoteLines.length - 1].text += ' ' + line.text.trim();
                     }
                     continue;
                 }
+
+                if (skipPatterns.some(p => line.text.includes(p))) continue;
 
                 const isDataRow = line.cells.some(c => /\d/.test(c.str));
                 if (!isDataRow) continue;
