@@ -438,6 +438,69 @@
         const rawText = document.getElementById('rawText');
 
         let pdfFile = null;
+        const STORAGE_KEY = 'table5_extracted_data';
+
+        function saveExtractedData(rows, footnotes, pdfName) {
+            const data = { rows, footnotes, pdfName, timestamp: new Date().toISOString() };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            console.log('Data saved to localStorage:', data);
+        }
+
+        function loadSavedData() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    return JSON.parse(saved);
+                } catch (e) {
+                    console.error('Error parsing saved data:', e);
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        function clearSavedData() {
+            localStorage.removeItem(STORAGE_KEY);
+            pdfFile = null;
+            fileInput.value = '';
+            fileName.textContent = '';
+            parseBtn.disabled = true;
+            status.textContent = '';
+            resultsContainer.innerHTML = '';
+            resultsTitle.style.display = 'none';
+            rawToggle.style.display = 'none';
+            rawText.textContent = '';
+        }
+
+        function restoreFromLocalStorage() {
+            const saved = loadSavedData();
+            if (saved) {
+                fileName.textContent = saved.pdfName + ' (שמור)';
+                resultsTitle.style.display = 'block';
+                status.textContent = `נתונים שמורים מ-${saved.pdfName}`;
+                status.className = 'status';
+                renderTable(saved.rows, saved.footnotes);
+                showNewExtractionButton();
+            }
+        }
+
+        function showNewExtractionButton() {
+            let newExtBtn = document.getElementById('newExtractionBtn');
+            if (!newExtBtn) {
+                newExtBtn = document.createElement('button');
+                newExtBtn.id = 'newExtractionBtn';
+                newExtBtn.className = 'action-btn';
+                newExtBtn.textContent = 'חילוץ חדש';
+                newExtBtn.style.marginTop = '16px';
+                newExtBtn.addEventListener('click', clearSavedData);
+                resultsContainer.parentNode.insertBefore(newExtBtn, resultsContainer.nextSibling);
+            }
+        }
+
+        function removeNewExtractionButton() {
+            const btn = document.getElementById('newExtractionBtn');
+            if (btn) btn.remove();
+        }
 
         dropZone.addEventListener('click', () => fileInput.click());
 
@@ -472,6 +535,7 @@
             status.textContent = '';
             resultsContainer.innerHTML = '';
             resultsTitle.style.display = 'none';
+            removeNewExtractionButton();
         }
 
         rawToggle.addEventListener('click', () => {
@@ -479,6 +543,11 @@
             rawToggle.textContent = rawText.classList.contains('visible')
                 ? 'הסתר טקסט גולמי'
                 : 'הצג טקסט גולמי מה-PDF';
+        });
+
+        // Initialize: restore saved data on page load
+        window.addEventListener('load', () => {
+            restoreFromLocalStorage();
         });
 
         parseBtn.addEventListener('click', async () => {
@@ -544,6 +613,8 @@
                 }
 
                 renderTable(filteredRows, footnotes);
+                saveExtractedData(rows, footnotes, pdfFile.name);
+                showNewExtractionButton();
 
             } catch (err) {
                 status.textContent = 'שגיאה בעיבוד ה-PDF: ' + err.message;
