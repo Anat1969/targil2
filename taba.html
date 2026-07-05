@@ -294,6 +294,20 @@
             border-color: #ccc;
             cursor: not-allowed;
         }
+
+        .buttons-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .buttons-container .action-btn,
+        .buttons-container .upgrade-link {
+            margin-top: 0;
+            flex: 1;
+            min-width: 150px;
+        }
     </style>
 </head>
 <body>
@@ -322,7 +336,10 @@
             <a class="mavat-link" href="https://mavat.iplan.gov.il/SV3" target="_blank" rel="noopener">הורדת טבלה 5 מאתר מאב"ת</a>
         </div>
 
-        <button class="action-btn" id="parseBtn" disabled>חלץ נתונים</button>
+        <div class="buttons-container">
+            <button class="action-btn" id="parseBtn" disabled>חלץ נתונים</button>
+            <a class="upgrade-link" href="https://claude.ai/code/session_01Mw5VYGDmVwrjCKpx6c6WJu" target="_blank" rel="noopener">שדרוג</a>
+        </div>
 
         <div class="section-title" id="resultsTitle" style="display:none">תוצאות</div>
 
@@ -332,8 +349,6 @@
 
         <div class="raw-text-toggle" id="rawToggle" style="display:none">הצג טקסט גולמי מה-PDF</div>
         <div class="raw-text" id="rawText"></div>
-
-        <a class="upgrade-link" href="https://claude.ai/code/session_01Mw5VYGDmVwrjCKpx6c6WJu" target="_blank" rel="noopener">שדרוג</a>
     </div>
 
     <script type="module">
