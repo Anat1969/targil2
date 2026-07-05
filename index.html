@@ -16,13 +16,20 @@
             font-family: 'Rubik', sans-serif;
             background: #fff;
             color: #1a1a1a;
-            padding: 40px 20px;
+            padding: 0;
             line-height: 1.6;
+        }
+
+        .header {
+            background: #f5f5f5;
+            border-bottom: 2px solid #1a1a1a;
+            padding: 20px;
         }
 
         .container {
             max-width: 600px;
             margin: 0 auto;
+            padding: 40px 20px;
         }
 
         h1 {
@@ -187,27 +194,30 @@
 
         .nav-menu {
             display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
+            gap: 16px;
             flex-wrap: wrap;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 20px;
+            justify-content: center;
         }
 
         .nav-btn {
-            padding: 10px 16px;
+            padding: 14px 24px;
             font-family: 'Rubik', sans-serif;
-            font-size: 0.875rem;
-            font-weight: 500;
+            font-size: 0.95rem;
+            font-weight: 600;
             color: #1a1a1a;
-            background: #f0f0f0;
-            border: 1px solid #ccc;
+            background: #fff;
+            border: 2px solid #1a1a1a;
             text-decoration: none;
             cursor: pointer;
-            transition: background 0.2s, border-color 0.2s;
+            transition: all 0.2s;
         }
 
         .nav-btn:hover {
-            background: #e0e0e0;
-            border-color: #999;
+            background: #1a1a1a;
+            color: #fff;
         }
 
         .nav-btn.active {
@@ -218,12 +228,14 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="header">
         <div class="nav-menu">
             <a class="nav-btn active" href="index.html">מחשבון תכסית ואחוזי בנייה</a>
             <a class="nav-btn" href="taba.html">טבלה 5 — חילוץ נתונים</a>
         </div>
+    </div>
 
+    <div class="container">
         <h1>מחשבון תכסית ואחוזי בנייה</h1>
 
         <div class="input-group">
