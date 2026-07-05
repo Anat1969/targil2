@@ -7,10 +7,1133 @@
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Rubik', sans-serif; background: #fff; color: #1a1a1a; padding: 40px 20px; line-height: 1.6; }
-        .container { max-width: 1300px; margin: 0 auto; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rubik', sans-serif;
+            background: #fff;
+            color: #1a1a1a;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 32px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #1a1a1a;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 24px;
+            font-size: 0.875rem;
+            color: #555;
+            text-decoration: none;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .nav-link:hover {
+            color: #1a1a1a;
+            border-color: #1a1a1a;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            font-family: 'Rubik', sans-serif;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 0;
+            outline: none;
+            background: #fff;
+            color: #1a1a1a;
+            -moz-appearance: textfield;
+        }
+
+        input:focus {
+            border-color: #666;
+        }
+
+        .drop-zone {
+            margin-top: 8px;
+            padding: 32px;
+            border: 2px dashed #ccc;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: #666;
+        }
+
+        .drop-zone p {
+            font-size: 0.875rem;
+            color: #777;
+            margin-bottom: 8px;
+        }
+
+        .drop-zone .file-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+
+        .drop-zone input[type="file"] {
+            display: none;
+        }
+
+        .mavat-link {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 0.8rem;
+            color: #777;
+            text-decoration: none;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .mavat-link:hover {
+            color: #1a1a1a;
+            border-color: #1a1a1a;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 36px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .status {
+            font-size: 0.875rem;
+            color: #777;
+            margin-bottom: 16px;
+        }
+
+        .status.error {
+            color: #800020;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+            min-width: 1200px;
+        }
+
+        .results-table thead th {
+            background: #f5f5f5;
+            font-weight: 600;
+            text-align: center;
+            padding: 6px 8px;
+            border: 1px solid #ccc;
+            white-space: normal;
+            vertical-align: middle;
+            line-height: 1.4;
+        }
+
+        .results-table thead tr:first-child th {
+            background: #eaeaea;
+        }
+
+        .results-table thead tr:nth-child(2) th {
+            background: #f0f0f0;
+        }
+
+        .results-table thead tr:nth-child(3) th {
+            background: #f5f5f5;
+        }
+
+        .results-table td {
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .results-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .no-results {
+            font-size: 0.875rem;
+            color: #999;
+            padding: 20px 0;
+        }
+
+        .footnote-ref {
+            color: #800020;
+            font-weight: 600;
+            cursor: default;
+        }
+
+        .footnotes-section {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: #fafafa;
+            border: 1px solid #eee;
+            border-right: 3px solid #800020;
+        }
+
+        .footnotes-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .footnote-item {
+            font-size: 0.8rem;
+            color: #444;
+            margin-bottom: 4px;
+            line-height: 1.6;
+        }
+
+        .footnote-num {
+            font-weight: 600;
+            color: #800020;
+            margin-left: 4px;
+        }
+
+        .raw-text-toggle {
+            margin-top: 24px;
+            font-size: 0.8rem;
+            color: #999;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .raw-text {
+            display: none;
+            margin-top: 12px;
+            padding: 12px;
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            font-size: 0.75rem;
+            white-space: pre-wrap;
+            direction: rtl;
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.8;
+        }
+
+        .raw-text.visible {
+            display: block;
+        }
+
+        .upgrade-link {
+            display: inline-block;
+            margin-top: 28px;
+            padding: 10px 24px;
+            font-family: 'Rubik', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1a1a1a;
+            background: none;
+            border: 1px solid #1a1a1a;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .upgrade-link:hover {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .action-btn {
+            margin-top: 16px;
+            padding: 10px 24px;
+            font-family: 'Rubik', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #fff;
+            background: #1a1a1a;
+            border: 1px solid #1a1a1a;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            background: #333;
+        }
+
+        .action-btn:disabled {
+            background: #ccc;
+            border-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .buttons-container .action-btn,
+        .buttons-container .upgrade-link {
+            margin-top: 0;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .requirements-section {
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 2px solid #eee;
+        }
+
+        .requirement-item {
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            background: #f9f9f9;
+            border-right: 3px solid #0066cc;
+        }
+
+        .requirement-authority {
+            font-weight: 600;
+            color: #0066cc;
+            margin-bottom: 6px;
+        }
+
+        .requirement-text {
+            font-size: 0.875rem;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .requirement-section-ref {
+            font-size: 0.8rem;
+            color: #777;
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        .requirements-container {
+            margin-top: 16px;
+        }
     </style>
 </head>
-<body><div class="container"><p>See gh-pages branch for live site</p></div></body>
+<body>
+    <div class="container">
+        <a class="nav-link" href="index.html">מחשבון תכסית ואחוזי בנייה</a>
+
+        <h1>מחשבון תב"ע — טבלה 5</h1>
+
+        <div class="input-group">
+            <label for="planNumber">מספר תב"ע</label>
+            <input type="text" id="planNumber" placeholder='לדוגמה: רע/1/1א'>
+        </div>
+
+        <div class="input-group">
+            <label for="plotNumber">מספר מגרש</label>
+            <input type="text" id="plotNumber" placeholder='לדוגמה: 101'>
+        </div>
+
+        <div class="input-group">
+            <label>קובץ PDF של טבלה 5</label>
+            <div class="drop-zone" id="dropZone">
+                <p>גררי קובץ PDF לכאן או לחצי לבחירה</p>
+                <span class="file-name" id="fileName"></span>
+                <input type="file" id="fileInput" accept=".pdf">
+            </div>
+            <a class="mavat-link" href="https://mavat.iplan.gov.il/SV3" target="_blank" rel="noopener">הורדת טבלה 5 מאתר מאב"ת</a>
+        </div>
+
+        <div class="buttons-container">
+            <button class="action-btn" id="parseBtn" disabled>חלץ נתונים</button>
+            <a class="upgrade-link" href="https://claude.ai/code/session_01Mw5VYGDmVwrjCKpx6c6WJu" target="_blank" rel="noopener">שדרוג</a>
+        </div>
+
+        <div class="requirements-section" style="display:none" id="requirementsSection">
+            <div class="section-title">דרישות הגורמים</div>
+
+            <div class="input-group">
+                <label>קובץ PDF של הוראות התב"ע</label>
+                <div class="drop-zone" id="instructionsDropZone">
+                    <p>גררי קובץ PDF לכאן או לחצי לבחירה</p>
+                    <span class="file-name" id="instructionsFileName"></span>
+                    <input type="file" id="instructionsFileInput" accept=".pdf">
+                </div>
+            </div>
+
+            <div class="buttons-container">
+                <button class="action-btn" id="requirementsBtn" disabled>חלץ דרישות</button>
+            </div>
+
+            <div class="status" id="requirementsStatus"></div>
+            <div id="requirementsContainer"></div>
+        </div>
+
+        <div class="section-title" id="resultsTitle" style="display:none">תוצאות</div>
+
+        <div class="status" id="status"></div>
+
+        <div id="resultsContainer"></div>
+
+        <div class="raw-text-toggle" id="rawToggle" style="display:none">הצג טקסט גולמי מה-PDF</div>
+        <div class="raw-text" id="rawText"></div>
+    </div>
+
+    <script type="module">
+        const pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs');
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
+
+        const LEAF_COLUMNS = [
+            { id: 'designation', label: 'ייעוד' },
+            { id: 'use', label: 'שימוש' },
+            { id: 'areaCells', label: 'תאי שטח' },
+            { id: 'buildingLocation', label: 'בניין/\nמיקום' },
+            { id: 'plotSize', label: 'גודל מגרש\nמוחלט' },
+            { id: 'buildAboveMain', label: 'עיקרי' },
+            { id: 'buildAboveService', label: 'שירות' },
+            { id: 'buildBelowMain', label: 'עיקרי' },
+            { id: 'buildBelowService', label: 'שירות' },
+            { id: 'buildTotal', label: 'סה"כ שטחי\nבנייה' },
+            { id: 'buildPercent', label: 'אחוזי בנייה\nכוללים (%)' },
+            { id: 'coverage', label: 'תכסית (%)\nמותר שטח' },
+            { id: 'unitsPerDunam', label: 'מספר\nיח"ד לדונם' },
+            { id: 'density', label: 'צפיפות\nיח"ד' },
+            { id: 'height', label: 'גובה מבנה\nמעל הכניסה\nהקובעת (מטר)' },
+            { id: 'floorsAbove', label: 'מעל הכניסה\nהקובעת' },
+            { id: 'floorsBelow', label: 'מתחת לכניסה\nהקובעת' },
+        ];
+
+        const HEADER_KEYWORDS_BY_COLUMN = {
+            designation: ['ייעוד', 'יעוד'],
+            use: ['שימוש'],
+            areaCells: ['תאי שטח', 'תאי'],
+            buildingLocation: ['בניין', 'בנין', 'מיקום'],
+            plotSize: ['גודל מגרש', 'מגרש מוחלט', 'גודל'],
+            buildAboveMain: ['עיקרי'],
+            buildAboveService: ['שירות'],
+            buildBelowMain: ['עיקרי'],
+            buildBelowService: ['שירות'],
+            buildTotal: ['סה"כ', 'סהכ'],
+            buildPercent: ['אחוזי בנייה', 'אחוזי בניה', 'אחוזי'],
+            coverage: ['תכסית'],
+            unitsPerDunam: ['יח"ד', 'לדונם'],
+            density: ['צפיפות'],
+            height: ['גובה'],
+            floorsAbove: ['הכניסה', 'הקובעת'],
+            floorsBelow: ['מתחת', 'לכניסה'],
+        };
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const parseBtn = document.getElementById('parseBtn');
+        const status = document.getElementById('status');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const resultsTitle = document.getElementById('resultsTitle');
+        const rawToggle = document.getElementById('rawToggle');
+        const rawText = document.getElementById('rawText');
+
+        let pdfFile = null;
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === 'application/pdf') {
+                setFile(file);
+            }
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files[0]) {
+                setFile(fileInput.files[0]);
+            }
+        });
+
+        function setFile(file) {
+            pdfFile = file;
+            fileName.textContent = file.name;
+            parseBtn.disabled = false;
+            status.textContent = '';
+            resultsContainer.innerHTML = '';
+            resultsTitle.style.display = 'none';
+        }
+
+        rawToggle.addEventListener('click', () => {
+            rawText.classList.toggle('visible');
+            rawToggle.textContent = rawText.classList.contains('visible')
+                ? 'הסתר טקסט גולמי'
+                : 'הצג טקסט גולמי מה-PDF';
+        });
+
+        parseBtn.addEventListener('click', async () => {
+            if (!pdfFile) return;
+
+            const plotNumber = document.getElementById('plotNumber').value.trim();
+
+            status.textContent = 'מעבד את ה-PDF...';
+            status.className = 'status';
+            resultsContainer.innerHTML = '';
+            resultsTitle.style.display = 'none';
+
+            try {
+                const arrayBuffer = await pdfFile.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+                let allText = '';
+                const allItems = [];
+
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    const items = content.items;
+
+                    let pageLines = groupItemsToLines(items);
+                    allText += `--- עמוד ${i} ---\n`;
+                    pageLines.forEach(line => {
+                        allText += line.text + '\n';
+                        allItems.push(line);
+                    });
+                }
+
+                rawText.textContent = allText;
+                rawToggle.style.display = 'block';
+
+                const { rows, colCount, footnotes } = extractTable(allItems);
+
+                resultsTitle.style.display = 'block';
+
+                if (rows.length === 0) {
+                    status.textContent = 'לא נמצאה טבלה בקובץ. נסי להציג את הטקסט הגולמי לבדיקה.';
+                    status.className = 'status error';
+                    return;
+                }
+
+                let filteredRows = rows;
+                if (plotNumber) {
+                    filteredRows = rows.filter(row =>
+                        row.some(cell => cell.includes(plotNumber))
+                    );
+                }
+
+                if (filteredRows.length === 0 && plotNumber) {
+                    status.textContent = `לא נמצאו שורות עבור מגרש "${plotNumber}". מציג את כל הטבלה.`;
+                    status.className = 'status error';
+                    filteredRows = rows;
+                } else if (plotNumber && filteredRows.length > 0) {
+                    status.textContent = `נמצאו ${filteredRows.length} שורות עבור מגרש ${plotNumber}.`;
+                    status.className = 'status';
+                } else {
+                    status.textContent = `נמצאו ${rows.length} שורות בטבלה (${colCount || '?'} עמודות זוהו).`;
+                    status.className = 'status';
+                }
+
+                renderTable(filteredRows, footnotes);
+
+            } catch (err) {
+                status.textContent = 'שגיאה בעיבוד ה-PDF: ' + err.message;
+                status.className = 'status error';
+                console.error(err);
+            }
+        });
+
+        function groupItemsToLines(items) {
+            if (items.length === 0) return [];
+
+            const sorted = [...items]
+                .filter(item => item.str.trim() !== '')
+                .sort((a, b) => {
+                    const dy = b.transform[5] - a.transform[5];
+                    if (Math.abs(dy) > 3) return dy;
+                    return a.transform[4] - b.transform[4];
+                });
+
+            const lines = [];
+            let currentLine = [];
+            let lineRefY = null;
+
+            for (const item of sorted) {
+                const y = item.transform[5];
+                const x = item.transform[4];
+                const str = item.str.trim();
+
+                if (lineRefY !== null && Math.abs(y - lineRefY) > 8) {
+                    if (currentLine.length > 0) {
+                        lines.push(finalizeLine(currentLine, lineRefY));
+                    }
+                    currentLine = [];
+                    lineRefY = null;
+                }
+
+                currentLine.push({ str, x, y });
+                if (lineRefY === null) lineRefY = y;
+            }
+
+            if (currentLine.length > 0) {
+                lines.push(finalizeLine(currentLine, lineRefY));
+            }
+
+            return lines;
+        }
+
+        function finalizeLine(cells, refY) {
+            cells.sort((a, b) => b.x - a.x);
+
+            const merged = [];
+            for (const cell of cells) {
+                const last = merged[merged.length - 1];
+                if (last) {
+                    const gap = last.x - cell.x;
+                    if (gap >= 0 && gap < 25) {
+                        last.str = last.str + ' ' + cell.str;
+                        continue;
+                    }
+                }
+                merged.push({ str: cell.str, x: cell.x, y: cell.y });
+            }
+
+            return {
+                y: refY,
+                text: merged.map(c => c.str).join(' '),
+                cells: merged
+            };
+        }
+
+        function extractTable(lines) {
+            const headerKeywords = [
+                'מגרש', 'ייעוד', 'יעוד', 'תכסית', 'שטח', 'בנייה', 'בניה',
+                'קומות', 'גובה', 'בניין', 'בנין', 'דיור', 'יח"ד', 'שימוש',
+                'עיקרי', 'שירות', 'מגורים', 'צפיפות', 'אחוזי', 'סה"כ',
+                'הכניסה', 'הקובעת', 'מתחת', 'תאי'
+            ];
+
+            let headerBlockStart = -1;
+            let headerBlockEnd = -1;
+            let maxKeywordCount = 0;
+
+            for (let i = 0; i < lines.length; i++) {
+                let combinedCount = 0;
+                const windowSize = Math.min(5, lines.length - i);
+                for (let j = 0; j < windowSize; j++) {
+                    const text = lines[i + j].text;
+                    for (const kw of headerKeywords) {
+                        if (text.includes(kw)) combinedCount++;
+                    }
+                }
+                if (combinedCount > maxKeywordCount) {
+                    maxKeywordCount = combinedCount;
+                    headerBlockStart = i;
+                }
+            }
+
+            if (headerBlockStart === -1 || maxKeywordCount < 4) {
+                return { rows: [] };
+            }
+
+            headerBlockEnd = headerBlockStart;
+            for (let i = headerBlockStart; i < Math.min(headerBlockStart + 6, lines.length); i++) {
+                const text = lines[i].text;
+                let kwCount = 0;
+                for (const kw of headerKeywords) {
+                    if (text.includes(kw)) kwCount++;
+                }
+                const hasDigitOnly = lines[i].cells.every(c => /^\d+[\d.,]*$/.test(c.str));
+                if (kwCount > 0 && !hasDigitOnly) {
+                    headerBlockEnd = i;
+                } else if (hasDigitOnly && lines[i].cells.length >= 5) {
+                    break;
+                }
+            }
+
+            const skipPatterns = ['---', 'טבלת זכויות', 'מועד הפקה', 'תוכנית מס', 'סיכום'];
+            const candidateDataLines = [];
+            const footnoteLines = [];
+            let foundFootnoteSection = false;
+
+            const instructionPatterns = ['הוראות טבלה', 'הוראות בנייה'];
+            let inInstructionSection = false;
+
+            for (let i = headerBlockEnd + 1; i < lines.length; i++) {
+                const line = lines[i];
+                const txt = line.text;
+
+                if (!foundFootnoteSection) {
+                    const hasHearot = txt.includes('הערות') || txt.includes('הערה');
+                    if (hasHearot) {
+                        console.log('Footnote section triggered at line', i, ':', txt.substring(0, 80));
+                        foundFootnoteSection = true;
+                    }
+                }
+
+                if (foundFootnoteSection) {
+                    const fnMatch = txt.match(/\((\d+)\)\s*(.+)/);
+                    if (fnMatch) {
+                        footnoteLines.push({ num: fnMatch[1], text: fnMatch[2].trim() });
+                        console.log('Footnote captured:', fnMatch[1], fnMatch[2].substring(0, 60));
+                    } else if (footnoteLines.length > 0 && !/^\s*\(?\d+\)?$/.test(txt.trim()) && txt.trim().length > 2) {
+                        footnoteLines[footnoteLines.length - 1].text += ' ' + txt.trim();
+                    }
+                    continue;
+                }
+
+                if (instructionPatterns.some(p => txt.includes(p))) {
+                    inInstructionSection = true;
+                    continue;
+                }
+
+                if (inInstructionSection) {
+                    const looksLikeInstruction = /^[א-ת]{1,2}[\-\.\s]/.test(txt.trim()) ||
+                        (line.cells.length <= 2 && txt.length > 40);
+                    if (looksLikeInstruction) continue;
+                    if (txt.trim().length < 5) continue;
+                }
+
+                if (skipPatterns.some(p => txt.includes(p))) continue;
+
+                const isDataRow = line.cells.some(c => /\d/.test(c.str));
+                if (!isDataRow) continue;
+                if (line.cells.length >= 2) {
+                    candidateDataLines.push(line);
+                }
+            }
+
+            if (footnoteLines.length === 0) {
+                console.log('No footnotes found via section detection, trying fallback scan...');
+                for (let i = headerBlockEnd + 1; i < lines.length; i++) {
+                    const txt = lines[i].text;
+                    const fnMatch = txt.match(/\((\d+)\)\s+(.{10,})/);
+                    if (fnMatch && lines[i].cells.length <= 4 && !lines[i].cells.some(c => /^\d{4,}$/.test(c.str))) {
+                        footnoteLines.push({ num: fnMatch[1], text: fnMatch[2].trim() });
+                        console.log('Fallback footnote captured:', fnMatch[1], fnMatch[2].substring(0, 60));
+                    }
+                }
+            }
+
+            console.log('Total footnotes extracted:', footnoteLines.length, footnoteLines);
+
+            const NUM_COLS = 17;
+            const colPositions = detectColumnPositions(candidateDataLines, NUM_COLS);
+
+            console.log('Data lines found:', candidateDataLines.length);
+            console.log('Cells per line:', candidateDataLines.map(l => l.cells.length));
+            console.log('Column positions detected:', colPositions?.length, colPositions?.map(p => Math.round(p)));
+            if (candidateDataLines.length > 0) {
+                console.log('Sample line X positions:', candidateDataLines[0].cells.map(c => ({ x: Math.round(c.x), str: c.str })));
+            }
+
+            if (!colPositions || colPositions.length === 0) {
+                return { rows: [] };
+            }
+
+            const rows = [];
+            for (const line of candidateDataLines) {
+                const row = assignCellsToColumns(line.cells, colPositions);
+                if (row.some(cell => cell !== '')) {
+                    rows.push(row);
+                }
+            }
+
+            return { rows, colCount: colPositions.length, footnotes: footnoteLines };
+        }
+
+        function detectColumnPositions(dataLines, expectedCols) {
+            if (dataLines.length === 0) return null;
+
+            const sortedByDensity = [...dataLines].sort((a, b) => b.cells.length - a.cells.length);
+            const anchorLines = sortedByDensity.slice(0, Math.min(5, sortedByDensity.length));
+
+            const allX = [];
+            for (const line of anchorLines) {
+                for (const cell of line.cells) {
+                    allX.push(cell.x);
+                }
+            }
+
+            if (allX.length === 0) return null;
+
+            allX.sort((a, b) => a - b);
+
+            const clusters = [];
+            for (const x of allX) {
+                const last = clusters[clusters.length - 1];
+                if (!last || x - last.max > 12) {
+                    clusters.push({ sum: x, count: 1, min: x, max: x });
+                } else {
+                    last.sum += x;
+                    last.count++;
+                    last.max = x;
+                }
+            }
+
+            let positions = clusters.map(c => c.sum / c.count);
+            positions.sort((a, b) => b - a);
+
+            console.log('Anchor lines used:', anchorLines.length,
+                'cells:', anchorLines.map(l => l.cells.length));
+            console.log('Raw clusters:', positions.length, 'expected:', expectedCols);
+            console.log('Cluster positions:', positions.map(p => Math.round(p)));
+
+            if (positions.length > expectedCols) {
+                while (positions.length > expectedCols) {
+                    let minGap = Infinity, minIdx = 0;
+                    for (let i = 0; i < positions.length - 1; i++) {
+                        const gap = positions[i] - positions[i + 1];
+                        if (gap < minGap) { minGap = gap; minIdx = i; }
+                    }
+                    const m = (positions[minIdx] + positions[minIdx + 1]) / 2;
+                    positions.splice(minIdx, 2, m);
+                }
+            } else if (positions.length < expectedCols) {
+                while (positions.length < expectedCols) {
+                    let maxGap = 0, maxIdx = 0;
+                    for (let i = 0; i < positions.length - 1; i++) {
+                        const gap = positions[i] - positions[i + 1];
+                        if (gap > maxGap) { maxGap = gap; maxIdx = i; }
+                    }
+                    if (maxGap < 15) break;
+                    positions.splice(maxIdx + 1, 0, (positions[maxIdx] + positions[maxIdx + 1]) / 2);
+                }
+            }
+
+            return positions;
+        }
+
+        function assignCellsToColumns(cells, colPositions) {
+            const row = new Array(colPositions.length).fill('');
+
+            const boundaries = [];
+            for (let i = 0; i < colPositions.length - 1; i++) {
+                boundaries.push((colPositions[i] + colPositions[i + 1]) / 2);
+            }
+
+            for (const cell of cells) {
+                let col = colPositions.length - 1;
+                for (let i = 0; i < boundaries.length; i++) {
+                    if (cell.x >= boundaries[i]) {
+                        col = i;
+                        break;
+                    }
+                }
+
+                if (row[col] === '') {
+                    row[col] = cell.str;
+                } else {
+                    row[col] += ' ' + cell.str;
+                }
+            }
+
+            return row;
+        }
+
+        function renderTable(rows, footnotes) {
+            if (rows.length === 0) {
+                resultsContainer.innerHTML = '<div class="no-results">לא נמצאו שורות בטבלה.</div>';
+                return;
+            }
+
+            const referencedNums = new Set();
+            for (const row of rows) {
+                for (const cell of row) {
+                    if (!cell) continue;
+                    const matches = cell.match(/\((\d+)\)/g);
+                    if (matches) {
+                        for (const m of matches) {
+                            referencedNums.add(m.replace(/[()]/g, ''));
+                        }
+                    }
+                }
+            }
+
+            let html = '<div class="table-wrapper">';
+            html += `<table class="results-table">`;
+            html += '<thead>';
+
+            html += '<tr>';
+            html += '<th rowspan="3">ייעוד</th>';
+            html += '<th rowspan="3">שימוש</th>';
+            html += '<th rowspan="3">תאי שטח</th>';
+            html += '<th rowspan="3">בניין/<br>מיקום</th>';
+            html += '<th rowspan="2">גודל מגרש<br>(מ"ר)</th>';
+            html += '<th colspan="5">שטחי בנייה (מ"ר)</th>';
+            html += '<th rowspan="3">אחוזי בנייה<br>כוללים (%)</th>';
+            html += '<th rowspan="3">תכסית (%)<br>מותר שטח</th>';
+            html += '<th rowspan="3">מספר<br>יח"ד לדונם</th>';
+            html += '<th rowspan="3">צפיפות<br>יח"ד</th>';
+            html += '<th rowspan="3">גובה מבנה<br>מעל הכניסה<br>הקובעת (מטר)</th>';
+            html += '<th colspan="2">מספר קומות</th>';
+            html += '</tr>';
+
+            html += '<tr>';
+            html += '<th colspan="2">מעל הכניסה הקובעת</th>';
+            html += '<th colspan="2">מתחת לכניסה הקובעת</th>';
+            html += '<th rowspan="2">סה"כ שטחי<br>בנייה</th>';
+            html += '<th rowspan="2">מעל הכניסה<br>הקובעת</th>';
+            html += '<th rowspan="2">מתחת לכניסה<br>הקובעת</th>';
+            html += '</tr>';
+
+            html += '<tr>';
+            html += '<th>גודל מגרש<br>מוחלט</th>';
+            html += '<th>עיקרי</th>';
+            html += '<th>שירות</th>';
+            html += '<th>עיקרי</th>';
+            html += '<th>שירות</th>';
+            html += '</tr>';
+
+            html += '</thead>';
+            html += '<tbody>';
+
+            for (const row of rows) {
+                html += '<tr>';
+                for (let i = 0; i < 17; i++) {
+                    const cellText = row[i] || '';
+                    const highlighted = escapeHtml(cellText).replace(
+                        /\((\d+)\)/g,
+                        '<sup class="footnote-ref">($1)</sup>'
+                    );
+                    html += `<td>${highlighted}</td>`;
+                }
+                html += '</tr>';
+            }
+
+            html += '</tbody></table></div>';
+
+            console.log('Footnotes passed to render:', footnotes);
+            console.log('Referenced nums from cells:', [...referencedNums]);
+
+            if (footnotes && footnotes.length > 0) {
+                html += '<div class="footnotes-section">';
+                html += '<div class="footnotes-title">הערות</div>';
+                for (const fn of footnotes) {
+                    const isReferenced = referencedNums.has(fn.num);
+                    const highlightClass = isReferenced ? ' style="font-weight:600;"' : '';
+                    html += `<div class="footnote-item"${highlightClass}><span class="footnote-num">(${escapeHtml(fn.num)})</span> ${escapeHtml(fn.text)}</div>`;
+                }
+                html += '</div>';
+            }
+
+            resultsContainer.innerHTML = html;
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // Requirements extraction
+        const instructionsDropZone = document.getElementById('instructionsDropZone');
+        const instructionsFileInput = document.getElementById('instructionsFileInput');
+        const instructionsFileName = document.getElementById('instructionsFileName');
+        const requirementsBtn = document.getElementById('requirementsBtn');
+        const requirementsSection = document.getElementById('requirementsSection');
+        const requirementsStatus = document.getElementById('requirementsStatus');
+        const requirementsContainer = document.getElementById('requirementsContainer');
+
+        let instructionsFile = null;
+
+        // Show requirements section when first PDF is loaded
+        parseBtn.addEventListener('click', () => {
+            requirementsSection.style.display = 'block';
+        });
+
+        instructionsDropZone.addEventListener('click', () => instructionsFileInput.click());
+
+        instructionsDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            instructionsDropZone.classList.add('dragover');
+        });
+
+        instructionsDropZone.addEventListener('dragleave', () => {
+            instructionsDropZone.classList.remove('dragover');
+        });
+
+        instructionsDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            instructionsDropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === 'application/pdf') {
+                setInstructionsFile(file);
+            }
+        });
+
+        instructionsFileInput.addEventListener('change', () => {
+            if (instructionsFileInput.files[0]) {
+                setInstructionsFile(instructionsFileInput.files[0]);
+            }
+        });
+
+        function setInstructionsFile(file) {
+            instructionsFile = file;
+            instructionsFileName.textContent = file.name;
+            requirementsBtn.disabled = false;
+            requirementsStatus.textContent = '';
+            requirementsContainer.innerHTML = '';
+        }
+
+        const AUTHORITIES = {
+            'משרד הפנים': ['משרד הפנים', 'שר הפנים'],
+            'משרד הסביבה': ['משרד הסביבה', 'אגודה להגנת הטבע'],
+            'משרד התחבורה': ['משרד התחבורה', 'רשות הדרכים'],
+            'רשות המים': ['רשות המים', 'מנהל מים וביוב'],
+            'חברת חשמל': ['חברת חשמל', 'חשמלאי'],
+            'בזק': ['בזק', 'טלקומוניקציה'],
+            'הוצאה לפועל': ['הוצאה לפועל'],
+            'רשות מקרקעי ישראל': ['רשות מקרקעי'],
+            'עיריה': ['עיריה', 'פקיד העיר'],
+            'קרן קיימת לישראל': ['קרן קיימת'],
+            'מינהל התכנון': ['מינהל התכנון'],
+            'משטרה': ['משטרה', 'מחלקת התנועה']
+        };
+
+        requirementsBtn.addEventListener('click', async () => {
+            if (!instructionsFile) return;
+
+            requirementsStatus.textContent = 'מעבד את הוראות התב"ע...';
+            requirementsContainer.innerHTML = '';
+
+            try {
+                const arrayBuffer = await instructionsFile.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+                let fullText = '';
+
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    const pageText = content.items.map(item => item.str).join(' ');
+                    fullText += pageText + '\n';
+                }
+
+                const requirements = extractRequirementsByAuthority(fullText);
+
+                if (Object.keys(requirements).length === 0) {
+                    requirementsStatus.textContent = 'לא נמצאו דרישות של גורמים בקובץ.';
+                    requirementsStatus.className = 'status error';
+                    return;
+                }
+
+                renderRequirements(requirements);
+                requirementsStatus.textContent = `נמצאו דרישות מ-${Object.keys(requirements).length} גורמים.`;
+                requirementsStatus.className = 'status';
+
+            } catch (err) {
+                requirementsStatus.textContent = 'שגיאה בעיבוד הקובץ: ' + err.message;
+                requirementsStatus.className = 'status error';
+                console.error(err);
+            }
+        });
+
+        function extractRequirementsByAuthority(text) {
+            const requirements = {};
+
+            // Split text into sentences/paragraphs
+            const lines = text.split(/[\n।।]/);
+
+            let currentAuthority = null;
+            let sectionRef = '';
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line.length < 5) continue;
+
+                // Check if line contains section number (e.g., "סעיף 4.3" or "4.3")
+                const sectionMatch = line.match(/^(סעיף\s+)?(\d+(?:\.\d+)?)/);
+                if (sectionMatch) {
+                    sectionRef = `סעיף ${sectionMatch[2]}`;
+                }
+
+                // Check for authority mentions
+                for (const [authority, keywords] of Object.entries(AUTHORITIES)) {
+                    if (keywords.some(kw => line.includes(kw))) {
+                        if (!requirements[authority]) {
+                            requirements[authority] = [];
+                        }
+
+                        // Extract requirement text (current line and next line if relevant)
+                        let requirementText = line;
+                        if (i + 1 < lines.length && lines[i + 1].trim().length > 5 && !lines[i + 1].match(/^(סעיף|\d+\.)/)) {
+                            requirementText += ' ' + lines[i + 1].trim();
+                        }
+
+                        requirements[authority].push({
+                            text: requirementText.replace(new RegExp(keywords.join('|'), 'gi'), '').trim(),
+                            section: sectionRef
+                        });
+
+                        break;
+                    }
+                }
+            }
+
+            // Remove duplicates and empty requirements
+            for (const auth in requirements) {
+                requirements[auth] = requirements[auth]
+                    .filter(req => req.text.length > 10)
+                    .filter((req, idx, arr) => idx === 0 || req.text !== arr[idx - 1].text)
+                    .slice(0, 5); // Limit to 5 per authority
+            }
+
+            return requirements;
+        }
+
+        function renderRequirements(requirements) {
+            let html = '';
+
+            for (const [authority, reqs] of Object.entries(requirements)) {
+                html += `<div class="requirement-item">`;
+                html += `<div class="requirement-authority">${escapeHtml(authority)}</div>`;
+
+                for (const req of reqs) {
+                    html += `<div class="requirement-text">${escapeHtml(req.text)}</div>`;
+                    if (req.section) {
+                        html += `<div class="requirement-section-ref">${escapeHtml(req.section)}</div>`;
+                    }
+                }
+
+                html += `</div>`;
+            }
+
+            requirementsContainer.innerHTML = html;
+        }
+    </script>
+</body>
 </html>
