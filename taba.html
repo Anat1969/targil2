@@ -377,7 +377,7 @@
             <a class="upgrade-link" href="https://claude.ai/code/session_01Mw5VYGDmVwrjCKpx6c6WJu" target="_blank" rel="noopener">שדרוג</a>
         </div>
 
-        <div class="requirements-section" style="display:none" id="requirementsSection">
+        <div class="requirements-section" id="requirementsSection">
             <div class="section-title">דרישות הגורמים</div>
 
             <div class="input-group">
@@ -969,11 +969,6 @@
         const requirementsContainer = document.getElementById('requirementsContainer');
 
         let instructionsFile = null;
-
-        // Show requirements section when first PDF is loaded
-        parseBtn.addEventListener('click', () => {
-            requirementsSection.style.display = 'block';
-        });
 
         instructionsDropZone.addEventListener('click', () => instructionsFileInput.click());
 
