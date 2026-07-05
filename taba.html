@@ -439,11 +439,23 @@
 
         let pdfFile = null;
         const STORAGE_KEY = 'table5_extracted_data';
+        let dataSavedSuccessfully = false;
 
         function saveExtractedData(rows, footnotes, pdfName) {
-            const data = { rows, footnotes, pdfName, timestamp: new Date().toISOString() };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            console.log('Data saved to localStorage:', data);
+            try {
+                const data = { rows, footnotes, pdfName, timestamp: new Date().toISOString() };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                dataSavedSuccessfully = true;
+                console.log('Data saved to localStorage');
+            } catch (e) {
+                dataSavedSuccessfully = false;
+                if (e.name === 'QuotaExceededError') {
+                    console.warn('localStorage quota exceeded, data not persisted:', e);
+                    status.textContent += ' (הערה: הנתונים גדולים מדי לשמירה בין-דפים)';
+                } else {
+                    console.error('Error saving data:', e);
+                }
+            }
         }
 
         function loadSavedData() {
@@ -485,6 +497,7 @@
         }
 
         function showNewExtractionButton() {
+            if (!dataSavedSuccessfully) return;
             let newExtBtn = document.getElementById('newExtractionBtn');
             if (!newExtBtn) {
                 newExtBtn = document.createElement('button');
