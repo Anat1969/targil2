@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://appofapp-gh.vercel.app/ai-menu.js"></script>
     <title>מחשבון תב"ע — טבלה 5</title>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
@@ -18,20 +17,13 @@
             font-family: 'Rubik', sans-serif;
             background: #fff;
             color: #1a1a1a;
-            padding: 0;
+            padding: 40px 20px;
             line-height: 1.6;
         }
 
-        .header {
-            background: #f5f5f5;
-            border-bottom: 2px solid #1a1a1a;
-            padding: 20px;
-        }
-
         .container {
-            max-width: 900px;
+            max-width: 1300px;
             margin: 0 auto;
-            padding: 40px 20px;
         }
 
         h1 {
@@ -40,7 +32,6 @@
             margin-bottom: 32px;
             padding-bottom: 12px;
             border-bottom: 2px solid #1a1a1a;
-            text-align: center;
         }
 
         .nav-link {
@@ -298,98 +289,67 @@
             background: #333;
         }
 
-        .program-summary {
-            margin-top: 20px;
-            padding: 16px;
-            background: #f9f9f9;
-            border-top: 3px solid #1a1a1a;
-            border-left: 1px solid #ddd;
-            border-right: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .program-summary-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #333;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .program-field {
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .program-field-label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #555;
-            min-width: 120px;
-        }
-
-        .program-field-value {
-            font-size: 0.875rem;
-            color: #1a1a1a;
-            flex: 1;
-            text-align: right;
-            direction: rtl;
-        }
-
         .action-btn:disabled {
             background: #ccc;
             border-color: #ccc;
             cursor: not-allowed;
         }
 
-        .nav-menu {
+        .buttons-container {
             display: flex;
-            gap: 16px;
+            gap: 12px;
+            margin-top: 24px;
             flex-wrap: wrap;
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 0 20px;
-            justify-content: center;
         }
 
-        .nav-btn {
-            padding: 14px 24px;
-            font-family: 'Rubik', sans-serif;
-            font-size: 0.95rem;
+        .buttons-container .action-btn,
+        .buttons-container .upgrade-link {
+            margin-top: 0;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .requirements-section {
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 2px solid #eee;
+        }
+
+        .requirement-item {
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            background: #f9f9f9;
+            border-right: 3px solid #0066cc;
+        }
+
+        .requirement-authority {
             font-weight: 600;
-            color: #1a1a1a;
-            background: #fff;
-            border: 2px solid #1a1a1a;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s;
+            color: #0066cc;
+            margin-bottom: 6px;
         }
 
-        .nav-btn:hover {
-            background: #1a1a1a;
-            color: #fff;
+        .requirement-text {
+            font-size: 0.875rem;
+            color: #333;
+            line-height: 1.6;
         }
 
-        .nav-btn.active {
-            background: #1a1a1a;
-            color: #fff;
-            border-color: #1a1a1a;
+        .requirement-section-ref {
+            font-size: 0.8rem;
+            color: #777;
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        .requirements-container {
+            margin-top: 16px;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="nav-menu">
-            <a class="nav-btn" href="index.html">מחשבון תכסית ואחוזי בנייה</a>
-            <a class="nav-btn active" href="taba.html">טבלה 5 — חילוץ נתונים</a>
-            <ai-menu chat="https://claude.ai/code/session_01Mw5VYGDmVwrjCKpx6c6WJu"></ai-menu>
-        </div>
-    </div>
-
     <div class="container">
+        <a class="nav-link" href="index.html">מחשבון תכסית ואחוזי בנייה</a>
+
         <h1>מחשבון תב"ע — טבלה 5</h1>
 
         <div class="input-group">
@@ -412,19 +372,39 @@
             <a class="mavat-link" href="https://mavat.iplan.gov.il/SV3" target="_blank" rel="noopener">הורדת טבלה 5 מאתר מאב"ת</a>
         </div>
 
-        <button class="action-btn" id="parseBtn" disabled>חלץ נתונים</button>
+        <div class="buttons-container">
+            <button class="action-btn" id="parseBtn" disabled>חלץ נתונים</button>
+            <a class="upgrade-link" href="https://claude.ai/code/session_01Mw5VYGDmVwrjCKpx6c6WJu" target="_blank" rel="noopener">שדרוג</a>
+        </div>
+
+        <div class="requirements-section" id="requirementsSection">
+            <div class="section-title">דרישות הגורמים</div>
+
+            <div class="input-group">
+                <label>קובץ PDF של הוראות התב"ע</label>
+                <div class="drop-zone" id="instructionsDropZone">
+                    <p>גררי קובץ PDF לכאן או לחצי לבחירה</p>
+                    <span class="file-name" id="instructionsFileName"></span>
+                    <input type="file" id="instructionsFileInput" accept=".pdf">
+                </div>
+            </div>
+
+            <div class="buttons-container">
+                <button class="action-btn" id="requirementsBtn" disabled>חלץ דרישות</button>
+            </div>
+
+            <div class="status" id="requirementsStatus"></div>
+            <div id="requirementsContainer"></div>
+        </div>
 
         <div class="section-title" id="resultsTitle" style="display:none">תוצאות</div>
 
         <div class="status" id="status"></div>
 
-        <div id="programSummary" class="program-summary" style="display:none"></div>
-
         <div id="resultsContainer"></div>
 
         <div class="raw-text-toggle" id="rawToggle" style="display:none">הצג טקסט גולמי מה-PDF</div>
         <div class="raw-text" id="rawText"></div>
-
     </div>
 
     <script type="module">
@@ -482,150 +462,6 @@
         const rawText = document.getElementById('rawText');
 
         let pdfFile = null;
-        const DB_NAME = 'Table5ExtractorDB';
-        const STORE_NAME = 'extracted_data';
-        let db = null;
-        let dataSavedSuccessfully = false;
-
-        // Initialize IndexedDB
-        function initIndexedDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, 1);
-
-                request.onerror = () => {
-                    console.error('IndexedDB initialization failed');
-                    reject(request.error);
-                };
-
-                request.onsuccess = () => {
-                    db = request.result;
-                    console.log('IndexedDB initialized successfully');
-                    resolve(db);
-                };
-
-                request.onupgradeneeded = (event) => {
-                    const database = event.target.result;
-                    if (!database.objectStoreNames.contains(STORE_NAME)) {
-                        database.createObjectStore(STORE_NAME);
-                        console.log('IndexedDB object store created');
-                    }
-                };
-            });
-        }
-
-        function saveExtractedData(rows, footnotes, programInfo, pdfName) {
-            if (!db) {
-                console.warn('IndexedDB not initialized');
-                return Promise.reject('DB not ready');
-            }
-
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction([STORE_NAME], 'readwrite');
-                const store = transaction.objectStore(STORE_NAME);
-                const data = { rows, footnotes, programInfo, pdfName, timestamp: new Date().toISOString() };
-
-                const request = store.put(data, 'table5_data');
-
-                request.onerror = () => {
-                    dataSavedSuccessfully = false;
-                    console.error('Error saving to IndexedDB:', request.error);
-                    reject(request.error);
-                };
-
-                request.onsuccess = () => {
-                    dataSavedSuccessfully = true;
-                    console.log('Data saved to IndexedDB successfully');
-                    resolve();
-                };
-            });
-        }
-
-        function loadSavedData() {
-            if (!db) {
-                console.warn('IndexedDB not initialized');
-                return Promise.reject('DB not ready');
-            }
-
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction([STORE_NAME], 'readonly');
-                const store = transaction.objectStore(STORE_NAME);
-                const request = store.get('table5_data');
-
-                request.onerror = () => {
-                    console.error('Error loading from IndexedDB:', request.error);
-                    reject(request.error);
-                };
-
-                request.onsuccess = () => {
-                    const data = request.result;
-                    if (data) {
-                        console.log('Data loaded from IndexedDB');
-                        resolve(data);
-                    } else {
-                        resolve(null);
-                    }
-                };
-            });
-        }
-
-        function clearSavedData() {
-            if (db) {
-                const transaction = db.transaction([STORE_NAME], 'readwrite');
-                const store = transaction.objectStore(STORE_NAME);
-                store.delete('table5_data');
-            }
-            pdfFile = null;
-            fileInput.value = '';
-            fileName.textContent = '';
-            parseBtn.disabled = true;
-            status.textContent = '';
-            document.getElementById('programSummary').style.display = 'none';
-            document.getElementById('programSummary').innerHTML = '';
-            resultsContainer.innerHTML = '';
-            resultsTitle.style.display = 'none';
-            rawToggle.style.display = 'none';
-            rawText.textContent = '';
-        }
-
-        function restoreFromIndexedDB() {
-            loadSavedData()
-                .then(saved => {
-                    if (saved) {
-                        fileName.textContent = saved.pdfName + ' (שמור)';
-                        resultsTitle.style.display = 'block';
-                        status.textContent = `נתונים שמורים מ-${saved.pdfName}`;
-                        status.className = 'status';
-                        if (saved.programInfo) {
-                            renderProgramSummary(saved.programInfo);
-                        }
-                        renderTable(saved.rows, saved.footnotes);
-                        dataSavedSuccessfully = true;
-                        showNewExtractionButton();
-                    }
-                })
-                .catch(err => {
-                    console.error('Error restoring data:', err);
-                });
-        }
-
-        function showNewExtractionButton() {
-            if (!dataSavedSuccessfully) return;
-            let newExtBtn = document.getElementById('newExtractionBtn');
-            if (!newExtBtn) {
-                newExtBtn = document.createElement('button');
-                newExtBtn.id = 'newExtractionBtn';
-                newExtBtn.className = 'action-btn';
-                newExtBtn.textContent = 'חילוץ חדש';
-                newExtBtn.style.marginTop = '16px';
-                newExtBtn.addEventListener('click', clearSavedData);
-                resultsContainer.parentNode.insertBefore(newExtBtn, resultsContainer.nextSibling);
-            }
-        }
-
-        function removeNewExtractionButton() {
-            const btn = document.getElementById('newExtractionBtn');
-            if (btn) btn.remove();
-        }
 
         dropZone.addEventListener('click', () => fileInput.click());
 
@@ -660,7 +496,6 @@
             status.textContent = '';
             resultsContainer.innerHTML = '';
             resultsTitle.style.display = 'none';
-            removeNewExtractionButton();
         }
 
         rawToggle.addEventListener('click', () => {
@@ -668,16 +503,6 @@
             rawToggle.textContent = rawText.classList.contains('visible')
                 ? 'הסתר טקסט גולמי'
                 : 'הצג טקסט גולמי מה-PDF';
-        });
-
-        // Initialize: set up IndexedDB and restore saved data on page load
-        window.addEventListener('load', async () => {
-            try {
-                await initIndexedDB();
-                restoreFromIndexedDB();
-            } catch (err) {
-                console.error('Failed to initialize storage:', err);
-            }
         });
 
         parseBtn.addEventListener('click', async () => {
@@ -714,7 +539,6 @@
                 rawToggle.style.display = 'block';
 
                 const { rows, colCount, footnotes } = extractTable(allItems);
-                const programInfo = extractProgramInfo(allItems);
 
                 resultsTitle.style.display = 'block';
 
@@ -743,18 +567,7 @@
                     status.className = 'status';
                 }
 
-                renderProgramSummary(programInfo);
                 renderTable(filteredRows, footnotes);
-
-                // Save data to IndexedDB
-                try {
-                    await saveExtractedData(rows, footnotes, programInfo, pdfFile.name);
-                    status.textContent += ' (נשמר בהצלחה)';
-                    showNewExtractionButton();
-                } catch (err) {
-                    console.warn('Could not save to IndexedDB:', err);
-                    dataSavedSuccessfully = false;
-                }
 
             } catch (err) {
                 status.textContent = 'שגיאה בעיבוד ה-PDF: ' + err.message;
@@ -962,69 +775,6 @@
             return { rows, colCount: colPositions.length, footnotes: footnoteLines };
         }
 
-        function extractProgramInfo(lines) {
-            const programInfo = {
-                planNumber: null,
-                planTitle: null,
-                programGoal: null,
-                otherMetadata: {}
-            };
-
-            // Look for plan number (תוכנית מס, תכנית מס)
-            for (let i = 0; i < Math.min(10, lines.length); i++) {
-                const text = lines[i].text;
-                const planMatch = text.match(/(?:תוכנית|תכנית)\s+מס\.?\s*[\:א]?\s*([א-ת0-9\-\/]+)/i);
-                if (planMatch) {
-                    programInfo.planNumber = planMatch[1].trim();
-                    console.log('Plan number found:', programInfo.planNumber);
-                    break;
-                }
-            }
-
-            // Look for program title (usually in first meaningful line)
-            for (let i = 0; i < Math.min(5, lines.length); i++) {
-                const text = lines[i].text.trim();
-                if (text.length > 10 && !text.includes('תוכנית מס') && !text.includes('תכנית מס') &&
-                    !text.match(/^\d+[\d\s]*$/)) {
-                    programInfo.planTitle = text;
-                    console.log('Plan title found:', programInfo.planTitle);
-                    break;
-                }
-            }
-
-            // Look for program goal section (מטרת התוכנית)
-            const goalKeywords = ['מטרת', 'מטרות', 'תכליות', 'יעדים', 'objectives'];
-            let goalStartIdx = -1;
-            for (let i = 0; i < lines.length; i++) {
-                const text = lines[i].text;
-                if (goalKeywords.some(kw => text.includes(kw))) {
-                    goalStartIdx = i;
-                    console.log('Program goal section found at line', i);
-                    break;
-                }
-            }
-
-            // Extract goal content (next 1-3 lines after heading)
-            if (goalStartIdx >= 0 && goalStartIdx + 1 < lines.length) {
-                const goalLines = [];
-                for (let i = goalStartIdx + 1; i < Math.min(goalStartIdx + 4, lines.length); i++) {
-                    const text = lines[i].text.trim();
-                    if (text.length > 0 && !text.includes('הערות') && !text.includes('הוראות')) {
-                        goalLines.push(text);
-                    } else {
-                        break;
-                    }
-                }
-                if (goalLines.length > 0) {
-                    programInfo.programGoal = goalLines.join(' ');
-                    console.log('Program goal extracted:', programInfo.programGoal.substring(0, 100));
-                }
-            }
-
-            console.log('Program info extracted:', programInfo);
-            return programInfo;
-        }
-
         function detectColumnPositions(dataLines, expectedCols) {
             if (dataLines.length === 0) return null;
 
@@ -1209,38 +959,175 @@
             return div.innerHTML;
         }
 
-        function renderProgramSummary(programInfo) {
-            const programSummary = document.getElementById('programSummary');
-            if (!programInfo || (!programInfo.planNumber && !programInfo.planTitle && !programInfo.programGoal)) {
-                programSummary.style.display = 'none';
-                return;
+        // Requirements extraction
+        const instructionsDropZone = document.getElementById('instructionsDropZone');
+        const instructionsFileInput = document.getElementById('instructionsFileInput');
+        const instructionsFileName = document.getElementById('instructionsFileName');
+        const requirementsBtn = document.getElementById('requirementsBtn');
+        const requirementsSection = document.getElementById('requirementsSection');
+        const requirementsStatus = document.getElementById('requirementsStatus');
+        const requirementsContainer = document.getElementById('requirementsContainer');
+
+        let instructionsFile = null;
+
+        instructionsDropZone.addEventListener('click', () => instructionsFileInput.click());
+
+        instructionsDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            instructionsDropZone.classList.add('dragover');
+        });
+
+        instructionsDropZone.addEventListener('dragleave', () => {
+            instructionsDropZone.classList.remove('dragover');
+        });
+
+        instructionsDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            instructionsDropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === 'application/pdf') {
+                setInstructionsFile(file);
+            }
+        });
+
+        instructionsFileInput.addEventListener('change', () => {
+            if (instructionsFileInput.files[0]) {
+                setInstructionsFile(instructionsFileInput.files[0]);
+            }
+        });
+
+        function setInstructionsFile(file) {
+            instructionsFile = file;
+            instructionsFileName.textContent = file.name;
+            requirementsBtn.disabled = false;
+            requirementsStatus.textContent = '';
+            requirementsContainer.innerHTML = '';
+        }
+
+        const AUTHORITIES = {
+            'משרד הפנים': ['משרד הפנים', 'שר הפנים'],
+            'משרד הסביבה': ['משרד הסביבה', 'אגודה להגנת הטבע'],
+            'משרד התחבורה': ['משרד התחבורה', 'רשות הדרכים'],
+            'רשות המים': ['רשות המים', 'מנהל מים וביוב'],
+            'חברת חשמל': ['חברת חשמל', 'חשמלאי'],
+            'בזק': ['בזק', 'טלקומוניקציה'],
+            'הוצאה לפועל': ['הוצאה לפועל'],
+            'רשות מקרקעי ישראל': ['רשות מקרקעי'],
+            'עיריה': ['עיריה', 'פקיד העיר'],
+            'קרן קיימת לישראל': ['קרן קיימת'],
+            'מינהל התכנון': ['מינהל התכנון'],
+            'משטרה': ['משטרה', 'מחלקת התנועה']
+        };
+
+        requirementsBtn.addEventListener('click', async () => {
+            if (!instructionsFile) return;
+
+            requirementsStatus.textContent = 'מעבד את הוראות התב"ע...';
+            requirementsContainer.innerHTML = '';
+
+            try {
+                const arrayBuffer = await instructionsFile.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+                let fullText = '';
+
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    const pageText = content.items.map(item => item.str).join(' ');
+                    fullText += pageText + '\n';
+                }
+
+                const requirements = extractRequirementsByAuthority(fullText);
+
+                if (Object.keys(requirements).length === 0) {
+                    requirementsStatus.textContent = 'לא נמצאו דרישות של גורמים בקובץ.';
+                    requirementsStatus.className = 'status error';
+                    return;
+                }
+
+                renderRequirements(requirements);
+                requirementsStatus.textContent = `נמצאו דרישות מ-${Object.keys(requirements).length} גורמים.`;
+                requirementsStatus.className = 'status';
+
+            } catch (err) {
+                requirementsStatus.textContent = 'שגיאה בעיבוד הקובץ: ' + err.message;
+                requirementsStatus.className = 'status error';
+                console.error(err);
+            }
+        });
+
+        function extractRequirementsByAuthority(text) {
+            const requirements = {};
+
+            // Split text into sentences/paragraphs
+            const lines = text.split(/[\n।।]/);
+
+            let currentAuthority = null;
+            let sectionRef = '';
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (line.length < 5) continue;
+
+                // Check if line contains section number (e.g., "סעיף 4.3" or "4.3")
+                const sectionMatch = line.match(/^(סעיף\s+)?(\d+(?:\.\d+)?)/);
+                if (sectionMatch) {
+                    sectionRef = `סעיף ${sectionMatch[2]}`;
+                }
+
+                // Check for authority mentions
+                for (const [authority, keywords] of Object.entries(AUTHORITIES)) {
+                    if (keywords.some(kw => line.includes(kw))) {
+                        if (!requirements[authority]) {
+                            requirements[authority] = [];
+                        }
+
+                        // Extract requirement text (current line and next line if relevant)
+                        let requirementText = line;
+                        if (i + 1 < lines.length && lines[i + 1].trim().length > 5 && !lines[i + 1].match(/^(סעיף|\d+\.)/)) {
+                            requirementText += ' ' + lines[i + 1].trim();
+                        }
+
+                        requirements[authority].push({
+                            text: requirementText.replace(new RegExp(keywords.join('|'), 'gi'), '').trim(),
+                            section: sectionRef
+                        });
+
+                        break;
+                    }
+                }
             }
 
-            let html = '<div class="program-summary-title">רזומה - תוכנית</div>';
-
-            if (programInfo.planNumber) {
-                html += '<div class="program-field">';
-                html += '<span class="program-field-label">מספר תוכנית:</span>';
-                html += `<span class="program-field-value">${escapeHtml(programInfo.planNumber)}</span>`;
-                html += '</div>';
+            // Remove duplicates and empty requirements
+            for (const auth in requirements) {
+                requirements[auth] = requirements[auth]
+                    .filter(req => req.text.length > 10)
+                    .filter((req, idx, arr) => idx === 0 || req.text !== arr[idx - 1].text)
+                    .slice(0, 5); // Limit to 5 per authority
             }
 
-            if (programInfo.planTitle) {
-                html += '<div class="program-field">';
-                html += '<span class="program-field-label">שם התוכנית:</span>';
-                html += `<span class="program-field-value">${escapeHtml(programInfo.planTitle)}</span>`;
-                html += '</div>';
+            return requirements;
+        }
+
+        function renderRequirements(requirements) {
+            let html = '';
+
+            for (const [authority, reqs] of Object.entries(requirements)) {
+                html += `<div class="requirement-item">`;
+                html += `<div class="requirement-authority">${escapeHtml(authority)}</div>`;
+
+                for (const req of reqs) {
+                    html += `<div class="requirement-text">${escapeHtml(req.text)}</div>`;
+                    if (req.section) {
+                        html += `<div class="requirement-section-ref">${escapeHtml(req.section)}</div>`;
+                    }
+                }
+
+                html += `</div>`;
             }
 
-            if (programInfo.programGoal) {
-                html += '<div class="program-field">';
-                html += '<span class="program-field-label">מטרת התוכנית:</span>';
-                html += `<span class="program-field-value">${escapeHtml(programInfo.programGoal)}</span>`;
-                html += '</div>';
-            }
-
-            programSummary.innerHTML = html;
-            programSummary.style.display = 'block';
+            requirementsContainer.innerHTML = html;
         }
     </script>
 </body>
