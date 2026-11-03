@@ -13,5 +13,10 @@ The top bar holds only the app name (links home), content navigation, and ONE lo
 - טופס ריק מציג דוגמה מסומנת (מגרש 1,000 מ"ר, 40%, 160%, 8 קומות).
 - בדיקה: `python3 -m http.server 8092 & node tests/walk.e2e.mjs`.
 
+## פריסה
+- Pages מוגש מהענף `gh-pages`. ה-Action `sync-pages.yml` מעתיק לשם את `index.html` בכל דחיפה לענף ברירת המחדל.
+- `taba.html` לא מועתק: בגרסה שב-`gh-pages` יש חילוץ דרישות שלא קיים בענף ברירת המחדל. איחוד שני הקבצים הוא משימה נפרדת.
+
 ## יומן תיקונים
 - 03.11.2026: נוסף "הנפח על המגרש", מתוך רייל על spaceplanner.co, בבקשת ענת להרחיב את ההליכה בגובה העיניים לעוד אפליקציות.
+- 03.11.2026: נמצא ש-Pages הציג את גרסת יולי, כולל בלי כפתור A&I. נוסף סנכרון של `index.html` ל-`gh-pages`.
