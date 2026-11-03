@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://appofapp-gh.vercel.app/ai-menu.js"></script>
     <title>מחשבון תכסית ואחוזי בנייה</title>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -16,13 +17,20 @@
             font-family: 'Rubik', sans-serif;
             background: #fff;
             color: #1a1a1a;
-            padding: 40px 20px;
+            padding: 0;
             line-height: 1.6;
         }
 
+        .header {
+            background: #f5f5f5;
+            border-bottom: 2px solid #1a1a1a;
+            padding: 20px;
+        }
+
         .container {
-            max-width: 600px;
+            max-width: 900px;
             margin: 0 auto;
+            padding: 40px 20px;
         }
 
         h1 {
@@ -31,6 +39,7 @@
             margin-bottom: 32px;
             padding-bottom: 12px;
             border-bottom: 2px solid #1a1a1a;
+            text-align: center;
         }
 
         .input-group {
@@ -184,12 +193,97 @@
             color: #1a1a1a;
             border-color: #1a1a1a;
         }
+
+        .nav-menu {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 20px;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            padding: 14px 24px;
+            font-family: 'Rubik', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            background: #fff;
+            border: 2px solid #1a1a1a;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .nav-btn.active {
+            background: #1a1a1a;
+            color: #fff;
+            border-color: #1a1a1a;
+        }
+
+        /* המגרש שמתרומם: שרטוט איזומטרי ב-SVG שנבנה צעד אחרי צעד (דפוס "ספר שמתעורר", בנק ההשראה של Claude-GH) */
+        .rise-wrap { margin-top: 40px; border: 2px solid #1a1a1a; }
+        .rise-head { padding: 12px 16px; border-bottom: 1px solid #ddd; background: #f5f5f5; }
+        .rise-head b { font-size: 1rem; }
+        .rise-head span { display: block; font-size: 0.85rem; color: #555; }
+        .rise-body { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); }
+        .rise-text { padding: 16px; border-inline-end: 1px solid #ddd; }
+        .rise-step-no { font-size: 0.75rem; color: #777; font-variant-numeric: tabular-nums; }
+        .rise-step-title { font-size: 1.15rem; font-weight: 600; margin: 2px 0 6px; }
+        .rise-step-line { font-size: 0.95rem; }
+        .rise-step-line b { font-weight: 600; }
+        .rise-verdict { margin-top: 10px; font-weight: 600; }
+        .rise-verdict.ok { background: linear-gradient(transparent 55%, #d6ecdf 55%); }
+        .rise-verdict.bad { text-decoration: underline; text-decoration-color: #800020; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+        .rise-svg { width: 100%; height: auto; display: block; background: #fafafa; }
+        .rise-svg .plot { fill: #fff; stroke: #999; stroke-width: 1; stroke-dasharray: 4 3; }
+        .rise-svg .foot { fill: #1a1a1a; opacity: .14; stroke: #1a1a1a; stroke-width: 1.2; }
+        .rise-svg .slab path { stroke: #1a1a1a; stroke-width: 1; stroke-linejoin: round; transition: opacity .35s ease; }
+        .rise-svg .slab .top { fill: #fff; }
+        .rise-svg .slab .l { fill: #e9e9e9; }
+        .rise-svg .slab .r { fill: #d4d4d4; }
+        .rise-svg .slab.over .top { fill: #f3d9df; }
+        .rise-svg .slab.over .l { fill: #e4b3be; }
+        .rise-svg .slab.over .r { fill: #d496a4; }
+        .rise-svg .slab.over path { stroke: #800020; }
+        .rise-svg .ghost { fill: none; stroke: #2e7d55; stroke-width: 1.4; stroke-dasharray: 5 4; }
+        .rise-svg .lbl { font-size: 11px; font-family: 'Rubik', sans-serif; fill: #1a1a1a; }
+        .rise-svg .lbl.g { fill: #2e7d55; font-weight: 600; }
+        .rise-svg .lbl.r { fill: #800020; font-weight: 600; }
+        .rise-svg .hide { opacity: 0; }
+        .rise-bar { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; gap: 8px; align-items: center; padding: 10px 16px; border-top: 1px solid #ddd; }
+        .rise-bar button { font-family: 'Rubik', sans-serif; font-size: .9rem; font-weight: 500; padding: 8px 16px; border: 1px solid #1a1a1a; border-radius: 0; background: #fff; cursor: pointer; box-shadow: 0 2px 0 #ccc; }
+        .rise-bar button:hover { transform: translateY(-1px); }
+        .rise-bar button:active { transform: translateY(1px); box-shadow: none; }
+        .rise-bar button[aria-pressed="true"] { background: #1a1a1a; color: #fff; }
+        .rise-bar button:disabled { opacity: .4; cursor: default; transform: none; }
+        .rise-dots { display: flex; gap: 6px; justify-content: center; }
+        .rise-dots i { width: 22px; height: 4px; background: #ddd; }
+        .rise-dots i.on { background: #1a1a1a; }
+        @media (max-width: 640px) {
+            .rise-body { grid-template-columns: minmax(0, 1fr); }
+            .rise-text { border-inline-end: 0; border-bottom: 1px solid #ddd; }
+        }
+        @media (prefers-reduced-motion: reduce) { .rise-svg .slab path { transition: none; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <a class="nav-link" href="taba.html">מחשבון תב"ע — טבלה 5</a>
+    <div class="header">
+        <div class="nav-menu">
+            <a class="nav-btn active" href="index.html">מחשבון תכסית ואחוזי בנייה</a>
+            <a class="nav-btn" href="taba.html">טבלה 5 — חילוץ נתונים</a>
+            <ai-menu chat="https://claude.ai/code/session_01Mw5VYGDmVwrjCKpx6c6WJu"></ai-menu>
+        </div>
+    </div>
 
+    <div class="container">
         <h1>מחשבון תכסית ואחוזי בנייה</h1>
 
         <div class="input-group">
@@ -256,7 +350,28 @@
             חריגה: שטח הבנייה המבוקש חורג מאחוזי הבנייה המותרים.
         </div>
 
-        <a class="upgrade-link" href="https://claude.ai/code/session_01Mw5VYGDmVwrjCKpx6c6WJu" target="_blank" rel="noopener">שדרוג</a>
+        <section class="rise-wrap" aria-label="המגרש שמתרומם">
+            <div class="rise-head">
+                <b>המגרש שמתרומם</b>
+                <span>ארבעה צעדים: מגרש, תכסית, קומות ואחוזי בנייה. המספרים שלמעלה בונים את הבניין.</span>
+            </div>
+            <div class="rise-body">
+                <div class="rise-text" aria-live="polite">
+                    <div class="rise-step-no" id="riseNo"></div>
+                    <div class="rise-step-title" id="riseTitle"></div>
+                    <div class="rise-step-line" id="riseLine"></div>
+                    <div class="rise-verdict" id="riseVerdict"></div>
+                </div>
+                <svg class="rise-svg" id="riseSvg" viewBox="0 0 420 300" role="img" aria-label="שרטוט איזומטרי של המגרש והבניין"></svg>
+            </div>
+            <div class="rise-bar" role="group" aria-label="צעדי ההסבר">
+                <button type="button" id="risePrev">הקודם</button>
+                <div class="rise-dots" id="riseDots"></div>
+                <button type="button" id="riseTour" aria-pressed="false">סיור</button>
+                <button type="button" id="riseNext">הבא</button>
+            </div>
+        </section>
+
     </div>
 
     <script>
@@ -323,7 +438,109 @@
             }
         }
 
+
+        /*
+         * המגרש שמתרומם. הקואורדינטות במטרים, ההטלה איזומטרית (30 מעלות).
+         * מגרש וטביעת רגל כריבועים באותו שטח, קומה בגובה 3 מ' (הנחה לשרטוט בלבד).
+         */
+        const FLOOR_M = 3;
+        const STEPS = ['המגרש', 'התכסית', 'הקומות', 'אחוזי הבנייה'];
+        let riseStep = 3;
+        let tourTimer = null;
+
+        function iso(x, y, z, k, ox, oy) {
+            return [ox + (x - y) * 0.866 * k, oy + (x + y) * 0.5 * k - z * k];
+        }
+        function poly(pts) { return pts.map(p => p.map(n => n.toFixed(1)).join(',')).join(' '); }
+
+        function drawRise() {
+            const plotArea = getVal('plotArea');
+            const cov = getVal('coveragePercent');
+            const bld = getVal('buildingPercent');
+            const floors = Math.max(1, Math.round(getVal('floors') || 1));
+            const foot = plotArea * cov / 100;
+            const total = plotArea * bld / 100;
+            const used = foot * floors;
+            const allowedFloors = foot > 0 ? total / foot : 0;
+            const ps = Math.sqrt(Math.max(plotArea, 1));
+            const fs = Math.sqrt(Math.max(foot, 0));
+            const off = (ps - fs) / 2;
+            const hMax = Math.max(floors, Math.ceil(allowedFloors)) * FLOOR_M;
+            // קנה מידה שמכניס את המגרש ואת הגובה לשרטוט
+            const k = Math.min(380 / (ps * 1.732), 250 / (ps + hMax * 1.0 + 1));
+            const ox = 210, oy = 270 - ps * k;
+            const svg = document.getElementById('riseSvg');
+            let h = '';
+            const P = (x, y, z) => iso(x, y, z, k, ox, oy);
+            h += '<polygon class="plot" points="' + poly([P(0,0,0), P(ps,0,0), P(ps,ps,0), P(0,ps,0)]) + '"/>';
+            if (riseStep >= 1 && foot > 0) {
+                h += '<polygon class="foot" points="' + poly([P(off,off,0), P(off+fs,off,0), P(off+fs,off+fs,0), P(off,off+fs,0)]) + '"/>';
+            }
+            if (riseStep >= 2 && foot > 0) {
+                for (let i = 0; i < floors; i++) {
+                    const z0 = i * FLOOR_M, z1 = z0 + FLOOR_M;
+                    const over = riseStep >= 3 && (i + 1) * foot > total + 1e-6;
+                    const a = off, b = off + fs;
+                    h += '<g class="slab' + (over ? ' over' : '') + '" style="transition-delay:' + (i * 60) + 'ms">';
+                    h += '<path class="l" d="M' + poly([P(a,b,z0), P(b,b,z0), P(b,b,z1), P(a,b,z1)]) + 'Z"/>';
+                    h += '<path class="r" d="M' + poly([P(b,a,z0), P(b,b,z0), P(b,b,z1), P(b,a,z1)]) + 'Z"/>';
+                    h += '<path class="top" d="M' + poly([P(a,a,z1), P(b,a,z1), P(b,b,z1), P(a,b,z1)]) + 'Z"/>';
+                    h += '</g>';
+                }
+            }
+            if (riseStep >= 3 && foot > 0 && total > 0) {
+                const zA = allowedFloors * FLOOR_M, a = off, b = off + fs;
+                h += '<polygon class="ghost" points="' + poly([P(a,a,zA), P(b,a,zA), P(b,b,zA), P(a,b,zA)]) + '"/>';
+                const t = P(b, a, zA);
+                h += '<text class="lbl g" x="' + (t[0] + 6).toFixed(1) + '" y="' + (t[1] + 4).toFixed(1) + '" direction="rtl" text-anchor="end">מותר: ' + allowedFloors.toLocaleString('he-IL', { maximumFractionDigits: 1 }) + ' קומות</text>';
+            }
+            svg.innerHTML = h;
+
+            const fmtN = n => n.toLocaleString('he-IL', { maximumFractionDigits: 1 });
+            const lines = [
+                'שטח המגרש <b>' + fmtN(plotArea) + ' מ"ר</b>. ממנו נגזר כל החישוב.',
+                'תכסית <b>' + fmtN(cov) + '%</b>: הבניין תופס <b>' + fmtN(foot) + ' מ"ר</b> על הקרקע. השאר פתוח.',
+                '<b>' + floors + '</b> קומות של <b>' + fmtN(foot) + ' מ"ר</b> הן <b>' + fmtN(used) + ' מ"ר</b> בנויים.',
+                'אחוזי בנייה <b>' + fmtN(bld) + '%</b> מתירים <b>' + fmtN(total) + ' מ"ר</b>, כלומר <b>' + fmtN(allowedFloors) + '</b> קומות בתכסית המלאה (הקו הירוק).'
+            ];
+            document.getElementById('riseNo').textContent = 'צעד ' + (riseStep + 1) + ' מתוך 4';
+            document.getElementById('riseTitle').textContent = STEPS[riseStep];
+            document.getElementById('riseLine').innerHTML = lines[riseStep];
+            const v = document.getElementById('riseVerdict');
+            if (riseStep === 3 && total > 0) {
+                const over = used - total;
+                v.className = 'rise-verdict ' + (over > 1e-6 ? 'bad' : 'ok');
+                v.textContent = over > 1e-6
+                    ? 'חריגה של ' + fmtN(over) + ' מ"ר: הקומות האדומות מעל הקו.'
+                    : (Math.abs(over) < 1e-6 ? 'בדיוק במותר: כל אחוזי הבנייה מנוצלים.' : 'בתוך המותר. נשארו ' + fmtN(-over) + ' מ"ר לניצול.');
+            } else { v.className = 'rise-verdict'; v.textContent = ''; }
+            document.getElementById('riseDots').innerHTML = STEPS.map((_, i) => '<i class="' + (i <= riseStep ? 'on' : '') + '"></i>').join('');
+            document.getElementById('risePrev').disabled = riseStep === 0;
+            document.getElementById('riseNext').disabled = riseStep === 3;
+        }
+
+        function setStep(n) { riseStep = Math.max(0, Math.min(3, n)); drawRise(); }
+        function stopTour() {
+            clearInterval(tourTimer); tourTimer = null;
+            document.getElementById('riseTour').setAttribute('aria-pressed', 'false');
+            document.getElementById('riseTour').textContent = 'סיור';
+        }
+        document.getElementById('risePrev').addEventListener('click', () => { stopTour(); setStep(riseStep - 1); });
+        document.getElementById('riseNext').addEventListener('click', () => { stopTour(); setStep(riseStep + 1); });
+        document.getElementById('riseTour').addEventListener('click', () => {
+            if (tourTimer) { stopTour(); return; }
+            const btn = document.getElementById('riseTour');
+            btn.setAttribute('aria-pressed', 'true'); btn.textContent = 'עצירה';
+            setStep(0);
+            tourTimer = setInterval(() => { if (riseStep >= 3) stopTour(); else setStep(riseStep + 1); }, 2600);
+        });
+        inputs.forEach(input => input.addEventListener('input', drawRise));
+
+        // דוגמה כדי שהשרטוט לא ייפתח ריק: מגרש של 1,000 מ"ר באשדוד, הערכים להמחשה בלבד
+        const EXAMPLE = { plotArea: 1000, coveragePercent: 40, buildingPercent: 160, floors: 4, parkingArea: 0 };
+        Object.entries(EXAMPLE).forEach(([id, v]) => { const el = document.getElementById(id); if (!el.value) el.value = v; });
         calculate();
+        drawRise();
     </script>
 </body>
 </html>
