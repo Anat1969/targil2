@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://appofapp-gh.vercel.app/ai-menu.js"></script>
     <title>מחשבון תכסית ואחוזי בנייה</title>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -226,6 +227,20 @@
             color: #fff;
             border-color: #1a1a1a;
         }
+
+        /* ---- the volume on the plot (shared <space-walk>, appofapp-gh/walk.js) ---- */
+        .volume { margin-top: 40px; }
+        .volume-note { font-size: 0.95rem; margin: -8px 0 16px; }
+        .volume-note b { font-weight: 600; }
+        space-walk {
+            display: block;
+            height: 600px;
+            border: 2px solid #1a1a1a;
+            --sw-ink: #1a1a1a; --sw-paper: #f5f5f5; --sw-card: #fff; --sw-line: #d6d6d6; --sw-muted: #5c5c5c;
+            --sw-accent: #1a1a1a; --sw-problem: #800020; --sw-solution: #2d6a4e; --sw-marker: #f3e37c;
+            --sw-font: 'Rubik', sans-serif;
+        }
+        @media (max-width: 860px) { space-walk { height: auto; } }
     </style>
 </head>
 <body>
@@ -233,6 +248,7 @@
         <div class="nav-menu">
             <a class="nav-btn active" href="index.html">מחשבון תכסית ואחוזי בנייה</a>
             <a class="nav-btn" href="taba.html">טבלה 5 — חילוץ נתונים</a>
+            <ai-menu chat="https://claude.ai/code/session_01Mw5VYGDmVwrjCKpx6c6WJu"></ai-menu>
         </div>
     </div>
 
@@ -303,9 +319,19 @@
             חריגה: שטח הבנייה המבוקש חורג מאחוזי הבנייה המותרים.
         </div>
 
-        <a class="upgrade-link" href="https://claude.ai/code/session_01Mw5VYGDmVwrjCKpx6c6WJu" target="_blank" rel="noopener">שדרוג</a>
+        <section class="volume" aria-label="הנפח על המגרש">
+            <div class="section-title">הנפח על המגרש</div>
+            <p class="volume-note" id="volumeNote">אותן זכויות, שני נפחים. עמדו על המדרכה שממול, או עברו למבט על.</p>
+            <space-walk id="walk"></space-walk>
+        </section>
+
     </div>
 
+    <script src="https://appofapp-gh.vercel.app/walk.js"></script>
+    <script>
+        // same file from the portfolio's GitHub Pages, for days when Vercel is rate-limited
+        if (!customElements.get('space-walk')) document.write('<script src="https://anat1969.github.io/AppOfApp-GH/walk.js"><\/script>');
+    </script>
     <script>
         const inputs = document.querySelectorAll('input');
         inputs.forEach(input => input.addEventListener('input', calculate));
@@ -368,6 +394,95 @@
             } else {
                 warning.classList.remove('visible');
             }
+
+            updateWalk(plotArea, coveragePercent, buildingPercent, floors);
+        }
+
+        // ---- the volume on the plot ----
+        // A square plot facing a street. Two variants with the same building rights:
+        // the requested floors (rights / floors per floor) and full coverage (fewest floors).
+        const FLOOR_H = 3.2;           // assumed floor height, metres
+        const NEIGHBOUR_FLOORS = 4;    // assumed neighbours, for scale
+        const EXAMPLE = { plotArea: 1000, coveragePercent: 40, buildingPercent: 160, floors: 8 };
+        const n1 = (v) => v.toLocaleString('he-IL', { maximumFractionDigits: 1 });
+        const sq = (a) => { const h = Math.sqrt(Math.max(a, 1)) / 2; return [[-h, -h], [h, -h], [h, h], [-h, h]]; };
+
+        function updateWalk(plotArea, coveragePercent, buildingPercent, floors) {
+            const el = document.getElementById('walk');
+            const example = !(plotArea > 0 && coveragePercent > 0 && buildingPercent > 0);
+            const v = example ? EXAMPLE : { plotArea, coveragePercent, buildingPercent, floors: Math.max(1, Math.round(floors)) };
+            const cover = v.plotArea * v.coveragePercent / 100;
+            const total = v.plotArea * v.buildingPercent / 100;
+            const perFloor = total / v.floors;
+            const fullFloors = Math.max(1, Math.ceil(total / cover));
+            const L = Math.sqrt(v.plotArea), H = L / 2;
+            const overCover = perFloor > cover + 0.01;
+
+            const note = document.getElementById('volumeNote');
+            note.innerHTML = example
+                ? 'דוגמה: מגרש <b>1,000 מ"ר</b>, תכסית <b>40%</b>, <b>160%</b> בנייה, <b>8 קומות</b>. מלאו את השדות והנפח יתעדכן.'
+                : 'אותן זכויות, שני נפחים. עמדו על המדרכה שממול, או עברו למבט על.';
+
+            const ground = [
+                { id: 'plot', type: 'prism', points: sq(v.plotArea), h: 0.02, color: '#cfd8c2', mapColor: '#cfd8c2' },
+                { id: 'sidewalk', type: 'surface', x: 0, z: H + 1.5, w: L + 28, d: 3, color: '#d6d2c8' },
+                { id: 'street', type: 'surface', x: 0, z: H + 6.5, w: L + 28, d: 7, color: '#55554f', layer: 1 },
+                { id: 'lane', type: 'surface', x: 0, z: H + 6.5, w: L + 28, d: 0.12, color: '#f4f1ea', layer: 2 },
+                { id: 'sidewalk-2', type: 'surface', x: 0, z: H + 11.5, w: L + 28, d: 3, color: '#d6d2c8' },
+                { id: 'n-west', type: 'box', x: -H - 7.5, z: 0, w: 11, d: Math.min(L, 24), h: NEIGHBOUR_FLOORS * FLOOR_H, color: '#c9c6bf' },
+                { id: 'n-east', type: 'box', x: H + 7.5, z: 0, w: 11, d: Math.min(L, 24), h: NEIGHBOUR_FLOORS * FLOOR_H, color: '#c9c6bf' },
+            ];
+            const allowed = { id: 'cover', type: 'prism', points: sq(cover), h: 0.02, color: '#f3e37c', layer: 1 };
+            const check = (id, label, value, ok) => ({ id, type: 'note', label, value, check: ok ? 'ok' : 'fail' });
+
+            const reqH = v.floors * FLOOR_H, fullH = fullFloors * FLOOR_H;
+            const nH = NEIGHBOUR_FLOORS * FLOOR_H;
+            const scale = (h) => h > nH * 1.05 ? 'גבוה פי **' + n1(h / nH) + '** מהשכנים.' : h < nH * 0.95 ? 'נמוך מהשכנים (**' + n1(nH) + ' מ\'**).' : 'בגובה השכנים.';
+            const plan = {
+                id: 'targil',
+                title: (example ? 'דוגמה · ' : '') + 'מגרש ' + n1(v.plotArea) + ' מ"ר · ' + n1(L) + ' × ' + n1(L) + ' מ\'',
+                bounds: [-H - 14, -H - 8, H + 14, H + 14],
+                ground: '#ddd9cf',
+                speed: 3,
+                spawn: { x: 0, z: H + 12, yaw: 0 },
+                heights: [{ cm: 160, label: 'מבוגר עומד' }, { cm: 95, label: 'ילד בן 3' }],
+                rule: 'הנפח: זכויות הבנייה העיליות חלקי מספר הקומות, כריבוע במרכז המגרש. גובה קומה **3.2 מ\'** (הונח). השכנים: **4 קומות** (הונח), רק לקנה מידה. מגבלה: בלי קווי בניין, מרפסות וגג.',
+                source: 'החישוב: שטח המגרש כפול אחוזי הבנייה, ושטח המגרש כפול התכסית, כמו בטבלה שמעל.',
+                items: ground,
+                variants: [
+                    {
+                        id: 'requested', label: 'הקומות המבוקשות', tone: overCover ? 'problem' : 'solution',
+                        note: overCover ? '**הקומה חורגת מהתכסית**: ' + n1(perFloor) + ' מ"ר מול ' + n1(cover) + ' מ"ר מותרים.' : 'כל קומה נכנסת בתכסית המותרת, המסומנת בצהוב על המגרש.',
+                        summary: {
+                            insight: '**' + v.floors + ' קומות**, גובה **' + n1(reqH) + ' מ\'**',
+                            explain: 'כל קומה **' + n1(perFloor) + ' מ"ר**, ' + (overCover ? 'יותר מ' : 'בתוך ') + 'התכסית של **' + n1(cover) + ' מ"ר**. ' + scale(reqH),
+                        },
+                        items: [
+                            allowed,
+                            { id: 'bldg', type: 'prism', points: sq(perFloor), h: reqH, color: overCover ? '#d9a79b' : '#ece8df' },
+                            check('c-cover', 'תכסית בפועל', n1(perFloor / v.plotArea * 100) + '%', !overCover),
+                            check('c-floors', 'קומות', String(v.floors), true),
+                            check('c-height', 'גובה', n1(reqH) + ' מ\'', true),
+                        ],
+                    },
+                    {
+                        id: 'full', label: 'במלוא התכסית', tone: 'solution',
+                        note: 'אותן זכויות, בכמה שפחות קומות: כל קומה ממלאת את התכסית.',
+                        summary: {
+                            insight: '**' + fullFloors + ' קומות**, גובה **' + n1(fullH) + ' מ\'**',
+                            explain: 'כל קומה **' + n1(cover) + ' מ"ר**, מלוא התכסית. אותן **' + n1(total) + ' מ"ר** זכויות כמו בבקשה. ' + scale(fullH),
+                        },
+                        items: [
+                            allowed,
+                            { id: 'bldg', type: 'prism', points: sq(cover), h: fullH, color: '#ece8df' },
+                            check('c-cover', 'תכסית בפועל', n1(v.coveragePercent) + '%', true),
+                            check('c-floors', 'קומות', String(fullFloors), true),
+                            check('c-height', 'גובה', n1(fullH) + ' מ\'', true),
+                        ],
+                    },
+                ],
+            };
+            el.plan = plan;
         }
 
         calculate();
