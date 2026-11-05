@@ -1,467 +1,146 @@
 <!DOCTYPE html>
 <html dir="rtl" lang="he">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מחשבון תב"ע — טבלה 5</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Rubik', sans-serif;
-            background: #fff;
-            color: #1a1a1a;
-            padding: 0;
-            line-height: 1.6;
-        }
-
-        .header {
-            background: #f5f5f5;
-            border-bottom: 2px solid #1a1a1a;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 32px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #1a1a1a;
-            text-align: center;
-        }
-
-        .nav-link {
-            display: inline-block;
-            margin-bottom: 24px;
-            font-size: 0.875rem;
-            color: #555;
-            text-decoration: none;
-            border-bottom: 1px solid #ccc;
-        }
-
-        .nav-link:hover {
-            color: #1a1a1a;
-            border-color: #1a1a1a;
-        }
-
-        .input-group {
-            margin-bottom: 16px;
-        }
-
-        label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: 4px;
-            color: #333;
-        }
-
-        input[type="text"],
-        input[type="number"] {
-            width: 100%;
-            padding: 10px 12px;
-            font-family: 'Rubik', sans-serif;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 0;
-            outline: none;
-            background: #fff;
-            color: #1a1a1a;
-            -moz-appearance: textfield;
-        }
-
-        input:focus {
-            border-color: #666;
-        }
-
-        .drop-zone {
-            margin-top: 8px;
-            padding: 32px;
-            border: 2px dashed #ccc;
-            text-align: center;
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-
-        .drop-zone:hover,
-        .drop-zone.dragover {
-            border-color: #666;
-        }
-
-        .drop-zone p {
-            font-size: 0.875rem;
-            color: #777;
-            margin-bottom: 8px;
-        }
-
-        .drop-zone .file-name {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #1a1a1a;
-        }
-
-        .drop-zone input[type="file"] {
-            display: none;
-        }
-
-        .mavat-link {
-            display: inline-block;
-            margin-top: 12px;
-            font-size: 0.8rem;
-            color: #777;
-            text-decoration: none;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .mavat-link:hover {
-            color: #1a1a1a;
-            border-color: #1a1a1a;
-        }
-
-        .section-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-top: 36px;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .status {
-            font-size: 0.875rem;
-            color: #777;
-            margin-bottom: 16px;
-        }
-
-        .status.error {
-            color: #800020;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-            margin-top: 12px;
-        }
-
-        .results-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.75rem;
-            min-width: 1200px;
-        }
-
-        .results-table thead th {
-            background: #f5f5f5;
-            font-weight: 600;
-            text-align: center;
-            padding: 6px 8px;
-            border: 1px solid #ccc;
-            white-space: normal;
-            vertical-align: middle;
-            line-height: 1.4;
-        }
-
-        .results-table thead tr:first-child th {
-            background: #eaeaea;
-        }
-
-        .results-table thead tr:nth-child(2) th {
-            background: #f0f0f0;
-        }
-
-        .results-table thead tr:nth-child(3) th {
-            background: #f5f5f5;
-        }
-
-        .results-table td {
-            padding: 6px 8px;
-            border: 1px solid #ddd;
-            text-align: center;
-            vertical-align: middle;
-            white-space: nowrap;
-        }
-
-        .results-table tbody tr:hover {
-            background: #fafafa;
-        }
-
-        .no-results {
-            font-size: 0.875rem;
-            color: #999;
-            padding: 20px 0;
-        }
-
-        .footnote-ref {
-            color: #800020;
-            font-weight: 600;
-            cursor: default;
-        }
-
-        .footnotes-section {
-            margin-top: 16px;
-            padding: 12px 16px;
-            background: #fafafa;
-            border: 1px solid #eee;
-            border-right: 3px solid #800020;
-        }
-
-        .footnotes-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        .footnote-item {
-            font-size: 0.8rem;
-            color: #444;
-            margin-bottom: 4px;
-            line-height: 1.6;
-        }
-
-        .footnote-num {
-            font-weight: 600;
-            color: #800020;
-            margin-left: 4px;
-        }
-
-        .raw-text-toggle {
-            margin-top: 24px;
-            font-size: 0.8rem;
-            color: #999;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        .raw-text {
-            display: none;
-            margin-top: 12px;
-            padding: 12px;
-            background: #f9f9f9;
-            border: 1px solid #eee;
-            font-size: 0.75rem;
-            white-space: pre-wrap;
-            direction: rtl;
-            max-height: 400px;
-            overflow-y: auto;
-            line-height: 1.8;
-        }
-
-        .raw-text.visible {
-            display: block;
-        }
-
-        .upgrade-link {
-            display: inline-block;
-            margin-top: 28px;
-            padding: 10px 24px;
-            font-family: 'Rubik', sans-serif;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #1a1a1a;
-            background: none;
-            border: 1px solid #1a1a1a;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .upgrade-link:hover {
-            background: #1a1a1a;
-            color: #fff;
-        }
-
-        .action-btn {
-            margin-top: 16px;
-            padding: 10px 24px;
-            font-family: 'Rubik', sans-serif;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #fff;
-            background: #1a1a1a;
-            border: 1px solid #1a1a1a;
-            cursor: pointer;
-        }
-
-        .action-btn:hover {
-            background: #333;
-        }
-
-        .program-summary {
-            margin-top: 20px;
-            padding: 16px;
-            background: #f9f9f9;
-            border-top: 3px solid #1a1a1a;
-            border-left: 1px solid #ddd;
-            border-right: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .program-summary-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: #333;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .program-field {
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .program-field-label {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #555;
-            min-width: 120px;
-        }
-
-        .program-field-value {
-            font-size: 0.875rem;
-            color: #1a1a1a;
-            flex: 1;
-            text-align: right;
-            direction: rtl;
-        }
-
-        .action-btn:disabled {
-            background: #ccc;
-            border-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        .buttons-container {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-            flex-wrap: wrap;
-        }
-
-        .buttons-container .action-btn,
-        .buttons-container .upgrade-link {
-            margin-top: 0;
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .requirements-section {
-            margin-top: 40px;
-            padding-top: 24px;
-            border-top: 2px solid #eee;
-        }
-
-        .requirement-item {
-            margin-bottom: 20px;
-            padding: 12px 16px;
-            background: #f9f9f9;
-            border-right: 3px solid #0066cc;
-        }
-
-        .requirement-authority {
-            font-weight: 600;
-            color: #0066cc;
-            margin-bottom: 6px;
-        }
-
-        .requirement-text {
-            font-size: 0.875rem;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .requirement-section-ref {
-            font-size: 0.8rem;
-            color: #777;
-            margin-top: 6px;
-            font-style: italic;
-        }
-
-        .requirements-container {
-            margin-top: 16px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>טבלה 5: המקור של הנפח</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<script src="https://appofapp-gh.vercel.app/ai-menu.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
+<style>
+  .frame.two{grid-template-columns:var(--side-r) minmax(0,1fr)}
+  .field.text{grid-template-columns:minmax(0,1fr) 130px}
+  .field.text input{font-family:var(--sans);text-align:right;direction:rtl}
+  .drop-zone{position:relative;display:grid;place-items:center;gap:4px;min-height:84px;padding:12px;text-align:center;cursor:pointer;
+    background:repeating-linear-gradient(45deg,#FBFAF7 0 10px,#F4F2EC 10px 20px);box-shadow:inset 0 0 0 1px var(--rule);transition:box-shadow .15s}
+  .drop-zone:hover{box-shadow:inset 0 0 0 1px var(--ink-3)}
+  .drop-zone.dragover{box-shadow:inset 0 0 0 3px var(--rights)}
+  .drop-zone p{font-size:13.5px;color:var(--ink-2)}
+  .drop-zone .file-name{font-family:var(--mono);font-size:11.5px;color:var(--rights);word-break:break-all}
+  .drop-zone input{display:none}
+  .mavat-link{font-size:12.5px;color:var(--ink-3);display:inline-block;margin-top:6px}
+  .mavat-link:hover{color:var(--rights)}
+  .action-btn{font:inherit;font-size:14px;border:0;border-radius:0;cursor:pointer;height:var(--btn-h);width:100%;margin-top:10px;
+    background:var(--rights-soft);color:var(--rights-deep);font-weight:600;box-shadow:0 1px 2px rgba(20,22,24,.07);transition:transform .15s,box-shadow .15s,background .15s}
+  .action-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-up);background:var(--rights-mid)}
+  .action-btn:active{transform:translateY(1px);box-shadow:none}
+  .action-btn:disabled{opacity:.45;cursor:default;transform:none;box-shadow:none}
+  #newExtractionBtn{width:auto;padding:0 16px;background:var(--rule-soft);color:var(--ink-2);font-weight:400}
+  .steps{display:grid;gap:6px;margin:0;padding:0;list-style:none;counter-reset:s}
+  .steps li{display:grid;grid-template-columns:24px minmax(0,1fr);gap:8px;font-size:13.5px;color:var(--ink-2);counter-increment:s}
+  .steps li::before{content:counter(s,decimal-leading-zero);font-family:var(--mono);font-size:12px;color:var(--rights);padding-top:2px}
+  .status{font-family:var(--mono);font-size:12px;color:var(--ink-3);min-height:1em}
+  .status.error{color:var(--problem)}
+  .program-summary{background:#fff;box-shadow:var(--shadow);padding:14px 16px;flex:none;border-inline-start:4px solid var(--rights)}
+  .program-summary-title{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-bottom:6px}
+  .program-field{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px;padding:3px 0;font-size:14px}
+  .program-field-label{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);padding-top:2px}
+  .table-card{background:#fff;box-shadow:var(--shadow);flex:none}
+  .table-wrapper{overflow-x:auto;max-width:100%}
+  .results-table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:1040px}
+  .results-table th{background:var(--paper);font-weight:500;font-size:11.5px;color:var(--ink-2);padding:6px 6px;border-bottom:1px solid var(--rule);border-inline-start:1px solid var(--rule-soft);vertical-align:bottom;line-height:1.3}
+  .results-table td{padding:6px;border-bottom:1px solid var(--rule-soft);border-inline-start:1px solid var(--rule-soft);font-family:var(--mono);font-size:12.5px;text-align:center;white-space:nowrap}
+  .results-table td:nth-child(n+2):nth-child(-n+5){font-family:var(--sans);text-align:right;white-space:normal}
+  .results-table tbody tr:hover td{background:#FBFAF7}
+  .results-table td.go{padding:4px}
+  .to-volume{display:inline-flex;align-items:center;justify-content:center;height:30px;padding:0 10px;background:var(--rights-soft);color:var(--rights-deep);font-family:var(--sans);font-size:12.5px;font-weight:600;text-decoration:none;box-shadow:0 1px 2px rgba(20,22,24,.07);white-space:nowrap}
+  .to-volume:hover{background:var(--rights-mid)}
+  .to-volume[aria-disabled="true"]{opacity:.4;pointer-events:none}
+  .footnote-ref{color:var(--rights);font-size:10px}
+  .footnotes-section{padding:12px 16px;border-top:1px solid var(--rule)}
+  .footnotes-title{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-bottom:6px}
+  .footnote-item{font-size:13px;color:var(--ink-2);padding:2px 0}
+  .footnote-num{font-family:var(--mono);color:var(--rights)}
+  .no-results{padding:16px;color:var(--ink-3)}
+  .empty{display:grid;gap:14px;padding:24px;background:#fff;box-shadow:var(--shadow)}
+  .empty h2{font-size:22px;font-weight:300}
+  .empty h2 b{font-weight:600}
+  .flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .flow div{padding:12px;background:var(--paper)}
+  .flow .n{font-family:var(--mono);font-size:22px;color:var(--rights)}
+  .flow b{display:block;font-size:14.5px}
+  .flow p{font-size:13px;color:var(--ink-2)}
+  .requirement-item{background:#fff;box-shadow:var(--shadow);padding:12px 16px;flex:none}
+  .requirement-authority{font-weight:600;font-size:14.5px;margin-bottom:4px}
+  .requirement-text{font-size:13.5px;color:var(--ink-2);padding:3px 0}
+  .requirement-section-ref{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+  .raw-text-toggle{font-family:var(--mono);font-size:12px;color:var(--ink-3);cursor:pointer;text-decoration:underline;flex:none}
+  .raw-text{display:none;white-space:pre-wrap;font-family:var(--mono);font-size:11.5px;background:#fff;box-shadow:var(--shadow);padding:12px;max-height:320px;overflow:auto;flex:none}
+  .raw-text.visible{display:block}
+  .section-title{font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+  @media (max-width:900px){.frame.two{grid-template-columns:minmax(0,1fr)}.flow{grid-template-columns:minmax(0,1fr)}}
+</style>
 </head>
 <body>
-    <div class="header">
-        <div class="nav-menu">
-            <a class="nav-btn" href="index.html">מחשבון תכסית ואחוזי בנייה</a>
-            <a class="nav-btn active" href="taba.html">טבלה 5 — חילוץ נתונים</a>
-        </div>
+<header class="topbar">
+  <a class="home" href="index.html" aria-label="תכסית ונפח, לדף הבית">
+    <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect x="2.5" y="2.5" width="25" height="25" fill="#fff" stroke="#141618" stroke-width="1.5"/><rect x="8" y="8" width="14" height="14" fill="#F3E37C"/><rect x="11" y="11" width="8" height="8" fill="#1F5E6B"/></svg>
+    <span class="brand"><b>תכסית ונפח</b><small>תרגיל 2 · זכויות בנייה כנפח</small></span>
+  </a>
+  <nav class="mainnav" aria-label="ניווט תוכן">
+    <a href="index.html"><small>01</small>הנפח על המגרש</a>
+    <a href="taba.html" aria-current="page"><small>02</small>טבלה 5 מהתב"ע</a>
+  </nav>
+  <ai-menu chat="https://claude.ai/code/session_01UBnSCKjceAQftmEhcfhDHZ"></ai-menu>
+</header>
+
+<main class="page">
+  <section class="lens">
+    <div>
+      <div class="kicker">המקור · הוראות התוכנית, טבלה 5</div>
+      <h1>הזכויות כתובות בטבלה, <b>הנפח</b> לא</h1>
+      <p class="sub">מעלים את טבלה 5 מקובץ התוכנית, מוצאים את המגרש, ושולחים את השורה לנפח בלחיצה אחת.</p>
     </div>
+    <div class="meta"><span>הקובץ נקרא בדפדפן בלבד</span><span>לא נשלח לשום שרת</span></div>
+  </section>
 
-    <div class="container">
-        <h1>מחשבון תב"ע — טבלה 5</h1>
-
-        <div class="input-group">
-            <label for="planNumber">מספר תב"ע</label>
-            <input type="text" id="planNumber" placeholder='לדוגמה: רע/1/1א'>
+  <div class="frame two">
+    <aside class="pane" aria-label="הקבצים">
+      <div class="ph"><span><b>01</b> הקובץ</span></div>
+      <div class="card">
+        <div class="field text"><label for="planNumber">מספר תב"ע<small>לזיהוי בלבד</small></label><input type="text" id="planNumber" placeholder="רע/1/1א"></div>
+        <div class="field text"><label for="plotNumber">מספר מגרש<small>מסנן את השורות</small></label><input type="text" id="plotNumber" placeholder="101"></div>
+        <div class="drop-zone" id="dropZone" style="margin-top:10px">
+          <p>טבלה 5 כ-PDF: גוררים לכאן או לוחצים</p>
+          <span class="file-name" id="fileName"></span>
+          <input type="file" id="fileInput" accept=".pdf">
         </div>
-
-        <div class="input-group">
-            <label for="plotNumber">מספר מגרש</label>
-            <input type="text" id="plotNumber" placeholder='לדוגמה: 101'>
+        <a class="mavat-link" href="https://mavat.iplan.gov.il/SV3" target="_blank" rel="noopener">איפה מוצאים: מבא"ת, מסמכי התוכנית</a>
+        <button class="action-btn" id="parseBtn" disabled>חילוץ הטבלה</button>
+      </div>
+      <div class="ph"><span><b>02</b> דרישות הגורמים · לא חובה</span></div>
+      <div class="card requirements-section" id="requirementsSection">
+        <div class="drop-zone" id="instructionsDropZone">
+          <p>הוראות התב"ע כ-PDF</p>
+          <span class="file-name" id="instructionsFileName"></span>
+          <input type="file" id="instructionsFileInput" accept=".pdf">
         </div>
+        <button class="action-btn" id="requirementsBtn" disabled>חילוץ הדרישות</button>
+      </div>
+      <p class="src">החילוץ מזהה עמודות לפי מילות כותרת. טבלה סרוקה כתמונה לא תיקרא: אז מקלידים את המספרים בדף הנפח.</p>
+    </aside>
 
-        <div class="input-group">
-            <label>קובץ PDF של טבלה 5</label>
-            <div class="drop-zone" id="dropZone">
-                <p>גררי קובץ PDF לכאן או לחצי לבחירה</p>
-                <span class="file-name" id="fileName"></span>
-                <input type="file" id="fileInput" accept=".pdf">
-            </div>
-            <a class="mavat-link" href="https://mavat.iplan.gov.il/SV3" target="_blank" rel="noopener">הורדת טבלה 5 מאתר מאב"ת</a>
+    <section class="pane" aria-label="הטבלה">
+      <div class="ph"><span><b>03</b> <span class="section-title" id="resultsTitle" style="display:none">השורות מהטבלה · "לנפח" שולח את המגרש לחישוב</span></span><span class="status" id="status"></span></div>
+      <div class="empty" id="emptyState">
+        <h2>שלושה צעדים <b>מהטבלה לנפח</b></h2>
+        <div class="flow">
+          <div><span class="n">01</span><b>מעלים את טבלה 5</b><p>מקובץ הוראות התוכנית במבא"ת.</p></div>
+          <div><span class="n">02</span><b>מסננים למגרש</b><p>מספר המגרש מוצא את השורה שלו.</p></div>
+          <div><span class="n">03</span><b>לוחצים "לנפח"</b><p>שטח, תכסית, זכויות וקומות עוברים לחישוב.</p></div>
         </div>
-
-        <div class="buttons-container">
-            <button class="action-btn" id="parseBtn" disabled>חלץ נתונים</button>
-            <a class="upgrade-link" href="https://claude.ai/code/session_01Mw5VYGDmVwrjCKpx6c6WJu" target="_blank" rel="noopener">שדרוג</a>
-        </div>
-
-        <div class="requirements-section" id="requirementsSection">
-            <div class="section-title">דרישות הגורמים</div>
-
-            <div class="input-group">
-                <label>קובץ PDF של הוראות התב"ע</label>
-                <div class="drop-zone" id="instructionsDropZone">
-                    <p>גררי קובץ PDF לכאן או לחצי לבחירה</p>
-                    <span class="file-name" id="instructionsFileName"></span>
-                    <input type="file" id="instructionsFileInput" accept=".pdf">
-                </div>
-            </div>
-
-            <div class="buttons-container">
-                <button class="action-btn" id="requirementsBtn" disabled>חלץ דרישות</button>
-            </div>
-
-            <div class="status" id="requirementsStatus"></div>
-            <div id="requirementsContainer"></div>
-        </div>
-
-        <div class="section-title" id="resultsTitle" style="display:none">תוצאות</div>
-
-        <div class="status" id="status"></div>
-
-        <div id="programSummary" class="program-summary" style="display:none"></div>
-
-        <div id="resultsContainer"></div>
-
-        <div class="raw-text-toggle" id="rawToggle" style="display:none">הצג טקסט גולמי מה-PDF</div>
-        <div class="raw-text" id="rawText"></div>
-    </div>
+      </div>
+      <div id="programSummary" class="program-summary" style="display:none"></div>
+      <div id="resultsContainer"></div>
+      <div class="status" id="requirementsStatus"></div>
+      <div id="requirementsContainer" style="display:grid;gap:8px"></div>
+      <div class="raw-text-toggle" id="rawToggle" style="display:none">הטקסט הגולמי מה-PDF</div>
+      <div class="raw-text" id="rawText"></div>
+    </section>
+  </div>
+</main>
 
     <script type="module">
         const pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs');
@@ -1169,11 +848,12 @@
                 }
             }
 
-            let html = '<div class="table-wrapper">';
+            let html = '<div class="table-card"><div class="table-wrapper">';
             html += `<table class="results-table">`;
             html += '<thead>';
 
             html += '<tr>';
+            html += '<th rowspan="3">לנפח</th>';
             html += '<th rowspan="3">ייעוד</th>';
             html += '<th rowspan="3">שימוש</th>';
             html += '<th rowspan="3">תאי שטח</th>';
@@ -1209,6 +889,10 @@
 
             for (const row of rows) {
                 html += '<tr>';
+                const q = volumeQuery(row);
+                html += q
+                    ? `<td class="go"><a class="to-volume" href="index.html?${q}" title="שטח, תכסית, זכויות וקומות עוברים לחישוב">לנפח</a></td>`
+                    : '<td class="go"><a class="to-volume" aria-disabled="true" title="חסר שטח מגרש או תכסית בשורה">לנפח</a></td>';
                 for (let i = 0; i < 17; i++) {
                     const cellText = row[i] || '';
                     const highlighted = escapeHtml(cellText).replace(
@@ -1230,13 +914,31 @@
                 html += '<div class="footnotes-title">הערות</div>';
                 for (const fn of footnotes) {
                     const isReferenced = referencedNums.has(fn.num);
-                    const highlightClass = isReferenced ? ' style="font-weight:600;"' : '';
+                    const highlightClass = isReferenced ? ' style="font-weight:600;color:var(--ink)"' : '';
                     html += `<div class="footnote-item"${highlightClass}><span class="footnote-num">(${escapeHtml(fn.num)})</span> ${escapeHtml(fn.text)}</div>`;
                 }
                 html += '</div>';
             }
 
+            html += '</div>';
             resultsContainer.innerHTML = html;
+            document.getElementById('emptyState').hidden = true;
+        }
+
+        // a row of table 5 becomes the volume page's inputs: plot, coverage, above-ground main rights, floors
+        function cellNum(cell) {
+            if (!cell) return 0;
+            const m = String(cell).replace(/\(\d+\)/g, '').replace(/,/g, '').match(/\d+(?:\.\d+)?/);
+            return m ? parseFloat(m[0]) : 0;
+        }
+        function volumeQuery(row) {
+            const a = cellNum(row[4]), c = cellNum(row[11]), main = cellNum(row[5]), pct = cellNum(row[10]), n = cellNum(row[15]);
+            if (!(a > 0 && c > 0 && c <= 100)) return '';
+            const r = main > 0 ? Math.round(main / a * 1000) / 10 : pct;
+            if (!(r > 0)) return '';
+            const q = new URLSearchParams({ a: String(a), c: String(c), r: String(r) });
+            if (n > 0) q.set('n', String(Math.round(n)));
+            return q.toString();
         }
 
         function escapeHtml(str) {
@@ -1252,7 +954,7 @@
                 return;
             }
 
-            let html = '<div class="program-summary-title">רזומה - תוכנית</div>';
+            let html = '<div class="program-summary-title">התוכנית</div>';
 
             if (programInfo.planNumber) {
                 html += '<div class="program-field">';
