@@ -1,7 +1,7 @@
 # GitHub Pages serves this app from branch gh-pages, which had stopped following the default branch
-# (03.11.2026: the live page was still the July version). On every push, index.html is copied there.
-# taba.html is NOT copied: the gh-pages copy has the requirements extraction that the default branch lacks.
-name: sync index.html to Pages
+# (03.11.2026: the live page was still the July version). On every push, the app files are copied there.
+# 05.11.2026: taba.html from gh-pages was merged into the default branch, so all three files are copied.
+name: sync the app to Pages
 on:
   push:
     branches: [claude/architect-coverage-calculator-ozjyul]
@@ -22,11 +22,11 @@ jobs:
         with:
           ref: gh-pages
           path: site
-      - name: Copy index.html and push when it changed
+      - name: Copy the app and push when it changed
         run: |
-          cp src/index.html site/index.html
+          cp src/index.html src/taba.html src/app.css site/
           cd site
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html
-          git diff --cached --quiet || { git commit -q -m "index.html from ${GITHUB_SHA}"; git push -q origin gh-pages; }
+          git add index.html taba.html app.css
+          git diff --cached --quiet || { git commit -q -m "app from ${GITHUB_SHA}"; git push -q origin gh-pages; }
