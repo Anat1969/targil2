@@ -1,491 +1,497 @@
 <!DOCTYPE html>
 <html dir="rtl" lang="he">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://appofapp-gh.vercel.app/ai-menu.js"></script>
-    <title>מחשבון תכסית ואחוזי בנייה</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>תכסית ונפח: אותן זכויות, נפח אחר</title>
+<meta name="description" content="מחשבון תכסית ואחוזי בנייה שמראה את הזכויות כנפח על המגרש, עם כל החלופות בחתך ושותף לחשיבה.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Hebrew:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<script src="https://appofapp-gh.vercel.app/ai-menu.js"></script>
+<style>
+  /* ===== הטור הימני: נתונים וחשבון ===== */
+  .datahead{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+  .ledger{display:grid;gap:0;margin:0}
+  .ledger .r{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:0 10px;padding:7px 0;border-bottom:1px solid var(--rule-soft)}
+  .ledger .r:last-child{border-bottom:0}
+  .ledger dt{font-size:13.5px;color:var(--ink-2)}
+  .ledger dt small{display:block;font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
+  .ledger dd{margin:0;font-family:var(--mono);font-size:15px;font-weight:500;text-align:left;direction:ltr;white-space:nowrap;align-self:center}
+  .ledger .r.key dd{font-size:18px}
+  .ledger .bad dd{color:var(--problem)} .ledger .good dd{color:var(--solution)}
+  .usebar{margin-top:10px}
+  .usebar .top{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-2)}
+  .usebar .top b{font-family:var(--mono);font-weight:500}
+  .track{position:relative;height:8px;background:var(--rule-soft);margin-top:4px}
+  .track .fill{height:100%;background:var(--rights);transition:width .4s}
+  .track .tick{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);inset-inline-end:0}
+  .usebar.over .fill{background:var(--problem)} .usebar.over .top b{color:var(--problem)}
+  .plan svg{display:block;width:100%;max-width:260px;margin:0 auto;height:auto}
+  .legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--ink-2);margin-top:6px}
+  .legend i{display:inline-block;width:10px;height:10px;margin-inline-end:5px;vertical-align:-1px}
+  .basis{font-size:12px;color:var(--ink-3);line-height:1.5}
+  .basis b{color:var(--ink-2);font-weight:500}
 
-        body {
-            font-family: 'Rubik', sans-serif;
-            background: #fff;
-            color: #1a1a1a;
-            padding: 0;
-            line-height: 1.6;
-        }
+  /* ===== המוקד: המודל והחתכים ===== */
+  .focus{gap:12px}
+  .walkbox{position:relative;flex:1;min-height:440px;box-shadow:var(--shadow);background:#fff}
+  .walkbox space-walk{position:absolute;inset:0;height:100%;
+    --sw-ink:#141618; --sw-paper:#F7F6F2; --sw-card:#fff; --sw-line:#DEDDD7; --sw-muted:#6B7178;
+    --sw-accent:#1F5E6B; --sw-problem:#B3261E; --sw-solution:#2E7D4F; --sw-marker:#FFE45C;
+    --sw-font:"IBM Plex Sans Hebrew",system-ui,sans-serif; --sw-display:"IBM Plex Sans Hebrew",system-ui,sans-serif}
+  .strip{padding:12px 16px 8px}
+  .strip .head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:4px}
+  .strip .head h2{font-size:16px;font-weight:500}
+  .strip .head h2 b{font-weight:600}
+  .strip svg{display:block;width:100%;height:auto;overflow:visible}
+  .alt{cursor:pointer}
+  .alt .hit{fill:transparent;transition:fill .15s}
+  .alt:hover .hit{fill:var(--rule-soft)}
+  .alt:focus{outline:none}
+  .alt:focus-visible .hit{fill:var(--rights-soft)}
+  .alt.sel .hit{fill:var(--rights-soft)}
+  .alt .grow{transform-box:fill-box;transform-origin:50% 100%}
+  .grown .alt .grow{animation:grow .7s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
 
-        .header {
-            background: #f5f5f5;
-            border-bottom: 2px solid #1a1a1a;
-            padding: 20px;
-        }
+  /* ===== השותף ===== */
+  .partner-note{font-size:12.5px;color:var(--ink-3);line-height:1.5}
+  .prompt{font-family:var(--mono);font-size:11.5px;line-height:1.55;color:var(--ink-2);background:var(--paper);padding:8px 10px;max-height:7.8em;overflow:hidden;white-space:pre-wrap;position:relative;margin:0 0 10px}
+  .prompt::after{content:"";position:absolute;inset:auto 0 0 0;height:2.2em;background:linear-gradient(transparent,var(--paper))}
+  .distill{font-size:14px;font-weight:500;margin-bottom:8px}
+  .crit{font-size:15px;line-height:1.5}
+  .crit b{font-family:var(--mono);font-weight:500}
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        h1 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 32px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #1a1a1a;
-            text-align: center;
-        }
-
-        .input-group {
-            margin-bottom: 16px;
-        }
-
-        label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: 4px;
-            color: #333;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px 12px;
-            font-family: 'Rubik', sans-serif;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 0;
-            outline: none;
-            background: #fff;
-            color: #1a1a1a;
-            -moz-appearance: textfield;
-        }
-
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        input:focus {
-            border-color: #666;
-        }
-
-        .section-title {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-top: 36px;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .result-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .result-label {
-            font-size: 0.875rem;
-            color: #555;
-        }
-
-        .result-value {
-            font-size: 1rem;
-            font-weight: 500;
-            direction: ltr;
-        }
-
-        .bar-container {
-            margin-top: 24px;
-            margin-bottom: 8px;
-        }
-
-        .bar-label {
-            font-size: 0.875rem;
-            color: #555;
-            margin-bottom: 6px;
-        }
-
-        .bar-track {
-            width: 100%;
-            height: 28px;
-            background: #eee;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .bar-fill {
-            height: 100%;
-            background: #888;
-            transition: width 0.2s ease, background 0.2s ease;
-            min-width: 0;
-        }
-
-        .bar-fill.overflow {
-            background: #800020;
-        }
-
-        .bar-percent {
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-top: 4px;
-            text-align: left;
-            direction: ltr;
-        }
-
-        .bar-percent.overflow {
-            color: #800020;
-        }
-
-        .warning {
-            margin-top: 20px;
-            padding: 12px;
-            border: 1px solid #800020;
-            color: #800020;
-            font-size: 0.875rem;
-            font-weight: 500;
-            display: none;
-        }
-
-        .warning.visible {
-            display: block;
-        }
-
-        .upgrade-link {
-            display: inline-block;
-            margin-top: 28px;
-            padding: 10px 24px;
-            font-family: 'Rubik', sans-serif;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: #1a1a1a;
-            background: none;
-            border: 1px solid #1a1a1a;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .upgrade-link:hover {
-            background: #1a1a1a;
-            color: #fff;
-        }
-
-        .nav-link {
-            display: inline-block;
-            margin-bottom: 24px;
-            font-size: 0.875rem;
-            color: #555;
-            text-decoration: none;
-            border-bottom: 1px solid #ccc;
-        }
-
-        .nav-link:hover {
-            color: #1a1a1a;
-            border-color: #1a1a1a;
-        }
-
-        .nav-menu {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 0 20px;
-            justify-content: center;
-        }
-
-        .nav-btn {
-            padding: 14px 24px;
-            font-family: 'Rubik', sans-serif;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            background: #fff;
-            border: 2px solid #1a1a1a;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .nav-btn:hover {
-            background: #1a1a1a;
-            color: #fff;
-        }
-
-        .nav-btn.active {
-            background: #1a1a1a;
-            color: #fff;
-            border-color: #1a1a1a;
-        }
-
-        /* ---- the volume on the plot (shared <space-walk>, appofapp-gh/walk.js) ---- */
-        .volume { margin-top: 40px; }
-        .volume-note { font-size: 0.95rem; margin: -8px 0 16px; }
-        .volume-note b { font-weight: 600; }
-        space-walk {
-            display: block;
-            height: 600px;
-            border: 2px solid #1a1a1a;
-            --sw-ink: #1a1a1a; --sw-paper: #f5f5f5; --sw-card: #fff; --sw-line: #d6d6d6; --sw-muted: #5c5c5c;
-            --sw-accent: #1a1a1a; --sw-problem: #800020; --sw-solution: #2d6a4e; --sw-marker: #f3e37c;
-            --sw-font: 'Rubik', sans-serif;
-        }
-        @media (max-width: 860px) { space-walk { height: auto; } }
-    </style>
+  @media (max-width:900px){
+    .walkbox{min-height:0}
+    .walkbox space-walk{position:static;height:auto}
+  }
+</style>
 </head>
 <body>
-    <div class="header">
-        <div class="nav-menu">
-            <a class="nav-btn active" href="index.html">מחשבון תכסית ואחוזי בנייה</a>
-            <a class="nav-btn" href="taba.html">טבלה 5 — חילוץ נתונים</a>
-            <ai-menu chat="https://claude.ai/code/session_01Mw5VYGDmVwrjCKpx6c6WJu"></ai-menu>
-        </div>
+<header class="topbar">
+  <a class="home" href="index.html" aria-label="תכסית ונפח, לדף הבית">
+    <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect x="2.5" y="2.5" width="25" height="25" fill="#fff" stroke="#141618" stroke-width="1.5"/><rect x="8" y="8" width="14" height="14" fill="#F3E37C"/><rect x="11" y="11" width="8" height="8" fill="#1F5E6B"/></svg>
+    <span class="brand"><b>תכסית ונפח</b><small>תרגיל 2 · זכויות בנייה כנפח</small></span>
+  </a>
+  <nav class="mainnav" aria-label="ניווט תוכן">
+    <a href="index.html" aria-current="page"><small>01</small>הנפח על המגרש</a>
+    <a href="taba.html"><small>02</small>טבלה 5 מהתב"ע</a>
+  </nav>
+  <ai-menu chat="https://claude.ai/code/session_01UBnSCKjceAQftmEhcfhDHZ"></ai-menu>
+</header>
+
+<main class="page">
+  <section class="lens">
+    <div>
+      <div class="kicker" id="kicker">זכויות בנייה הן כמות חומר · אותה כמות, לרוחב או לגובה</div>
+      <h1 id="insight">אותן זכויות, נפח אחר</h1>
+      <p class="sub" id="explain"></p>
     </div>
-
-    <div class="container">
-        <h1>מחשבון תכסית ואחוזי בנייה</h1>
-
-        <div class="input-group">
-            <label for="plotArea">שטח מגרש (מ"ר)</label>
-            <input type="number" id="plotArea" min="0" step="any" placeholder="0">
-        </div>
-
-        <div class="input-group">
-            <label for="coveragePercent">תכסית מותרת (%)</label>
-            <input type="number" id="coveragePercent" min="0" max="100" step="any" placeholder="0">
-        </div>
-
-        <div class="input-group">
-            <label for="buildingPercent">אחוזי בנייה מותרים (%)</label>
-            <input type="number" id="buildingPercent" min="0" step="any" placeholder="0">
-        </div>
-
-        <div class="input-group">
-            <label for="floors">מספר קומות מבוקש</label>
-            <input type="number" id="floors" min="1" step="1" placeholder="1">
-        </div>
-
-        <div class="input-group">
-            <label for="parkingArea">שטח חניון תת-קרקעי (מ"ר)</label>
-            <input type="number" id="parkingArea" min="0" step="any" placeholder="0">
-        </div>
-
-        <div class="section-title">תוצאות</div>
-
-        <div class="result-row">
-            <span class="result-label">שטח תכסית מקסימלי</span>
-            <span class="result-value" id="maxCoverage">0 מ"ר</span>
-        </div>
-
-        <div class="result-row">
-            <span class="result-label">סה"כ שטח בנייה מותר (עילי)</span>
-            <span class="result-value" id="totalBuilding">0 מ"ר</span>
-        </div>
-
-        <div class="result-row">
-            <span class="result-label">שטח ממוצע לקומה</span>
-            <span class="result-value" id="avgPerFloor">0 מ"ר</span>
-        </div>
-
-        <div class="result-row">
-            <span class="result-label">שטח שנותר לניצול</span>
-            <span class="result-value" id="remaining">0 מ"ר</span>
-        </div>
-
-        <div class="result-row">
-            <span class="result-label">שטח חניון תת-קרקעי</span>
-            <span class="result-value" id="parkingDisplay">0 מ"ר</span>
-        </div>
-
-        <div class="bar-container">
-            <div class="bar-label">אחוז ניצול</div>
-            <div class="bar-track">
-                <div class="bar-fill" id="barFill" style="width: 0%"></div>
-            </div>
-            <div class="bar-percent" id="barPercent">0%</div>
-        </div>
-
-        <div class="warning" id="warning">
-            חריגה: שטח הבנייה המבוקש חורג מאחוזי הבנייה המותרים.
-        </div>
-
-        <section class="volume" aria-label="הנפח על המגרש">
-            <div class="section-title">הנפח על המגרש</div>
-            <p class="volume-note" id="volumeNote">אותן זכויות, שני נפחים. עמדו על המדרכה שממול, או עברו למבט על.</p>
-            <space-walk id="walk"></space-walk>
-        </section>
-
+    <div class="meta">
+      <span>גובה קומה <b class="num">3.2</b> מ' · הנחה</span>
+      <span>שכנים <b class="num">4</b> קומות · הנחה</span>
+      <span>בלי קווי בניין ושטחי שירות</span>
     </div>
+  </section>
 
-    <script src="https://anat1969.github.io/AppOfApp-GH/walk.js"></script>
-    <script>
-        // walk.js comes from the portfolio's GitHub Pages first (it follows every merge to main, no Vercel quota); Vercel is the backup
-        if (!customElements.get('space-walk')) document.write('<script src="https://appofapp-gh.vercel.app/walk.js"><\/script>');
-    </script>
-    <script>
-        const inputs = document.querySelectorAll('input');
-        inputs.forEach(input => input.addEventListener('input', calculate));
+  <div class="frame">
+    <!-- הקשר: הנתונים והחשבון -->
+    <aside class="pane" aria-label="הנתונים">
+      <div class="ph"><span><b>01</b> הנתונים</span><span class="saved" id="saved" aria-live="polite"></span></div>
+      <div class="card">
+        <div class="datahead"><span class="lbl">מהתב"ע, טבלה 5</span><span class="tag" id="exampleTag" hidden>דוגמה</span></div>
+        <div class="field"><label for="plotArea">שטח המגרש<small>מ"ר</small></label><input type="number" id="plotArea" inputmode="decimal" min="0" step="any" placeholder="1000"></div>
+        <div class="field"><label for="coveragePercent">תכסית מותרת<small>% מהמגרש</small></label><input type="number" id="coveragePercent" inputmode="decimal" min="0" max="100" step="any" placeholder="40"></div>
+        <div class="field"><label for="buildingPercent">אחוזי בנייה עיליים<small>% מהמגרש, עיקרי</small></label><input type="number" id="buildingPercent" inputmode="decimal" min="0" step="any" placeholder="160"></div>
+        <div class="field"><label for="floors">מספר קומות<small>ההחלטה שלכם</small></label><input type="number" id="floors" inputmode="numeric" min="1" step="1" placeholder="8"></div>
+        <div class="field"><label for="parkingArea">חניון תת־קרקעי<small>מ"ר, לא נספר בזכויות</small></label><input type="number" id="parkingArea" inputmode="decimal" min="0" step="any" placeholder="0"></div>
+        <div class="line" style="margin-top:10px">
+          <button class="btn" type="button" id="fillExample">דוגמה</button>
+          <button class="btn" type="button" id="clearAll">ניקוי</button>
+          <a class="btn" href="taba.html" title="לחלץ את הנתונים מקובץ טבלה 5">מטבלה 5</a>
+        </div>
+      </div>
 
-        function getVal(id) {
-            return parseFloat(document.getElementById(id).value) || 0;
-        }
+      <div class="ph"><span><b>02</b> החשבון</span><span>מ"ר · מ'</span></div>
+      <div class="card">
+        <dl class="ledger" id="ledger"></dl>
+        <div class="usebar" id="usebar">
+          <div class="top"><span>כל קומה תופסת מהתכסית</span><b id="usePct">0%</b></div>
+          <div class="track"><div class="fill" id="useFill" style="width:0"></div><span class="tick" title="100%: מלוא התכסית"></span></div>
+        </div>
+      </div>
 
-        function fmt(n) {
-            return n.toLocaleString('he-IL', { maximumFractionDigits: 1 }) + ' מ"ר';
-        }
+      <div class="card plan">
+        <span class="lbl">תוכנית · קנה מידה אחד</span>
+        <svg id="planSvg" viewBox="0 0 220 214" role="img" aria-label="תוכנית המגרש: התכסית המותרת והקומה הטיפוסית"></svg>
+        <div class="legend"><span><i style="background:var(--cover)"></i>תכסית מותרת</span><span><i style="background:var(--gypsum);box-shadow:inset 0 0 0 1px var(--ink)"></i>קומה טיפוסית</span></div>
+      </div>
+      <p class="basis">
+        <b>על מה זה נשען:</b> המונחים לפי תקנות התכנון והבנייה (חישוב שטחים ואחוזי בנייה בתכניות ובהיתרים), התשנ"ב-1992.<br>
+        <b>מה מדויק:</b> כל המספרים בטבלה נגזרים מהשדות.<br>
+        <b>מה הערכה:</b> הנפח כריבוע במרכז המגרש, גובה הקומה, השכנים והחניות.
+      </p>
+    </aside>
 
-        function calculate() {
-            const plotArea = getVal('plotArea');
-            const coveragePercent = getVal('coveragePercent');
-            const buildingPercent = getVal('buildingPercent');
-            const floors = getVal('floors') || 1;
-            const parkingArea = getVal('parkingArea');
+    <!-- המוקד: הנפח, וכל החלופות בחתך -->
+    <section class="pane focus" aria-label="המודל">
+      <div class="ph"><span><b>03</b> הנפח על המגרש · ללכת על המדרכה שממול, או לעבור למבט על</span><span id="walkTitle"></span></div>
+      <div class="walkbox"><space-walk id="walk"></space-walk></div>
+      <div class="card strip">
+        <div class="head">
+          <h2 id="stripTitle">כל החלופות, באותן זכויות</h2>
+          <span class="lbl">חתך · קנה מידה אחד · לחיצה בוחרת</span>
+        </div>
+        <svg id="stripSvg" viewBox="0 0 1000 192" role="group" aria-label="חלופות לפי מספר קומות"></svg>
+        <div class="legend">
+          <span><i style="background:var(--gypsum);box-shadow:inset 0 0 0 1px var(--gypsum-edge)"></i>נכנס בתכסית</span>
+          <span><i style="background:var(--problem-soft);box-shadow:inset 0 0 0 1px var(--problem)"></i>חורג מהתכסית</span>
+          <span><i style="background:var(--rights-soft);box-shadow:inset 0 0 0 1px var(--rights)"></i>הבחירה שלכם</span>
+          <span><i style="background:var(--neighbour)"></i>שכנים, 4 קומות</span>
+        </div>
+      </div>
+    </section>
 
-            const maxCoverage = plotArea * (coveragePercent / 100);
-            const totalBuilding = plotArea * (buildingPercent / 100);
-            const avgPerFloor = floors > 0 ? totalBuilding / floors : 0;
-            const usedArea = maxCoverage * floors;
-            const remaining = totalBuilding - usedArea;
-            const utilization = totalBuilding > 0 ? (usedArea / totalBuilding) * 100 : 0;
-            const isOverflow = remaining < 0 && totalBuilding > 0;
+    <!-- הפקה: השותף -->
+    <aside class="pane" aria-label="השותף">
+      <div class="ph"><span><b>04</b> השותף · מציע, ואתם מחליטים</span></div>
+      <div class="card">
+        <span class="lbl">מה השותף רואה במספרים</span>
+        <div class="psi" id="psi"></div>
+        <p class="partner-note" style="margin-top:10px">השותף כאן הוא חישוב גלוי, לא מודל שפה. כל משפט נגזר מהטור הימני, ואפשר לבדוק אותו.</p>
+      </div>
+      <div class="card">
+        <span class="lbl">להמשיך עם Claude · ביקורת וחלופה שלישית</span>
+        <pre class="prompt" id="claudePrompt"></pre>
+        <div class="line">
+          <button class="btn primary" type="button" data-copy="claudePrompt">העתקת השאלה</button>
+          <a class="btn" id="openClaude" href="https://claude.ai/new" target="_blank" rel="noopener">פתיחה ב-Claude</a>
+        </div>
+      </div>
+      <div class="card">
+        <span class="lbl">תמונה של הנפח · פרומפט למידג'רני</span>
+        <p class="distill" id="mjDistill"></p>
+        <pre class="prompt" id="mjPrompt"></pre>
+        <div class="line"><button class="btn" type="button" data-copy="mjPrompt">העתקת הפרומפט</button></div>
+      </div>
+      <div class="card">
+        <span class="lbl">שאלה לביקורת</span>
+        <p class="crit" id="crit"></p>
+      </div>
+    </aside>
+  </div>
+</main>
 
-            document.getElementById('maxCoverage').textContent = fmt(maxCoverage);
-            document.getElementById('totalBuilding').textContent = fmt(totalBuilding);
-            document.getElementById('avgPerFloor').textContent = fmt(avgPerFloor);
-            document.getElementById('remaining').textContent = fmt(Math.abs(remaining));
-            document.getElementById('parkingDisplay').textContent = fmt(parkingArea);
+<script src="https://anat1969.github.io/AppOfApp-GH/walk.js"></script>
+<script>
+  // walk.js comes from the portfolio's GitHub Pages first (it follows every merge to main, no Vercel quota); Vercel is the backup
+  if (!customElements.get('space-walk')) document.write('<script src="https://appofapp-gh.vercel.app/walk.js"><\/script>');
+</script>
+<script>
+  // ---------- the model: one source, every view derives from it ----------
+  const FLOOR_H = 3.2;          // assumed floor height, metres
+  const NEIGHBOUR_FLOORS = 4;   // assumed neighbours, for scale only
+  const M2_PER_SPACE = 30;      // estimate: one parking space with its aisle
+  const EXAMPLE = { a: 1000, c: 40, r: 160, n: 8, p: 0 };
+  const IDS = { a: 'plotArea', c: 'coveragePercent', r: 'buildingPercent', n: 'floors', p: 'parkingArea' };
+  const STORE = 'targil2.volume.v1';
+  const $ = (id) => document.getElementById(id);
+  const n1 = (v) => (Number.isFinite(v) ? v : 0).toLocaleString('he-IL', { maximumFractionDigits: 1 });
+  const n0 = (v) => Math.round(v).toLocaleString('he-IL');
+  const num = (id) => { const v = parseFloat($(id).value); return Number.isFinite(v) && v > 0 ? v : 0; };
 
-            const remainingEl = document.getElementById('remaining');
-            if (isOverflow) {
-                remainingEl.textContent = '-' + fmt(Math.abs(remaining));
-                remainingEl.style.color = '#800020';
-            } else {
-                remainingEl.style.color = '#1a1a1a';
-            }
+  function read() {
+    const v = { a: num(IDS.a), c: Math.min(num(IDS.c), 100), r: num(IDS.r), n: Math.round(num(IDS.n)), p: num(IDS.p) };
+    const example = !(v.a > 0 && v.c > 0 && v.r > 0);
+    return { ...(example ? EXAMPLE : v), example };
+  }
 
-            const barFill = document.getElementById('barFill');
-            const barPercent = document.getElementById('barPercent');
-            const displayPercent = Math.min(utilization, 100);
+  function model(v) {
+    const cover = v.a * v.c / 100;                       // the largest footprint allowed
+    const total = v.a * v.r / 100;                       // above-ground main rights
+    const nMin = Math.max(1, Math.ceil(total / cover - 1e-9));  // fewest floors whose plate fits the coverage
+    const n = v.n > 0 ? v.n : nMin;
+    const per = (k) => total / k;
+    const perFloor = per(n);
+    const fits = perFloor <= cover + 0.01;
+    const open = v.a - perFloor;
+    const nH = NEIGHBOUR_FLOORS * FLOOR_H;
+    const half = Math.max(nMin, Math.ceil(total / (v.a * 0.5) - 1e-9)); // fewest floors that leave half the plot open
+    return {
+      ...v, cover, total, nMin, n, nAssumed: !(v.n > 0), per, perFloor, fits,
+      open, openPct: open / v.a * 100, use: perFloor / cover * 100,
+      height: n * FLOOR_H, fullH: nMin * FLOOR_H, nH, half, L: Math.sqrt(v.a),
+      basements: v.p > 0 ? Math.ceil(v.p / v.a) : 0, spaces: Math.floor(v.p / M2_PER_SPACE),
+    };
+  }
 
-            barFill.style.width = displayPercent + '%';
-            barPercent.textContent = utilization.toLocaleString('he-IL', { maximumFractionDigits: 1 }) + '%';
+  // ---------- the lens ----------
+  function renderLens(m) {
+    let h;
+    if (!m.fits) h = '<b>' + m.n + ' קומות</b> לא מספיקות: צריך לפחות <b>' + m.nMin + '</b>';
+    else if (m.n === m.nMin) h = '<b>' + m.n + ' קומות</b> ממלאות את התכסית: הנפח הנמוך ביותר';
+    else h = 'אותן <b>' + n0(m.total) + ' מ"ר</b>: <b>' + m.n + '</b> קומות, או <b>' + m.nMin + '</b> במלוא התכסית';
+    $('insight').innerHTML = h;
+    $('explain').innerHTML = m.fits
+      ? 'כל קומה <b>' + n1(m.perFloor) + ' מ"ר</b>, <b>' + n0(m.use) + '%</b> מהתכסית. נשארים <b>' + n0(m.openPct) + '%</b> מהמגרש פתוחים לגינה, לעצים ולחלחול.'
+      : 'כל קומה <b>' + n1(m.perFloor) + ' מ"ר</b>, יותר מ-<b>' + n1(m.cover) + ' מ"ר</b> המותרים. מוסיפים קומות, או מוותרים על זכויות.';
+    $('exampleTag').hidden = !m.example;
+    $('kicker').textContent = m.example
+      ? 'דוגמה · מגרש 1,000 מ"ר, 40% תכסית, 160% בנייה · מלאו את השדות'
+      : 'זכויות בנייה הן כמות חומר · אותה כמות, לרוחב או לגובה';
+  }
 
-            if (isOverflow) {
-                barFill.classList.add('overflow');
-                barPercent.classList.add('overflow');
-            } else {
-                barFill.classList.remove('overflow');
-                barPercent.classList.remove('overflow');
-            }
+  // ---------- the ledger: every number with its rule ----------
+  function renderLedger(m) {
+    const rows = [
+      ['תכסית מקסימלית', 'מגרש × תכסית', n1(m.cover) + ' מ"ר'],
+      ['זכויות בנייה עיליות', 'מגרש × אחוזי בנייה', n1(m.total) + ' מ"ר', 'key'],
+      ['שטח לקומה', 'זכויות ÷ ' + m.n + ' קומות' + (m.nAssumed ? ' (המינימום)' : ''), n1(m.perFloor) + ' מ"ר', m.fits ? 'good' : 'bad'],
+      ['מינימום קומות', 'זכויות ÷ תכסית, כלפי מעלה', String(m.nMin)],
+      ['גובה משוער', m.n + ' × 3.2 מ\' (הנחה)', n1(m.height) + ' מ\''],
+      ['קרקע פתוחה', 'מגרש פחות קומה', m.open >= 0 ? n1(m.open) + ' מ"ר · ' + n0(m.openPct) + '%' : 'אין', m.open >= 0 ? '' : 'bad'],
+    ];
+    if (m.p > 0) rows.push(['חניון תת־קרקעי', 'הערכה: ' + M2_PER_SPACE + ' מ"ר לחניה, מרתף בגודל המגרש', m.basements + ' מרתפים · ' + m.spaces + ' חניות']);
+    $('ledger').innerHTML = rows.map(([t, f, v, c]) => '<div class="r ' + (c || '') + '"><dt>' + t + '<small>' + f + '</small></dt><dd>' + v + '</dd></div>').join('');
+    $('usePct').textContent = n0(m.use) + '%';
+    $('useFill').style.width = Math.min(m.use, 100) + '%';
+    $('usebar').classList.toggle('over', !m.fits);
+  }
 
-            const warning = document.getElementById('warning');
-            if (isOverflow) {
-                warning.classList.add('visible');
-            } else {
-                warning.classList.remove('visible');
-            }
+  // ---------- the plan: plot, allowed coverage, typical floor, street ----------
+  function renderPlan(m) {
+    const S = 150, x0 = 35, y0 = 22, k = S / m.L;
+    const sqr = (area, fill, stroke, dash, w) => { const s = Math.sqrt(Math.max(area, 0)) * k, o = (S - s) / 2;
+      return '<rect x="' + (x0 + o) + '" y="' + (y0 + o) + '" width="' + s + '" height="' + s + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + (w || 1) + '"' + (dash ? ' stroke-dasharray="4 3"' : '') + '/>'; };
+    $('planSvg').innerHTML =
+      '<text x="' + (x0 + S / 2) + '" y="12" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#6B7178">' + n1(m.L) + ' מ\'</text>' +
+      '<line x1="' + x0 + '" y1="16" x2="' + (x0 + S) + '" y2="16" stroke="#6B7178" stroke-width=".75"/>' +
+      '<rect x="' + x0 + '" y="' + y0 + '" width="' + S + '" height="' + S + '" fill="#fff" stroke="#141618" stroke-width="1.25"/>' +
+      sqr(m.cover, '#F3E37C', '#B8A630', true) +
+      sqr(Math.min(m.perFloor, m.a), m.fits ? '#ECE8DF' : '#F6E1DE', m.fits ? '#141618' : '#B3261E', false, 1.25) +
+      '<text x="' + (x0 + S / 2) + '" y="' + (y0 + S / 2 + 4) + '" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#141618">' + n0(m.perFloor) + '</text>' +
+      '<rect x="0" y="' + (y0 + S + 10) + '" width="220" height="22" fill="#DEDDD7"/>' +
+      '<text x="110" y="' + (y0 + S + 25) + '" text-anchor="middle" font-family="IBM Plex Sans Hebrew, sans-serif" font-size="11" fill="#3B4045">רחוב</text>';
+  }
 
-            updateWalk(plotArea, coveragePercent, buildingPercent, floors);
-        }
+  // ---------- every alternative as a section, on one scale ----------
+  let grownOnce = false;
+  function renderStrip(m) {
+    const svg = $('stripSvg');
+    const W = Math.round(svg.getBoundingClientRect().width) || 1000, K = W < 640 ? 6 : 12, HT = 192, cw = W / K, base = 120, top = 6;
+    let start = Math.max(1, Math.min(m.nMin - 2, m.n - 2));
+    if (m.n > start + K - 2) start = m.n - K + 3;
+    const ks = Array.from({ length: K }, (_, i) => start + i);
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + HT);
+    const hMax = Math.max(ks[K - 1] * FLOOR_H, m.nH);
+    const s = Math.min((cw * 0.74) / m.L, (base - top) / hMax);   // one scale for width and height: a true section
+    const plotW = m.L * s;
+    const mono = 'font-family="IBM Plex Mono, monospace"';
+    let out = '';
+    ks.forEach((k, i) => {
+      const cx = i * cw + cw / 2, pf = m.per(k), fits = pf <= m.cover + 0.01, sel = k === m.n;
+      const bw = Math.sqrt(Math.min(pf, m.a)) * s, bh = k * FLOOR_H * s;
+      const nw = Math.max(3, Math.min(10, (cw - plotW) / 2 - 5)), nh = m.nH * s;
+      const fill = sel ? '#DCEAEC' : fits ? '#ECE8DF' : '#F6E1DE';
+      const stroke = sel ? '#1F5E6B' : fits ? '#B9B2A4' : '#B3261E';
+      let floors = '';
+      if (FLOOR_H * s >= 3.5) for (let f = 1; f < k; f++) { const y = base - f * FLOOR_H * s; floors += '<line x1="' + (cx - bw / 2) + '" x2="' + (cx + bw / 2) + '" y1="' + y + '" y2="' + y + '" stroke="' + stroke + '" stroke-width=".5" opacity=".7"/>'; }
+      const open = (m.a - pf) / m.a * 100;
+      out += '<g class="alt' + (sel ? ' sel' : '') + '" data-k="' + k + '" tabindex="0" role="button" aria-pressed="' + sel + '" aria-label="' + k + ' קומות, ' + (fits ? 'פתוח ' + n0(open) + '%' : 'חורג מהתכסית') + '">' +
+        '<rect class="hit" x="' + (i * cw + 2) + '" y="0" width="' + (cw - 4) + '" height="' + HT + '"/>' +
+        '<rect x="' + (cx - plotW / 2 - nw - 3) + '" y="' + (base - nh) + '" width="' + nw + '" height="' + nh + '" fill="#C9C6BF"/>' +
+        '<rect x="' + (cx + plotW / 2 + 3) + '" y="' + (base - nh) + '" width="' + nw + '" height="' + nh + '" fill="#C9C6BF"/>' +
+        '<g class="grow" style="animation-delay:' + (i * 45) + 'ms"><rect x="' + (cx - bw / 2) + '" y="' + (base - bh) + '" width="' + bw + '" height="' + bh + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + (sel ? 1.6 : 1) + '"/>' + floors + '</g>' +
+        '<line x1="' + (i * cw + 4) + '" x2="' + ((i + 1) * cw - 4) + '" y1="' + base + '" y2="' + base + '" stroke="#141618" stroke-width=".75"/>' +
+        '<line x1="' + (cx - plotW / 2) + '" x2="' + (cx + plotW / 2) + '" y1="' + base + '" y2="' + base + '" stroke="#141618" stroke-width="2.5"/>' +
+        '<text x="' + cx + '" y="' + (base + 22) + '" text-anchor="middle" ' + mono + ' font-size="18" font-weight="' + (sel ? 600 : 400) + '" fill="' + (sel ? '#16303A' : '#141618') + '">' + k + '</text>' +
+        '<text x="' + cx + '" y="' + (base + 39) + '" text-anchor="middle" font-family="IBM Plex Sans Hebrew, sans-serif" font-size="12.5" fill="' + (fits ? '#6B7178' : '#B3261E') + '">' + (fits ? 'פתוח ' + n0(open) + '%' : 'חורג') + '</text>' +
+        (k === m.nMin ? '<text x="' + cx + '" y="' + (base + 54) + '" text-anchor="middle" font-family="IBM Plex Sans Hebrew, sans-serif" font-size="11" fill="#2E7D4F">מלוא התכסית</text>' : '') +
+        (k === m.half && k !== m.nMin ? '<text x="' + cx + '" y="' + (base + 54) + '" text-anchor="middle" font-family="IBM Plex Sans Hebrew, sans-serif" font-size="11" fill="#1F5E6B">חצי מגרש פתוח</text>' : '') +
+        '</g>';
+    });
+    svg.innerHTML = out;
+    if (!grownOnce) { grownOnce = true; svg.classList.add('grown'); setTimeout(() => svg.classList.remove('grown'), 1400); }
+    $('stripTitle').innerHTML = 'כל החלופות באותן <b>' + n0(m.total) + ' מ"ר</b>: הגובה מול הקרקע הפתוחה';
+  }
 
-        // ---- the volume on the plot ----
-        // A square plot facing a street. Two variants with the same building rights:
-        // the requested floors (rights / floors per floor) and full coverage (fewest floors).
-        const FLOOR_H = 3.2;           // assumed floor height, metres
-        const NEIGHBOUR_FLOORS = 4;    // assumed neighbours, for scale
-        const EXAMPLE = { plotArea: 1000, coveragePercent: 40, buildingPercent: 160, floors: 8 };
-        const n1 = (v) => v.toLocaleString('he-IL', { maximumFractionDigits: 1 });
-        const sq = (a) => { const h = Math.sqrt(Math.max(a, 1)) / 2; return [[-h, -h], [h, -h], [h, h], [-h, h]]; };
+  // ---------- the partner: problem, solution, insight, and the next questions ----------
+  function renderPartner(m) {
+    const gain = (k) => m.per(k) - m.per(k + 1);
+    let p, s;
+    if (!m.fits) p = ['הקומה חורגת מהתכסית', n1(m.perFloor) + ' מ"ר בקומה, מול ' + n1(m.cover) + ' מ"ר מותרים. אי אפשר לקבל היתר כך.'];
+    else if (m.height > m.nH * 2.5) p = ['מגדל צר מול שכנים נמוכים', 'גובה ' + n1(m.height) + ' מ\', פי ' + n1(m.height / m.nH) + ' מהשכנים. צל ארוך ורוח חזקה ברחוב.'];
+    else if (m.openPct < 50) p = ['רוב המגרש בנוי', 'נשארים ' + n0(m.openPct) + '% פתוחים. מעט מקום לעצים, לחלחול ולחצר משותפת.'];
+    else p = ['חצר גדולה, חזית צרה', 'נשארים ' + n0(m.openPct) + '% פתוחים, אבל הבניין רחוק מקו הרחוב ומשאיר פער בחזית.'];
+    if (!m.fits) s = ['לפחות ' + m.nMin + ' קומות', 'כך כל קומה, ' + n1(m.per(m.nMin)) + ' מ"ר, נכנסת בתכסית. גובה ' + n1(m.fullH) + ' מ\'.'];
+    else if (m.half !== m.n) s = [m.half + ' קומות: הנמוך ביותר עם חצי מגרש פתוח', 'כל קומה ' + n1(m.per(m.half)) + ' מ"ר, גובה ' + n1(m.half * FLOOR_H) + ' מ\', ' + n0((m.a - m.per(m.half)) / m.a * 100) + '% פתוח. נקודת האיזון בין גובה לקרקע.'];
+    else s = ['הבחירה משאירה חצי מגרש פתוח', 'זו נקודת האיזון: הכי מעט קומות שמשאירות ' + n0(m.openPct) + '% פתוחים.'];
+    const k1 = Math.max(m.n, m.nMin), k2 = k1 + 5;
+    const i = ['כל קומה נוספת מפנה פחות קרקע', 'מ-' + k1 + ' ל-' + (k1 + 1) + ' קומות מתפנים ' + n0(gain(k1)) + ' מ"ר. מ-' + k2 + ' ל-' + (k2 + 1) + ', רק ' + n0(gain(k2)) + ' מ"ר. הגובה עולה בקצב קבוע.'];
+    $('psi').innerHTML = [['p', 'בעיה', p], ['s', 'פתרון', s], ['i', 'תובנה', i]]
+      .map(([c, t, [b, x]]) => '<div class="' + c + '"><span class="t">' + t + '</span><b>' + b + '</b>' + x + '</div>').join('');
 
-        function updateWalk(plotArea, coveragePercent, buildingPercent, floors) {
-            const el = document.getElementById('walk');
-            const example = !(plotArea > 0 && coveragePercent > 0 && buildingPercent > 0);
-            const v = example ? EXAMPLE : { plotArea, coveragePercent, buildingPercent, floors: Math.max(1, Math.round(floors)) };
-            const cover = v.plotArea * v.coveragePercent / 100;
-            const total = v.plotArea * v.buildingPercent / 100;
-            const perFloor = total / v.floors;
-            const fullFloors = Math.max(1, Math.ceil(total / cover));
-            const L = Math.sqrt(v.plotArea), H = L / 2;
-            const overCover = perFloor > cover + 0.01;
+    const q = [
+      'את/ה שותף/ה לתכנון במשרד אדריכלים. ענה/י בעברית, בקצרה.',
+      'מגרש ' + n0(m.a) + ' מ"ר (' + n1(m.L) + '×' + n1(m.L) + ' מ\'), תכסית מותרת ' + n1(m.c) + '% (' + n0(m.cover) + ' מ"ר), אחוזי בנייה עיליים ' + n1(m.r) + '% (' + n0(m.total) + ' מ"ר).',
+      'ההצעה: ' + m.n + ' קומות של ' + n0(m.perFloor) + ' מ"ר, גובה כ-' + n1(m.height) + ' מ\'. חלופה: ' + m.nMin + ' קומות במלוא התכסית, גובה ' + n1(m.fullH) + ' מ\'.',
+      'השכנים: כ-4 קומות (הנחה).' + (m.p > 0 ? ' חניון תת־קרקעי: ' + n0(m.p) + ' מ"ר.' : ''),
+      '1. השווה/י את שתי החלופות: צל, רוח, קרקע פתוחה וחזית לרחוב.',
+      '2. הצע/י חלופה שלישית עם אותן זכויות, שאינה ריבוע במרכז המגרש (טרסות, חצר פנימית, בלוק היקפי).',
+      '3. מה לבדוק בתב"ע לפני שמחליטים: קווי בניין, גובה מרבי, שטחי שירות.',
+      'סמן/י מה נגזר מהנתונים ומה הערכה שלך.',
+    ].join('\n');
+    $('claudePrompt').textContent = q;
+    $('openClaude').href = 'https://claude.ai/new?q=' + encodeURIComponent(q);
 
-            const note = document.getElementById('volumeNote');
-            note.innerHTML = example
-                ? 'דוגמה: מגרש <b>1,000 מ"ר</b>, תכסית <b>40%</b>, <b>160%</b> בנייה, <b>8 קומות</b>. מלאו את השדות והנפח יתעדכן.'
-                : 'אותן זכויות, שני נפחים. עמדו על המדרכה שממול, או עברו למבט על.';
+    $('mjDistill').textContent = m.n + ' קומות של גבס לבן, על מגרש שנשאר ' + (m.openPct >= 50 ? 'רובו' : 'מעטו') + ' פתוח, בין שכנים נמוכים.';
+    $('mjPrompt').textContent = 'מודל עבודה אדריכלי מגבס לבן על שולחן סטודיו: נפח ריבועי פשוט בן ' + m.n + ' קומות, קווי רצפה דקים, על מגרש ריבועי של ' + n0(m.L) + ' מטר שהתכסית המותרת בו מסומנת בצהוב חיוור, בין שני בנייני שכנים בני 4 קומות מקרטון אפור, ורחוב צר בחזית. אור צד רך מחלון צפוני, צל ארוך על המגרש, עומק שדה רדוד. Documentary realism, Professional architecture photography, 1:1 --ar 1:1 --no text, words, writing, frame divisions';
 
-            const ground = [
-                { id: 'plot', type: 'prism', points: sq(v.plotArea), h: 0.02, color: '#cfd8c2', mapColor: '#cfd8c2' },
-                { id: 'sidewalk', type: 'surface', x: 0, z: H + 1.5, w: L + 28, d: 3, color: '#d6d2c8' },
-                { id: 'street', type: 'surface', x: 0, z: H + 6.5, w: L + 28, d: 7, color: '#55554f', layer: 1 },
-                { id: 'lane', type: 'surface', x: 0, z: H + 6.5, w: L + 28, d: 0.12, color: '#f4f1ea', layer: 2 },
-                { id: 'sidewalk-2', type: 'surface', x: 0, z: H + 11.5, w: L + 28, d: 3, color: '#d6d2c8' },
-                { id: 'n-west', type: 'box', x: -H - 7.5, z: 0, w: 11, d: Math.min(L, 24), h: NEIGHBOUR_FLOORS * FLOOR_H, color: '#c9c6bf' },
-                { id: 'n-east', type: 'box', x: H + 7.5, z: 0, w: 11, d: Math.min(L, 24), h: NEIGHBOUR_FLOORS * FLOOR_H, color: '#c9c6bf' },
-            ];
-            const allowed = { id: 'cover', type: 'prism', points: sq(cover), h: 0.02, color: '#f3e37c', layer: 1 };
-            const check = (id, label, value, ok) => ({ id, type: 'note', label, value, check: ok ? 'ok' : 'fail' });
+    const k0 = m.nMin, dOpen = m.per(k0) - m.perFloor, dH = (m.n - k0) * FLOOR_H;
+    $('crit').innerHTML = m.n > k0
+      ? 'מ-<b>' + k0 + '</b> ל-<b>' + m.n + '</b> קומות מרוויחים <b>' + n0(dOpen) + ' מ"ר</b> קרקע, והבניין עולה ב-<b>' + n1(dH) + ' מ\'</b>. למי זה שווה יותר: לדיירים, לשכנים או לרחוב?'
+      : 'הבניין נמוך ככל האפשר, והמגרש בנוי עד התכסית. מה הרחוב מקבל בתמורה, ומה היה קורה עם <b>' + (k0 + 2) + '</b> קומות?';
+  }
 
-            const reqH = v.floors * FLOOR_H, fullH = fullFloors * FLOOR_H;
-            const nH = NEIGHBOUR_FLOORS * FLOOR_H;
-            const scale = (h) => h > nH * 1.05 ? 'גבוה פי **' + n1(h / nH) + '** מהשכנים.' : h < nH * 0.95 ? 'נמוך מהשכנים (**' + n1(nH) + ' מ\'**).' : 'בגובה השכנים.';
-            const plan = {
-                id: 'targil',
-                title: (example ? 'דוגמה · ' : '') + 'מגרש ' + n1(v.plotArea) + ' מ"ר · ' + n1(L) + ' × ' + n1(L) + ' מ\'',
-                bounds: [-H - 14, -H - 8, H + 14, H + 14],
-                ground: '#ddd9cf',
-                speed: 3,
-                spawn: { x: 0, z: H + 12, yaw: 0 },
-                heights: [{ cm: 160, label: 'מבוגר עומד' }, { cm: 95, label: 'ילד בן 3' }],
-                rule: 'הנפח: זכויות הבנייה העיליות חלקי מספר הקומות, כריבוע במרכז המגרש. גובה קומה **3.2 מ\'** (הונח). השכנים: **4 קומות** (הונח), רק לקנה מידה. מגבלה: בלי קווי בניין, מרפסות וגג.',
-                source: 'החישוב: שטח המגרש כפול אחוזי הבנייה, ושטח המגרש כפול התכסית, כמו בטבלה שמעל.',
-                items: ground,
-                variants: [
-                    {
-                        id: 'requested', label: 'הקומות המבוקשות', tone: overCover ? 'problem' : 'solution',
-                        note: overCover ? '**הקומה חורגת מהתכסית**: ' + n1(perFloor) + ' מ"ר מול ' + n1(cover) + ' מ"ר מותרים.' : 'כל קומה נכנסת בתכסית המותרת, המסומנת בצהוב על המגרש.',
-                        summary: {
-                            insight: '**' + v.floors + ' קומות**, גובה **' + n1(reqH) + ' מ\'**',
-                            explain: 'כל קומה **' + n1(perFloor) + ' מ"ר**, ' + (overCover ? 'יותר מ' : 'בתוך ') + 'התכסית של **' + n1(cover) + ' מ"ר**. ' + scale(reqH),
-                        },
-                        items: [
-                            allowed,
-                            { id: 'bldg', type: 'prism', points: sq(perFloor), h: reqH, color: overCover ? '#d9a79b' : '#ece8df' },
-                            check('c-cover', 'תכסית בפועל', n1(perFloor / v.plotArea * 100) + '%', !overCover),
-                            check('c-floors', 'קומות', String(v.floors), true),
-                            check('c-height', 'גובה', n1(reqH) + ' מ\'', true),
-                        ],
-                    },
-                    {
-                        id: 'full', label: 'במלוא התכסית', tone: 'solution',
-                        note: 'אותן זכויות, בכמה שפחות קומות: כל קומה ממלאת את התכסית.',
-                        summary: {
-                            insight: '**' + fullFloors + ' קומות**, גובה **' + n1(fullH) + ' מ\'**',
-                            explain: 'כל קומה **' + n1(cover) + ' מ"ר**, מלוא התכסית. אותן **' + n1(total) + ' מ"ר** זכויות כמו בבקשה. ' + scale(fullH),
-                        },
-                        items: [
-                            allowed,
-                            { id: 'bldg', type: 'prism', points: sq(cover), h: fullH, color: '#ece8df' },
-                            check('c-cover', 'תכסית בפועל', n1(v.coveragePercent) + '%', true),
-                            check('c-floors', 'קומות', String(fullFloors), true),
-                            check('c-height', 'גובה', n1(fullH) + ' מ\'', true),
-                        ],
-                    },
-                ],
-            };
-            el.plan = plan;
-        }
+  // ---------- the volume on the plot (shared <space-walk>) ----------
+  const sq = (a) => { const h = Math.sqrt(Math.max(a, 1)) / 2; return [[-h, -h], [h, -h], [h, h], [-h, h]]; };
+  function stack(area, floors, color, edge) {   // one prism per floor, a darker slab between: the floors read in 3D
+    const out = [];
+    for (let f = 0; f < floors; f++) {
+      out.push({ id: 'f' + f, type: 'prism', points: sq(area), y0: f * FLOOR_H, h: FLOOR_H - 0.22, color });
+      out.push({ id: 's' + f, type: 'prism', points: sq(area * 1.004), y0: (f + 1) * FLOOR_H - 0.22, h: 0.22, color: edge });
+    }
+    return out;
+  }
+  function renderWalk(m) {
+    const L = m.L, H = L / 2;
+    const overCover = !m.fits;
+    const scale = (h) => h > m.nH * 1.05 ? 'גבוה פי **' + n1(h / m.nH) + '** מהשכנים.' : h < m.nH * 0.95 ? 'נמוך מהשכנים (**' + n1(m.nH) + ' מ\'**).' : 'בגובה השכנים.';
+    const ground = [
+      { id: 'plot', type: 'prism', points: sq(m.a), h: 0.02, color: '#d9dccf', mapColor: '#d9dccf' },
+      { id: 'sidewalk', type: 'surface', x: 0, z: H + 1.5, w: L + 28, d: 3, color: '#dcd8ce' },
+      { id: 'street', type: 'surface', x: 0, z: H + 6.5, w: L + 28, d: 7, color: '#5b5d5a', layer: 1 },
+      { id: 'lane', type: 'surface', x: 0, z: H + 6.5, w: L + 28, d: 0.12, color: '#f4f1ea', layer: 2 },
+      { id: 'sidewalk-2', type: 'surface', x: 0, z: H + 11.5, w: L + 28, d: 3, color: '#dcd8ce' },
+      { id: 'n-west', type: 'box', x: -H - 7.5, z: 0, w: 11, d: Math.min(L, 24), h: m.nH, color: '#c9c6bf' },
+      { id: 'n-east', type: 'box', x: H + 7.5, z: 0, w: 11, d: Math.min(L, 24), h: m.nH, color: '#c9c6bf' },
+    ];
+    const allowed = { id: 'cover', type: 'prism', points: sq(m.cover), h: 0.02, color: '#F3E37C', layer: 1 };
+    const check = (id, label, value, ok) => ({ id, type: 'note', label, value, check: ok ? 'ok' : 'fail' });
+    $('walk').plan = {
+      id: 'targil',
+      title: (m.example ? 'דוגמה · ' : '') + 'מגרש ' + n1(m.a) + ' מ"ר · ' + n1(L) + ' × ' + n1(L) + ' מ\'',
+      bounds: [-H - 14, -H - 8, H + 14, H + 14],
+      ground: '#e2e0d8',
+      speed: 3,
+      spawn: { x: 0, z: H + 12, yaw: 0 },
+      heights: [{ cm: 160, label: 'מבוגר עומד' }, { cm: 95, label: 'ילד בן 3' }],
+      rule: 'הנפח: זכויות הבנייה העיליות חלקי מספר הקומות, כריבוע במרכז המגרש. גובה קומה **3.2 מ\'** (הונח). השכנים: **4 קומות** (הונח), רק לקנה מידה. מגבלה: בלי קווי בניין, מרפסות וגג.',
+      source: 'החישוב: שטח המגרש כפול אחוזי הבנייה, ושטח המגרש כפול התכסית, כמו בטור הנתונים.',
+      items: ground,
+      variants: [
+        {
+          id: 'requested', label: 'הקומות המבוקשות', tone: overCover ? 'problem' : 'solution',
+          note: overCover ? '**הקומה חורגת מהתכסית**: ' + n1(m.perFloor) + ' מ"ר מול ' + n1(m.cover) + ' מ"ר מותרים.' : 'כל קומה נכנסת בתכסית המותרת, המסומנת בצהוב על המגרש.',
+          summary: {
+            insight: '**' + m.n + ' קומות**, גובה **' + n1(m.height) + ' מ\'**',
+            explain: 'כל קומה **' + n1(m.perFloor) + ' מ"ר**, ' + (overCover ? 'יותר מ' : 'בתוך ') + 'התכסית של **' + n1(m.cover) + ' מ"ר**. ' + scale(m.height),
+          },
+          items: [
+            allowed, ...stack(m.perFloor, m.n, overCover ? '#e3b3a8' : '#efebe3', overCover ? '#a8574a' : '#9d978b'),
+            check('c-cover', 'תכסית בפועל', n1(m.perFloor / m.a * 100) + '%', !overCover),
+            check('c-floors', 'קומות', String(m.n), true),
+            check('c-height', 'גובה', n1(m.height) + ' מ\'', true),
+          ],
+        },
+        {
+          id: 'full', label: 'במלוא התכסית', tone: 'solution',
+          note: 'אותן זכויות, בכמה שפחות קומות: כל קומה ממלאת את התכסית.',
+          summary: {
+            insight: '**' + m.nMin + ' קומות**, גובה **' + n1(m.fullH) + ' מ\'**',
+            explain: 'כל קומה **' + n1(m.per(m.nMin)) + ' מ"ר**, עד מלוא התכסית. אותן **' + n1(m.total) + ' מ"ר** זכויות כמו בבקשה. ' + scale(m.fullH),
+          },
+          items: [
+            allowed, ...stack(m.per(m.nMin), m.nMin, '#efebe3', '#9d978b'),
+            check('c-cover', 'תכסית בפועל', n1(m.per(m.nMin) / m.a * 100) + '%', true),
+            check('c-floors', 'קומות', String(m.nMin), true),
+            check('c-height', 'גובה', n1(m.fullH) + ' מ\'', true),
+          ],
+        },
+      ],
+    };
+  }
 
-        calculate();
-    </script>
+  // the shared component keeps its own look; here it gets the app's quiet buttons and a narrower panel
+  const SKIN = `
+    .sw{grid-template-columns:minmax(0,1fr) 250px}
+    .stage{background:#E8EBEA}
+    .panel{padding:14px 14px 18px}
+    .insight{font-size:21px;font-weight:300} .insight b{font-weight:600}
+    .explain{font-size:13.5px}
+    .lbl{font-family:"IBM Plex Mono","IBM Plex Sans Hebrew",monospace;margin:14px 0 6px}
+    .btn,.opt{border:0!important;background:#F1F0EB;box-shadow:0 1px 2px rgba(20,22,24,.08);transition:transform .15s,box-shadow .15s,background .15s}
+    .btn:hover,.opt:hover{background:#ECEBE5;box-shadow:0 2px 4px rgba(20,22,24,.06),0 8px 18px rgba(20,22,24,.09)}
+    .btn:active{margin-top:0}
+    .opt[aria-pressed='true']{background:#DCEAEC;color:#16303A;box-shadow:inset -3px 0 0 #1F5E6B}
+    .vars .opt[aria-pressed='true'][data-tone='problem']{background:#F6E1DE;color:#B3261E;box-shadow:inset -3px 0 0 #B3261E}
+    .vars .opt[aria-pressed='true'][data-tone='solution']{background:#DFEEE5;color:#1F5130;box-shadow:inset -3px 0 0 #2E7D4F}
+    .vars .opt,.views .opt{font-weight:500}
+    .opt .n{font-family:"IBM Plex Mono",monospace;font-weight:500}
+    .opt[aria-pressed='true'] .cnt{color:inherit}
+    .row{background:#F7F6F2}
+    .mapbox,.hint{border:0;box-shadow:0 1px 2px rgba(20,22,24,.05),0 2px 8px rgba(20,22,24,.08)}
+    .eye{background:#16303A}
+    .map{width:150px;height:128px}
+    @media (max-width:860px){.sw{grid-template-columns:1fr}}`;
+  customElements.whenDefined('space-walk').then(() => {
+    const sr = $('walk').shadowRoot;
+    if (sr && !sr.querySelector('style[data-skin]')) { const s = document.createElement('style'); s.dataset.skin = ''; s.textContent = SKIN; sr.appendChild(s); }
+  });
+
+  // ---------- state: the address and this browser keep the inputs ----------
+  function persist() {
+    const q = new URLSearchParams();
+    Object.entries(IDS).forEach(([k, id]) => { if ($(id).value !== '') q.set(k, $(id).value); });
+    history.replaceState(null, '', q.toString() ? '?' + q : location.pathname);
+    try { localStorage.setItem(STORE, q.toString()); } catch (e) { /* storage blocked: the address still keeps it */ }
+    $('saved').textContent = q.toString() ? 'נשמר בכתובת' : '';
+  }
+  function restore() {
+    let q = new URLSearchParams(location.search);
+    if (![...q.keys()].some((k) => k in IDS)) { try { q = new URLSearchParams(localStorage.getItem(STORE) || ''); } catch (e) { /* none */ } }
+    Object.entries(IDS).forEach(([k, id]) => { if (q.get(k)) $(id).value = q.get(k); });
+  }
+
+  function update(save) {
+    const m = model(read());
+    renderLens(m); renderLedger(m); renderPlan(m); renderStrip(m); renderPartner(m); renderWalk(m);
+    if (save) persist();
+  }
+  // kept for the shared test and older links
+  function calculate() { update(true); }
+  function updateWalk() { renderWalk(model(read())); }
+
+  Object.values(IDS).forEach((id) => $(id).addEventListener('input', () => update(true)));
+  $('fillExample').addEventListener('click', () => { Object.entries(IDS).forEach(([k, id]) => { $(id).value = EXAMPLE[k] || ''; }); update(true); });
+  $('clearAll').addEventListener('click', () => { Object.values(IDS).forEach((id) => { $(id).value = ''; }); update(true); });
+  const pick = (g) => { const k = +g.dataset.k; const v = read(); if (v.example) Object.entries(IDS).forEach(([key, id]) => { if (key !== 'n' && !$(id).value) $(id).value = EXAMPLE[key] || ''; }); $(IDS.n).value = k; update(true); };
+  $('stripSvg').addEventListener('click', (e) => { const g = e.target.closest('.alt'); if (g) pick(g); });
+  $('stripSvg').addEventListener('keydown', (e) => { const g = e.target.closest('.alt'); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); pick(g); } });
+  document.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-copy]'); if (!b) return;
+    const text = $(b.dataset.copy).textContent, label = b.textContent;
+    try { await navigator.clipboard.writeText(text); } catch (err) {
+      const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove();
+    }
+    b.textContent = 'הועתק'; setTimeout(() => { b.textContent = label; }, 1500);
+  });
+
+  let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => renderStrip(model(read())), 120); });
+  restore();
+  update(false);
+</script>
 </body>
 </html>
