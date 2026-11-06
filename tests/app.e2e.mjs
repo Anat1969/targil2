@@ -119,6 +119,35 @@ if (existsSync(`${AOA}/walk.js`)) {
   await ctx.close()
 }
 
+// ---- table 5: the plan store, read once in "מה נבנה סביבי" and checked ----
+{
+  const { ctx, p, errs } = await open('/taba.html', { viewport: { width: 1440, height: 900 } })
+  const idx = JSON.parse(readFileSync('plans/index.json', 'utf8')).plans
+  ok(await p.locator('#emptyPlans .plan').count() === idx.length, 'empty state lists every stored plan: ' + idx.length)
+  await p.locator('#pickPlan').click(); await p.waitForTimeout(100)
+  ok(await p.locator('#planPop').isVisible(), 'the store button opens the list')
+  await p.locator('#planList [data-plan="603-0391219"]').click(); await p.waitForTimeout(400)
+  ok(await p.locator('#planPop').isHidden(), 'choosing closes the list')
+  ok(await p.locator('#resultsContainer tbody tr').count() === 29, 'the plan fills the table: 29 lots')
+  ok((await txt(p, '#verdict')).includes('לא מתחבר'), 'a plan whose units do not add up says so: ' + await txt(p, '#verdict'))
+  ok(new URL(p.url()).searchParams.get('plan') === '603-0391219', 'the plan is kept in the address')
+  await p.locator('#checkTab').click(); await p.waitForTimeout(100)
+  ok((await txt(p, '#checks')).includes('365') && (await txt(p, '#checks')).includes('315'), 'the check shows both numbers')
+  await p.goto(BASE + '/taba.html?plan=tamal-2021', { waitUntil: 'networkidle' }); await p.waitForTimeout(400)
+  ok(await p.locator('#resultsContainer tbody tr').count() === 29, 'a link with ?plan= opens that plan')
+  ok(await p.locator('#resultsContainer tr.flag').count() > 0, 'lots with a finding are marked in the table')
+  await p.locator('#checkTab').click(); await p.locator('.ck .lots [data-tok="p:301"]').click(); await p.waitForTimeout(200)
+  ok(await p.locator('#resultsContainer tbody tr').count() === 1, 'a lot in the check selects it in the table')
+  ok(await p.evaluate(() => document.documentElement.scrollHeight - innerHeight) <= 2, 'plan store: the page fits the screen')
+  await p.locator('[data-tok=""]').first().click(); await p.locator('[data-low="table"]').click()
+  await p.screenshot({ path: `${SHOTS}/taba-plan.png` })
+  await p.locator('#loadExample').click(); await p.waitForTimeout(200)
+  ok(await p.locator('#verdict').isHidden() && await p.locator('#checkTab').isHidden(), 'the example leaves the plan: no verdict, no check tab')
+  ok(!new URL(p.url()).searchParams.has('plan'), 'and the address forgets the plan')
+  ok(errs.length === 0, 'plan store: no page errors ' + errs.join(' | '))
+  await ctx.close()
+}
+
 // ---- table 5: a saved row goes to the volume page ----
 {
   const { ctx, p, errs } = await open('/taba.html', { viewport: { width: 1440, height: 900 } })

@@ -143,6 +143,48 @@
   .program-field + .program-field::before{content:" · "}
   .program-field-label{display:none}
 
+  /* ===== מאגר התוכניות: מה שכבר נקרא ב"מה נבנה סביבי", עם בדיקת התאמה ===== */
+  .filebar{position:relative}
+  .filebar .btn.store{background:var(--rights);color:#fff;font-weight:600}
+  .verdict{font-size:12.5px;font-weight:600;padding:5px 10px;white-space:nowrap}
+  .verdict[hidden]{display:none}
+  .v-ok{background:var(--solution-soft);color:var(--solution)} .v-check{background:#FBF1C9;color:#7A5B00} .v-fail{background:var(--problem-soft);color:var(--problem)}
+  .planpop{position:absolute;top:calc(100% + 6px);inset-inline-end:0;z-index:20;width:min(620px,92vw);max-height:min(560px,70vh);overflow-y:auto;background:#fff;box-shadow:var(--shadow-up);padding:8px 0;scrollbar-width:thin}
+  .planpop[hidden]{display:none}
+  .planpop h3,.storehead{font-family:var(--mono);font-size:11.5px;font-weight:400;color:var(--ink-3);padding:4px 14px 6px;display:flex;justify-content:space-between;gap:12px}
+  .plans{display:grid}
+  .plan{font:inherit;border:0;border-radius:0;background:transparent;cursor:pointer;text-align:start;display:grid;grid-template-columns:6px minmax(0,1fr) 92px 58px 58px;gap:4px 12px;align-items:center;padding:7px 0 7px 14px;color:var(--ink);transition:background .15s}
+  .plan:hover{background:var(--rule-soft)}
+  .plan[aria-current="true"]{background:var(--rights-soft)}
+  .plan i{align-self:stretch} .plan i.ok{background:var(--solution)} .plan i.check{background:#D9A400} .plan i.fail{background:var(--problem)}
+  .plan b{font-weight:600;font-size:14px;display:block;line-height:1.25}
+  .plan small{font-size:12px;color:var(--ink-3);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .plan .num{font-family:var(--mono);font-size:12px;color:var(--ink-2);direction:ltr;text-align:right}
+  .plan .n{font-family:var(--mono);font-size:12.5px;text-align:left}
+  .plan .n em{display:block;font-style:normal;font-size:10.5px;color:var(--ink-3);font-family:var(--sans)}
+  .empty .store{width:100%;max-width:980px;background:var(--paper);max-height:38vh;overflow-y:auto;scrollbar-width:thin}
+  .empty .store .plan:hover{background:#fff}
+  /* בדיקת התאמה */
+  .checks{display:grid;gap:0 32px;grid-template-columns:repeat(auto-fill,minmax(520px,1fr))}
+  .ck{display:grid;grid-template-columns:6px 150px minmax(0,1fr);gap:4px 14px;padding:8px 0;border-bottom:1px solid var(--rule-soft)}
+  .ck i.ok{background:var(--solution)} .ck i.check{background:#D9A400} .ck i.fail{background:var(--problem)} .ck i.na{background:var(--rule)}
+  .ck .t{font-weight:600;font-size:14px} .ck .t small{display:block;font-weight:400;font-size:12px;color:var(--ink-3)}
+  .ck .d{font-size:13.5px;color:var(--ink-2);line-height:1.5} .ck .d b{color:var(--ink)}
+  .ck .lots{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .ck .lots button{font:inherit;font-family:var(--mono);font-size:12px;height:26px;padding:0 8px;border:0;border-radius:0;background:var(--rule-soft);cursor:pointer}
+  .ck .lots button:hover{background:var(--rights-soft)}
+  .ckhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;padding-bottom:8px;border-bottom:1px solid var(--ink)}
+  .ckhead h3{font-size:17px;font-weight:600}
+  .ckhead a{font-size:13px;color:var(--rights)}
+  .ckfoot{font-size:12.5px;color:var(--ink-3);line-height:1.6}
+  @media (max-width:600px){.checks{grid-template-columns:minmax(0,1fr)}.ck{grid-template-columns:6px minmax(0,1fr)}.ck .d{grid-column:2}
+    .plan{grid-template-columns:6px minmax(0,1fr) 52px 52px;padding-inline-end:10px}
+    .plan i{grid-row:1/3} .plan .num{grid-column:2;grid-row:2;text-align:start;direction:rtl}
+    .storehead span:last-child{display:none}
+    .empty{padding:18px 14px} .empty h2{order:-2} .empty .store{order:-1;max-height:none}}
+  .results-table tr.flag td:first-child{box-shadow:inset 3px 0 0 #D9A400}
+  .results-table tr.flag td:nth-child(4)::after{content:" לבדיקה";font-family:var(--sans);font-size:10.5px;font-weight:600;color:#7A5B00}
+
   /* ===== מצב ריק ===== */
   .empty{grid-column:1/-1;grid-row:3/6;display:grid;align-content:center;justify-items:start;gap:18px;padding:32px;background:#fff;box-shadow:var(--shadow)}
   .empty h2{font-size:clamp(22px,2vw,30px);font-weight:300;max-width:30ch}
@@ -193,7 +235,10 @@
     <div class="filebar">
       <div id="programSummary" class="program-summary" style="display:none"></div>
       <span class="name" id="fileName"></span>
+      <span class="verdict" id="verdict" hidden></span>
+      <button class="btn store" type="button" id="pickPlan" aria-expanded="false" aria-controls="planPop">מאגר התוכניות</button>
       <button class="btn" type="button" id="pickFile">טבלה 5 חדשה</button>
+      <div class="planpop" id="planPop" hidden><h3><span>מאגר התוכניות · נקרא מ"מה נבנה סביבי"</span><span>מגרשים · יח"ד</span></h3><div class="plans" id="planList"></div></div>
       <button class="btn" type="button" id="loadExample">טבלה לדוגמה</button>
     </div>
   </section>
@@ -201,12 +246,13 @@
   <div class="empty">
     <h2>מטבלה 5 <b>לתשריט, לבחירה ולנפח</b></h2>
     <div class="flow">
-      <div><span class="n">01</span><b>מעלים את טבלה 5</b><p>PDF מקובץ הוראות התוכנית במבא"ת. נקרא בדפדפן בלבד.</p></div>
+      <div><span class="n">01</span><b>בוחרים תב"ע מהמאגר, או מעלים חדשה</b><p>המאגר: התוכניות שכבר נקראו ב"מה נבנה סביבי", עם בדיקת התאמה. חדשה: PDF מהוראות התוכנית, נקרא בדפדפן בלבד.</p></div>
       <div><span class="n">02</span><b>בוחרים</b><p>מגרש או מגרשים, ייעוד, פרטי או ציבורי, שטחים פתוחים או מבני חינוך.</p></div>
       <div><span class="n">03</span><b>לוחצים "לנפח"</b><p>שטח, תכסית, זכויות וקומות עוברים לחישוב ולתלת־ממד.</p></div>
     </div>
+    <div class="store"><div class="storehead"><span>מאגר התוכניות · הפס בצד: בדיקת ההתאמה</span><span>מגרשים · יח"ד</span></div><div class="plans" id="emptyPlans"></div></div>
     <div class="line">
-      <button class="btn primary" type="button" id="pickFile2">העלאת טבלה 5</button>
+      <button class="btn primary" type="button" id="pickFile2">העלאת טבלה 5 חדשה</button>
       <button class="btn" type="button" id="loadExample2">טבלה לדוגמה</button>
     </div>
     <span class="status" id="emptyStatus"></span>
@@ -235,11 +281,13 @@
   <section class="low">
     <div class="lowtabs" role="tablist">
       <button role="tab" aria-selected="true" data-low="table">הטבלה <span class="status" id="resultsTitle"></span></button>
+      <button role="tab" aria-selected="false" data-low="check" id="checkTab" hidden>בדיקת התאמה</button>
       <button role="tab" aria-selected="false" data-low="req">דרישות הגורמים</button>
       <button role="tab" aria-selected="false" data-low="file">הקובץ</button>
       <span class="status" id="status" style="margin-inline-start:auto;align-self:center"></span>
     </div>
     <div class="lowpanel" data-lowpanel="table"><div id="resultsContainer"></div></div>
+    <div class="lowpanel pad" data-lowpanel="check" hidden><div id="checks"></div></div>
     <div class="lowpanel pad" data-lowpanel="req" hidden>
       <div class="requirements-section" id="requirementsSection">
         <div class="two"><div>
@@ -518,7 +566,9 @@
         window.addEventListener('load', async () => {
             try {
                 await initIndexedDB();
-                restoreFromIndexedDB();
+                const want = new URLSearchParams(location.search).get('plan');
+                await loadPlans();
+                if (want && PLANS.some((p) => p.slug === want)) loadPlan(want); else restoreFromIndexedDB();
             } catch (err) {
                 console.error('Failed to initialize storage:', err);
             }
@@ -999,7 +1049,8 @@
             html += '<tbody>';
 
             for (const row of rows) {
-                html += `<tr style="--c:${groupOf(row).color}">`;
+                const fl = CUR && CUR.lotFlags[String(row[2])];
+                html += `<tr style="--c:${groupOf(row).color}"` + (fl ? ` class="flag" title="${escapeHtml(fl.join(' · '))}"` : '') + '>';
                 const q = volumeQuery(row);
                 html += q
                     ? `<td class="go"><a class="to-volume" href="index.html?${q}" title="שטח, תכסית, זכויות וקומות עוברים לחישוב">לנפח</a></td>`
@@ -1275,12 +1326,14 @@
             { tok: '', label: 'הכול' }, { tok: 'o:private', label: 'פרטי' }, { tok: 'o:public', label: 'ציבורי' },
             { tok: 'g:open', label: 'שטח ציבורי פתוח' }, { tok: 'edu', label: 'מבני חינוך' },
         ];
-        let DATA = null;
+        let DATA = null, CUR = null, PLANS = [];
         const SEL = new Set();   // 'g:<group>', 'd:<designation>', 'o:public|private', 'edu', 'p:<plot>'; a row is shown when it matches any token
         const fmt = (v) => Math.round(v).toLocaleString('he-IL');
         const pct = (a, b) => (b > 0 ? Math.round(a / b * 100) : 0);
         const txt = (row) => (row[0] || '') + ' ' + (row[1] || '');
-        function groupOf(row) { const t = txt(row); return GROUPS.find((g) => g.test.test(t)) || GROUPS[GROUPS.length - 1]; }
+        // the designation decides; the use column only when the designation says nothing ("ציבור 310 מ"ר" inside a housing lot is not a public lot)
+        function groupOf(row) { const d = String(row[0] || ''), real = GROUPS.slice(0, -1);
+            return real.find((g) => g.test.test(d)) || real.find((g) => g.test.test(txt(row))) || GROUPS[GROUPS.length - 1]; }
         const desig = (row) => String(row[0] || '').replace(/\(\d+\)/g, '').trim() || 'ללא ייעוד';
         function cellsOf(row) {
             const out = [];
@@ -1321,7 +1374,9 @@
             renderView();
         }
 
-        function renderTable(rows, footnotes) {
+        function renderTable(rows, footnotes, plan) {
+            CUR = plan || null;
+            if (!CUR) leavePlan();
             DATA = { rows, footnotes };
             document.body.classList.remove('nodata');
             renderView();
@@ -1419,10 +1474,77 @@
             svg.innerHTML = out + legendLine;
         }
 
+        // ================= the plan store: read once in "מה נבנה סביבי", stored in plans/, checked =================
+        const VERDICT = { ok: 'בדיקת התאמה: תואם', check: 'בדיקת התאמה: יש מה לבדוק', fail: 'בדיקת התאמה: לא מתחבר' };
+        const STATE = { ok: 'תואם', check: 'לבדיקה', fail: 'לא מתחבר', na: 'אין מה להשוות' };
+        const bold = (t) => escapeHtml(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+        function planRows(cur) {
+            return PLANS.map((p) => '<button class="plan" type="button" data-plan="' + p.slug + '" aria-current="' + (cur === p.slug) + '" title="' + escapeHtml(VERDICT[p.verdict]) + '">' +
+                '<i class="' + p.verdict + '"></i><span><b>' + escapeHtml(p.place) + '</b><small>' + escapeHtml(p.name || '') + '</small></span>' +
+                '<span class="num">' + escapeHtml(p.number) + '</span><span class="n">' + p.lots + '<em>מגרשים</em></span><span class="n">' + (p.units ? p.units.toLocaleString('he-IL') : '·') + '<em>יח"ד</em></span></button>').join('');
+        }
+        function renderPlanLists() {
+            const cur = CUR && CUR.slug;
+            document.getElementById('planList').innerHTML = planRows(cur);
+            document.getElementById('emptyPlans').innerHTML = planRows(cur);
+            document.getElementById('pickPlan').textContent = 'מאגר התוכניות · ' + PLANS.length;
+        }
+        async function loadPlans() {
+            try { const r = await fetch('plans/index.json'); if (!r.ok) throw new Error(r.status); PLANS = (await r.json()).plans; renderPlanLists(); }
+            catch (e) { document.getElementById('pickPlan').hidden = true; document.querySelector('.empty .store').hidden = true; }
+        }
+        async function loadPlan(slug) {
+            togglePop(false);
+            status.textContent = 'טוען את התוכנית מהמאגר';
+            try {
+                const r = await fetch('plans/' + encodeURIComponent(slug) + '.json'); if (!r.ok) throw new Error(r.status);
+                const p = await r.json();
+                SEL.clear(); document.getElementById('plotNumber').value = '';
+                renderProgramSummary({ planNumber: p.number, planTitle: p.name });
+                fileName.textContent = 'מאגר · ' + p.place;
+                status.textContent = 'נקרא פעם אחת ב-' + p.imported + ' מ"מה נבנה סביבי" · ' + p.rows.length + ' מגרשים';
+                removeNewExtractionButton();
+                renderTable(p.rows, p.notes, p);
+                const v = document.getElementById('verdict'); v.hidden = false; v.className = 'verdict v-' + p.verdict; v.textContent = VERDICT[p.verdict];
+                document.getElementById('checkTab').hidden = false;
+                document.getElementById('checks').innerHTML = checksHtml(p);
+                const u = new URL(location.href); u.searchParams.set('plan', slug); history.replaceState(null, '', u.pathname + u.search + location.hash);
+                renderPlanLists();
+            } catch (e) { status.textContent = 'התוכנית לא נטענה מהמאגר. רעננו את הדף.'; status.className = 'status error'; }
+        }
+        function leavePlan() {
+            document.getElementById('verdict').hidden = true;
+            const tab = document.getElementById('checkTab');
+            if (tab.getAttribute('aria-selected') === 'true') document.querySelector('[data-low="table"]').click();
+            tab.hidden = true;
+            const u = new URL(location.href);
+            if (u.searchParams.has('plan')) { u.searchParams.delete('plan'); history.replaceState(null, '', u.pathname + u.search + location.hash); }
+            if (PLANS.length) renderPlanLists();
+        }
+        function checksHtml(p) {
+            const L = p.links, link = (h, t) => h ? '<a href="' + h + '" target="_blank" rel="noopener">' + t + '</a>' : '';
+            return '<div class="ckhead"><h3>' + escapeHtml(VERDICT[p.verdict]) + '</h3><span class="verdict v-' + p.verdict + '">' + escapeHtml(p.number) + '</span>' +
+                link(L.horaot, 'הוראות התוכנית, PDF') + link(L.mavat, 'מבא"ת') + link(L.page, 'העמוד ב"מה נבנה סביבי"') + '</div>' +
+                '<div class="checks">' + p.checks.map((c) => '<div class="ck"><i class="' + c.state + '"></i><div class="t">' + escapeHtml(c.title) + '<small>' + STATE[c.state] + '</small></div><div class="d">' + bold(c.detail) +
+                    (c.lots && c.lots.length ? '<div class="lots">' + c.lots.map((l) => '<button type="button" data-tok="p:' + escapeHtml(l) + '" title="' + escapeHtml((p.lotFlags[l] || []).join(' · ')) + '">מגרש ' + escapeHtml(l) + '</button>').join('') + '</div>' : '') + '</div></div>').join('') + '</div>' +
+                '<p class="ckfoot">איך בודקים: יחידות הדיור בכל המגרשים מול הסך שבתוכנית. שטח המגרש בטבלה מול שטח המגרש בתשריט המוצע (סטייה מעל 5%). סך שטחי הבנייה מול סכום העיקרי והשירות, מעל ומתחת לכניסה. גובה לקומה במגורים בין 2.8 ל-5 מ\'. ' +
+                'שורה מסומנת "לבדיקה" בטבלה היא מגרש עם ממצא, והסבר במעבר עכבר. מקור: ' + escapeHtml(p.source || 'טבלה 5') + ', כפי שנקראה ב"מה נבנה סביבי". הנתונים לא נכתבו מחדש, רק נבדקו.</p>';
+        }
+        function togglePop(open) {
+            const pop = document.getElementById('planPop'), b = document.getElementById('pickPlan');
+            pop.hidden = !open; b.setAttribute('aria-expanded', String(open));
+        }
+        document.getElementById('pickPlan').addEventListener('click', (e) => { e.stopPropagation(); togglePop(document.getElementById('planPop').hidden); });
+        document.addEventListener('click', (e) => {
+            const pl = e.target.closest('[data-plan]'); if (pl) { loadPlan(pl.dataset.plan); return; }
+            if (!e.target.closest('#planPop')) togglePop(false);
+        });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') togglePop(false); });
+
         // ---------- events ----------
         document.addEventListener('click', (e) => {
             const t = e.target.closest('[data-tok]');
-            if (t && !t.disabled) { choose(t.dataset.tok, !!t.dataset.add || e.shiftKey || e.metaKey || e.ctrlKey); return; }
+            if (t && !t.disabled) { choose(t.dataset.tok, !!t.dataset.add || e.shiftKey || e.metaKey || e.ctrlKey); if (t.closest('.ck')) document.querySelector('[data-low="table"]').click(); return; }
             const lt = e.target.closest('[data-low]');
             if (lt) { document.querySelectorAll('[data-low]').forEach((b) => b.setAttribute('aria-selected', String(b === lt)));
                 document.querySelectorAll('[data-lowpanel]').forEach((p) => { p.hidden = p.dataset.lowpanel !== lt.dataset.low; }); }

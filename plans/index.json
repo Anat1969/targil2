@@ -1,0 +1,364 @@
+{
+ "from": "Anat1969/HITCHADSHUT",
+ "site": "https://nihul-hitchadshut-ashdod.vercel.app",
+ "imported": "2026-11-06",
+ "plans": [
+  {
+   "slug": "603-0271296",
+   "number": "603-0271296",
+   "name": "מתחם אבן עזרא, אשדוד",
+   "place": "אבן עזרא",
+   "status": {
+    "label": "בביצוע",
+    "text": "התוכנית אושרה ב-2017. לפי המאגר הממשלתי המתחם נמצא בביצוע. הבנייה מתוכננת בשלבים: קודם המגדל הראשון, ואליו עוברים הדיירים של הבניינים הראשונים שנהרסים.",
+    "source": "חותמות האישור על שער ההוראות, דברי ההסבר, ומאגר מתחמי ההתחדשות העירונית ב-data.gov.il"
+   },
+   "housing": true,
+   "lots": 5,
+   "units": 648,
+   "totalUnits": 648,
+   "verdict": "check",
+   "links": {
+    "horaot": "https://nihul-hitchadshut-ashdod.vercel.app/plans/603-0271296/docs/horaot.pdf",
+    "mavat": "https://mavat.iplan.gov.il/SV4/1/6000337311/310",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/603-0271296"
+   }
+  },
+  {
+   "slug": "tamal-2023",
+   "number": "תמל/2023",
+   "name": "פינוי בינוי מתחם אחד-העם / הרצל",
+   "place": "אחד העם",
+   "status": {
+    "label": "תוכנית מאושרת",
+    "text": "במאגר מתחמי ההתחדשות העירונית התוכנית רשומה כמאושרת בשנת 2025, לפני מימוש. הביצוע עוד לא התחיל.",
+    "source": "מאגר מתחמי ההתחדשות העירונית ב-data.gov.il. הוראות התוכנית, גרסה מ-04/11/2025"
+   },
+   "housing": true,
+   "lots": 5,
+   "units": 532,
+   "totalUnits": 532,
+   "verdict": "check",
+   "links": {
+    "horaot": "https://nihul-hitchadshut-ashdod.vercel.app/plans/tamal-2023/docs/horaot.pdf",
+    "mavat": "https://mavat.iplan.gov.il/SV4/1/6000397461/310",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/%D7%AA%D7%9E%D7%9C%2F2023"
+   }
+  },
+  {
+   "slug": "603-1259092",
+   "number": "603-1259092",
+   "name": "התחדשות עירונית מתחם גאפונוב - רובע ה', אשדוד",
+   "place": "גאפנוב",
+   "status": {
+    "label": "בתכנון, לקראת הפקדה",
+    "text": "המסמכים שבידינו הם הגרסה שנחתמה להפקדה (תדפיס מ-26 ביולי 2026). התוכנית עוד לא אושרה. הוועדה המחוזית היא שמפקידה ומאשרת אותה. בשלב ההפקדה אפשר להגיש התנגדויות.",
+    "source": "הוראות התכנית, תדפיס חתום להפקדה, 26/07/2026, סעיף 1.4; מאגר מתחמי ההתחדשות העירונית ב-data.gov.il: תכנון סטטוטורי"
+   },
+   "housing": true,
+   "lots": 10,
+   "units": 700,
+   "totalUnits": 700,
+   "verdict": "check",
+   "links": {
+    "horaot": "https://nihul-hitchadshut-ashdod.vercel.app/plans/603-1259092/docs/horaot.pdf",
+    "mavat": "https://mavat.iplan.gov.il/SV4/1/6005331994/310",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/603-1259092"
+   }
+  },
+  {
+   "slug": "603-0346031",
+   "number": "603-0346031",
+   "name": "שכונת מגורים, אצטדיון רובע א' באשדוד",
+   "place": "האצטדיון",
+   "status": {
+    "label": "תוכנית מאושרת",
+    "text": "התוכנית אושרה ב-2020, והביצוע עוד לא התחיל. לפי ההוראות, התוכנית צריכה להתממש תוך 15 שנה מיום אישורה.",
+    "source": "מאגר מתחמי ההתחדשות העירונית ב-data.gov.il; הוראות התכנית, סעיף 7.2"
+   },
+   "housing": true,
+   "lots": 28,
+   "units": 974,
+   "totalUnits": 974,
+   "verdict": "check",
+   "links": {
+    "horaot": "https://nihul-hitchadshut-ashdod.vercel.app/plans/603-0346031/docs/horaot.pdf",
+    "mavat": "https://mavat.iplan.gov.il/SV4/1/6000373087/310",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/603-0346031"
+   }
+  },
+  {
+   "slug": "3-03-102-94",
+   "number": "3/03/102/94",
+   "name": "התחדשות אורבאנית, פינוי-בינוי ברח' הדקל - רובע א' אשדוד",
+   "place": "הדקל",
+   "status": {
+    "label": "תוכנית מאושרת",
+    "text": "הוועדה המחוזית החליטה לאשר את התוכנית בנובמבר 2012, והתוכנית קיבלה תוקף ב-2013. לפי המאגר הממשלתי המתחם נמצא אחרי רישוי, כלומר כבר ניתנו בו היתרי בנייה.",
+    "source": "חותמת הוועדה המחוזית על שער ההוראות, ומאגר מתחמי ההתחדשות העירונית ב-data.gov.il"
+   },
+   "housing": true,
+   "lots": 9,
+   "units": 675,
+   "totalUnits": 675,
+   "verdict": "check",
+   "links": {
+    "horaot": "https://nihul-hitchadshut-ashdod.vercel.app/plans/3-03-102-94/docs/horaot.pdf",
+    "mavat": "https://mavat.iplan.gov.il/SV4/1/6072140/310",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/3%2F03%2F102%2F94"
+   }
+  },
+  {
+   "slug": "tamal-2047",
+   "number": "תמל/2047",
+   "name": "פינוי בינוי הרב מימון רובע ב' אשדוד",
+   "place": "הרב מימון",
+   "status": {
+    "label": "תוכנית מאושרת",
+    "text": "במאגר הממשלתי התוכנית רשומה כ\"תכנית מאושרת לפני מימוש\", משנת 2025. הביצוע עוד לא התחיל.",
+    "source": "מאגר מתחמי ההתחדשות העירונית ב-data.gov.il"
+   },
+   "housing": true,
+   "lots": 19,
+   "units": 1363,
+   "totalUnits": 1363,
+   "verdict": "check",
+   "links": {
+    "horaot": "https://nihul-hitchadshut-ashdod.vercel.app/plans/tamal-2047/docs/horaot.pdf",
+    "mavat": "https://mavat.iplan.gov.il/SV4/1/6001022055/310",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/%D7%AA%D7%9E%D7%9C%2F2047"
+   }
+  },
+  {
+   "slug": "3-03-104-67",
+   "number": "3/03/104/67",
+   "name": "התחדשות עירונית ברחוב הרב שאולי בקטעו המערבי של שד' הרצל - רובע ד' - אשדוד",
+   "place": "הרב שאולי",
+   "status": {
+    "label": "בביצוע",
+    "text": "התוכנית אושרה ב-2017. לפי המאגר הממשלתי המתחם נמצא בביצוע. הבנייה מתוכננת בארבעה שלבים, כך שהדיירים עוברים פעם אחת.",
+    "source": "חותמות האישור על שער ההוראות, ומאגר מתחמי ההתחדשות העירונית ב-data.gov.il"
+   },
+   "housing": true,
+   "lots": 3,
+   "units": 684,
+   "totalUnits": 684,
+   "verdict": "check",
+   "links": {
+    "horaot": "https://nihul-hitchadshut-ashdod.vercel.app/plans/3-03-104-67/docs/horaot.pdf",
+    "mavat": "https://mavat.iplan.gov.il/SV4/1/6000262185/310",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/3%2F03%2F104%2F67"
+   }
+  },
+  {
+   "slug": "603-0704064",
+   "number": "603-0704064",
+   "name": "פינוי בינוי שדרות הרצל / הרב שאולי אביסרור",
+   "place": "הרב שאולי-אביסרור",
+   "status": {
+    "label": "תוכנית מאושרת",
+    "text": "לפי המאגר הממשלתי, התוכנית אושרה ב-2025 והביצוע עוד לא התחיל. הסמכות לתוכנית היא של הוועדה המחוזית.",
+    "source": "מאגר מתחמי ההתחדשות העירונית ב-data.gov.il, וסעיף 1.4"
+   },
+   "housing": true,
+   "lots": 8,
+   "units": 212,
+   "totalUnits": 212,
+   "verdict": "ok",
+   "links": {
+    "horaot": "https://nihul-hitchadshut-ashdod.vercel.app/plans/603-0704064/docs/horaot.pdf",
+    "mavat": "https://mavat.iplan.gov.il/SV4/1/6000974759/310",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/603-0704064"
+   }
+  },
+  {
+   "slug": "tamal-2021",
+   "number": "תמל/2021",
+   "name": "פינוי בינוי מתחם הרותם פלדות - רובע ח'",
+   "place": "הרותם-פלדות",
+   "status": {
+    "label": "תוכנית מאושרת",
+    "text": "לפי המאגר הממשלתי התוכנית מאושרת, והביצוע עוד לא התחיל. התוכנית קודמה בוותמ\"ל, הוועדה הארצית למתחמים מועדפים לדיור. מסמך ההוראות שבידינו הופק ב-28 במאי 2023.",
+    "source": "מאגר מתחמי ההתחדשות העירונית ב-data.gov.il, וסעיף 1.4 בהוראות התוכנית"
+   },
+   "housing": true,
+   "lots": 29,
+   "units": 1436,
+   "totalUnits": 1436,
+   "verdict": "check",
+   "links": {
+    "horaot": "https://nihul-hitchadshut-ashdod.vercel.app/plans/tamal-2021/docs/horaot.pdf",
+    "mavat": "https://mavat.iplan.gov.il/SV4/1/6000383399/310",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/%D7%AA%D7%9E%D7%9C%2F2021"
+   }
+  },
+  {
+   "slug": "603-1097815",
+   "number": "603-1097815",
+   "name": "התחדשות עירונית מתחם \"הנשיא\" אשדוד",
+   "place": "יצחק הנשיא",
+   "status": {
+    "label": "תוכנית מאושרת",
+    "text": "הסטטוס לפי הרשות הממשלתית להתחדשות עירונית: תכנית מאושרת לפני מימוש, שנת מתן תוקף 2026. אם לא יינתן היתר בנייה לבניין הראשון בתוך 5 שנים מאישור התוכנית, התוכנית מתבטלת.",
+    "source": "מאגר מתחמי ההתחדשות העירונית, data.gov.il; סעיף 7.2"
+   },
+   "housing": true,
+   "lots": 17,
+   "units": 830,
+   "totalUnits": 830,
+   "verdict": "check",
+   "links": {
+    "horaot": "https://nihul-hitchadshut-ashdod.vercel.app/plans/603-1097815/docs/horaot.pdf",
+    "mavat": "https://mavat.iplan.gov.il/SV4/1/6005230368/310",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/603-1097815"
+   }
+  },
+  {
+   "slug": "603-0391219",
+   "number": "603-0391219",
+   "name": "פינוי בינוי והתחדשות עירונית במרכז א', אשדוד",
+   "place": "מרכז מסחרי רובע א'",
+   "status": {
+    "label": "תוכנית מאושרת",
+    "text": "לפי המאגר הממשלתי, התוכנית אושרה ב-2025 והביצוע עוד לא התחיל. התוכנית בסמכות הוועדה המחוזית, ומגישה היא עיריית אשדוד.",
+    "source": "מאגר מתחמי ההתחדשות העירונית ב-data.gov.il, וסעיפים 1.4 ו-1.8.1"
+   },
+   "housing": true,
+   "lots": 29,
+   "units": 365,
+   "totalUnits": 315,
+   "verdict": "fail",
+   "links": {
+    "horaot": "https://nihul-hitchadshut-ashdod.vercel.app/plans/603-0391219/docs/horaot.pdf",
+    "mavat": "https://mavat.iplan.gov.il/SV4/1/6000396757/310",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/603-0391219"
+   }
+  },
+  {
+   "slug": "tamal-2024",
+   "number": "תמל/2024",
+   "name": "התחדשות עירונית מתחם הרצל-נאות ספיר רובע ה' אשדוד",
+   "place": "נאות ספיר",
+   "status": {
+    "label": "תוכנית מאושרת",
+    "text": "לפי המאגר הממשלתי, התוכנית מאושרת והביצוע עוד לא התחיל. התאריך שרשום במאגר: 7 באוגוסט 2025.",
+    "source": "מאגר מתחמי ההתחדשות העירונית ב-data.gov.il"
+   },
+   "housing": true,
+   "lots": 14,
+   "units": 900,
+   "totalUnits": 900,
+   "verdict": "check",
+   "links": {
+    "horaot": "https://nihul-hitchadshut-ashdod.vercel.app/plans/tamal-2024/docs/horaot.pdf",
+    "mavat": "https://mavat.iplan.gov.il/SV4/1/99005083836/310",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/%D7%AA%D7%9E%D7%9C%2F2024"
+   }
+  },
+  {
+   "slug": "603-0993790",
+   "number": "603-0993790",
+   "name": "התחדשות עירונית - מתחם \"הרצל\" אשדוד",
+   "place": "סיני-קדש (\"מתחם הרצל\")",
+   "status": {
+    "label": "תוכנית בהפקדה",
+    "text": "התוכנית עוד לא אושרה. הוועדה המחוזית דרום החליטה ב-30 במרץ 2025 להפקיד אותה, והמסמכים נחתמו להפקדה ב-23 ביולי 2025. בזמן ההפקדה אפשר להגיש התנגדויות.",
+    "source": "חותמת הוועדה המחוזית על תשריט מצב מוצע; תדפיס הוראות התכנית, חתום להפקדה, 20/07/2025, סעיף 1.4; מאגר מתחמי ההתחדשות העירונית ב-data.gov.il (תכנון סטטוטורי)"
+   },
+   "housing": true,
+   "lots": 5,
+   "units": 310,
+   "totalUnits": 310,
+   "verdict": "check",
+   "links": {
+    "horaot": "https://nihul-hitchadshut-ashdod.vercel.app/plans/603-0993790/docs/horaot.pdf",
+    "mavat": "https://mavat.iplan.gov.il/SV4/1/6005150934/310",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/603-0993790"
+   }
+  },
+  {
+   "slug": "603-0780734",
+   "number": "603-0780734",
+   "name": "התחדשות עירונית מתחם בני ברית-ציזלינג - אשדוד רובע ו'",
+   "place": "ציזלינג / בני ברית",
+   "status": {
+    "label": "בתכנון",
+    "text": "התוכנית עוד לא אושרה. העמוד מבוסס על נוסח ההוראות מאתר תכנון זמין מ-21 במרץ 2026. ההוראות לא מציינות שהתוכנית הופקדה. הסמכות לתוכנית היא של הוועדה המחוזית. לפי המאגר הממשלתי, המתחם בשלב תכנון סטטוטורי.",
+    "source": "הוראות התוכנית, עמוד השער וסעיף 1.4; מאגר מתחמי ההתחדשות העירונית ב-data.gov.il"
+   },
+   "housing": true,
+   "lots": 14,
+   "units": 832,
+   "totalUnits": 832,
+   "verdict": "check",
+   "links": {
+    "horaot": "https://nihul-hitchadshut-ashdod.vercel.app/plans/603-0780734/docs/horaot.pdf",
+    "mavat": "https://mavat.iplan.gov.il/SV4/1/6001023589/310",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/603-0780734"
+   }
+  },
+  {
+   "slug": "3-03-104-66",
+   "number": "3/03/104/66",
+   "name": "מתחם שפירא-שד' הרצל, אשדוד",
+   "place": "שפירא / פעמוני העיר",
+   "status": {
+    "label": "היתר בנייה",
+    "text": "הוועדה המחוזית החליטה לאשר את התוכנית ב-30 ביוני 2014. לפי המאגר הממשלתי המתחם נמצא אחרי רישוי, כלומר בשלב ההיתרים.",
+    "source": "חותמת הוועדה המחוזית על שער ההוראות, ומאגר מתחמי ההתחדשות העירונית ב-data.gov.il"
+   },
+   "housing": true,
+   "lots": 3,
+   "units": 324,
+   "totalUnits": 324,
+   "verdict": "check",
+   "links": {
+    "horaot": "https://nihul-hitchadshut-ashdod.vercel.app/plans/3-03-104-66/docs/horaot.pdf",
+    "mavat": "https://mavat.iplan.gov.il/SV4/1/6000261531/310",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/3%2F03%2F104%2F66"
+   }
+  },
+  {
+   "slug": "3-03-101-71a",
+   "number": "3/03/101/71א",
+   "name": "תוכנית מס' 71/101/02/3 א' - עורף נמל אשדוד",
+   "place": "עורף נמל אשדוד (תוכנית תעשייה ונמל, בלי מגורים)",
+   "status": {
+    "label": "תוכנית מאושרת",
+    "text": "התוכנית פורסמה למתן תוקף בילקוט הפרסומים 5500, ב-27 בפברואר 2006. ההוראות מעריכות שהביצוע יימשך 20 שנה, כלומר עד 2026 בערך. המסמכים כאן סרוקים, ונקראו בעין.",
+    "source": "חותמת הפרסום על דף המבוא של ההוראות, וסעיף 20"
+   },
+   "housing": false,
+   "lots": 104,
+   "units": 0,
+   "totalUnits": 0,
+   "verdict": "check",
+   "links": {
+    "horaot": "https://nihul-hitchadshut-ashdod.vercel.app/plans/3-03-101-71a/docs/horaot.pdf",
+    "mavat": "",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/3%2F03%2F101%2F71%D7%90"
+   }
+  },
+  {
+   "slug": "603-1510577",
+   "number": "603-1510577",
+   "name": "התחדשות עירונית צפון רובע י', אשדוד",
+   "place": "ציר מנחם בגין",
+   "status": {
+    "label": "תכנון ראשוני",
+    "text": "לפי הרשות הממשלתית להתחדשות עירונית, המתחם בשלב תכנון ראשוני. נספח הבינוי נשלח לאתר תכנון זמין בפברואר ובמרץ 2026, בגרסאות מ-8 בפברואר ומ-3 במרץ. התוכנית עוד לא אושרה, והוראות התוכנית והתשריט עוד לא היו בידינו כשהעמוד נכתב. הכול יכול להשתנות.",
+    "source": "מאגר מתחמי ההתחדשות העירונית ב-data.gov.il, ותאריכי הגיליונות בנספח הבינוי"
+   },
+   "housing": false,
+   "lots": 75,
+   "units": 0,
+   "totalUnits": null,
+   "verdict": "check",
+   "links": {
+    "horaot": "",
+    "mavat": "https://mavat.iplan.gov.il/SV4/1/6005487816/310",
+    "page": "https://nihul-hitchadshut-ashdod.vercel.app/plan/603-1510577"
+   }
+  }
+ ]
+}
