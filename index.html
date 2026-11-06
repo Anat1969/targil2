@@ -163,7 +163,7 @@
         <button class="opt" type="button" data-eye="95" aria-pressed="false" title="ילד בן 3">95</button>
       </div>
     </div>
-    <div class="stage"><space-walk id="walk" variant="block" eye="160"></space-walk></div>
+    <div class="stage"><space-walk id="walk" bare variant="block" view="walk" eye="160"></space-walk></div>
     <p class="caption"><span id="shapeHint"></span><span>גוררים כדי להסתכל, חיצים כדי ללכת, לחיצה על התוכנית הקטנה מעבירה לשם.</span><span>צהוב על המגרש: התכסית המותרת.</span></p>
   </section>
 
@@ -455,27 +455,30 @@
     };
   }
 
-  // the shared component keeps its own look; here its panel is hidden (this page has its own controls) and its buttons are quiet
+  // bare mode (walk.js, 06.11.2026): the component hides its panel and this page drives variant, view and eye
+  // through attributes. The skin only quiets its look.
   const SKIN = `
-    .sw{grid-template-columns:minmax(0,1fr)} .panel{display:none}
     .stage{background:#E8EBEA;border:0}
     .map{width:150px;height:128px}
     .mapbox,.hint{border:0;box-shadow:0 1px 2px rgba(20,22,24,.05),0 2px 8px rgba(20,22,24,.08)}
     .hint{display:none}
     .btn{border:0!important;background:#F1F0EB;box-shadow:0 1px 2px rgba(20,22,24,.08);font-weight:500}
     .btn:active{margin-top:0}
-    .eye{background:#16303A}
-    @media (max-width:860px){.sw{grid-template-rows:1fr;height:100%}}`;
+    .eye{background:#16303A}`;
   const shadow = () => $('walk').shadowRoot;
-  const inWalk = (sel) => { const b = shadow() && shadow().querySelector(sel); if (b) b.click(); };
+  // one place sets the 3D state and lights the bar's buttons
+  function setWalk(name, val) {
+    $('walk').setAttribute(name, val);
+    const v = $('walk').getAttribute('view'), e = $('walk').getAttribute('eye');
+    document.querySelectorAll('.stagebar [data-view]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
+    document.querySelectorAll('.stagebar [data-eye]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.eye === e)));
+  }
   customElements.whenDefined('space-walk').then(() => {
     const sr = shadow();
     if (sr && !sr.querySelector('style[data-skin]')) { const st = document.createElement('style'); st.dataset.skin = ''; st.textContent = SKIN; sr.appendChild(st); }
   });
-  $('walk').addEventListener('walkchange', (e) => {
-    document.querySelectorAll('[data-view]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === e.detail.view)));
-    document.querySelectorAll('[data-eye]').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.eye === e.detail.eye)));
-  });
+  // a click on the small plan inside the scene moves the viewer to the street: the bar follows
+  $('walk').addEventListener('walkchange', (e) => { setWalk('view', e.detail.view); });
 
   // ---------- state: the address and this browser keep the inputs ----------
   function persist() {
@@ -511,9 +514,9 @@
   $('clearAll').addEventListener('click', () => { Object.values(IDS).forEach((id) => { $(id).value = ''; }); update(true); });
   document.addEventListener('click', (e) => {
     const sh = e.target.closest('[data-shape]');
-    if (sh) { shape = sh.dataset.shape; update(true); inWalk('[data-variant="' + shape + '"]'); return; }
-    const v = e.target.closest('.stagebar [data-view]'); if (v) { inWalk('[data-view="' + v.dataset.view + '"]'); return; }
-    const ey = e.target.closest('.stagebar [data-eye]'); if (ey) { inWalk('[data-eye="' + ey.dataset.eye + '"]'); return; }
+    if (sh) { shape = sh.dataset.shape; update(true); setWalk('variant', shape); return; }
+    const v = e.target.closest('.stagebar [data-view]'); if (v) { setWalk('view', v.dataset.view); return; }
+    const ey = e.target.closest('.stagebar [data-eye]'); if (ey) { setWalk('eye', ey.dataset.eye); return; }
     const tab = e.target.closest('[data-tab]');
     if (tab) { document.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b === tab)));
       document.querySelectorAll('[data-panel]').forEach((p) => { p.hidden = p.dataset.panel !== tab.dataset.tab; }); }
