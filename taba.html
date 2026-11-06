@@ -10,70 +10,167 @@
 <script src="https://appofapp-gh.vercel.app/ai-menu.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
 <style>
-  .frame.two{grid-template-columns:var(--side-r) minmax(0,1fr)}
-  .field.text{grid-template-columns:minmax(0,1fr) 130px}
+  /* טבלה 5 כתשריט מופשט: כל מגרש אריח בגודל השטח שלו ובצבע הייעוד. הבחירה מאירה, השאר נשאר בהקשר.
+     בורר אחד: עדשות מהירות, מגרשים, ומקרא שכל פריט בו מבודד את הייעוד שלו. */
+  .sheet{height:calc(100dvh - var(--nav-h));display:grid;max-width:1800px;margin:0 auto;padding:14px var(--pad) 12px;gap:10px 28px;
+    grid-template-columns:minmax(0,1fr) 380px;grid-template-rows:auto auto minmax(0,1.25fr) auto minmax(0,1fr);
+    grid-template-areas:"lede lede" "pick pick" "map legend" "kpi kpi" "low low"}
+  .lede{grid-area:lede;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 24px;align-items:end}
+  .kicker{font-family:var(--mono);font-size:12px;color:var(--rights)}
+  .lede h1{font-size:clamp(22px,2.2vw,34px);font-weight:300}
+  .lede h1 b{font-weight:600}
+  .lede .sub{font-size:14.5px;color:var(--ink-2)}
+  .filebar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  .filebar .name{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .filebar .btn{height:32px;font-size:13px;padding:0 12px}
+
+  /* ===== הבורר ===== */
+  .pick{grid-area:pick;display:flex;align-items:center;gap:8px 20px;flex-wrap:wrap;padding:8px 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--rule)}
+  .pick .grp{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .pick .grp > span{font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+  .pick .opt{height:32px;font-size:13.5px;padding:0 12px}
+  .pick .opt.all{background:#fff;font-weight:600}
+  .pick .opt.all[aria-pressed="true"]{background:var(--ink);color:#fff;box-shadow:none}
+  .plots{display:flex;align-items:center;gap:6px}
+  .plots input::placeholder{color:#A9ADB2}
+  .plots input{height:32px;width:150px;border:0;border-bottom:1px solid var(--ink-3);background:transparent;font-family:var(--mono);font-size:14px;padding:0 4px;direction:ltr;text-align:right}
+  .plots input:focus{outline:none;border-bottom-color:var(--rights);background:var(--rights-soft)}
+  .now{margin-inline-start:auto;font-size:13px;color:var(--ink-2)}
+  .now b{font-weight:600;color:var(--ink)}
+
+  /* ===== התשריט המופשט ===== */
+  .map{grid-area:map;min-height:0;display:flex;flex-direction:column;gap:8px}
+  .mapbox{position:relative;flex:1;min-height:0}
+  .map .shares{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;flex:none}
+  .map svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .tile{cursor:pointer}
+  .tile rect{stroke:#fff;stroke-width:1.5;transition:opacity .25s}
+  .tile.dim rect{opacity:.16}
+  .tile.dim text{opacity:.35}
+  .tile:hover rect{stroke:var(--ink);stroke-width:2}
+  .tile text{pointer-events:none;font-family:"IBM Plex Mono",monospace}
+  .maphint{position:absolute;bottom:0;left:0;font-size:11.5px;color:var(--ink-3);background:rgba(247,246,242,.9);padding:2px 6px}
+
+  /* ===== המקרא, שהוא גם הבורר ===== */
+  .legendcol{grid-area:legend;min-height:0;overflow-y:auto;scrollbar-width:thin;display:flex;flex-direction:column;gap:10px;padding:0 2px 4px}
+  .legendcol h2{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);font-weight:400;display:flex;justify-content:space-between;border-bottom:1px solid var(--ink);padding-bottom:4px}
+  .lg{display:grid;gap:2px}
+  .lg .row{display:grid;grid-template-columns:minmax(0,1fr) 28px;gap:2px}
+  .lg .it{font:inherit;font-size:13.5px;border:0;border-radius:0;background:transparent;cursor:pointer;display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:8px;align-items:center;text-align:start;padding:5px 6px;color:var(--ink-2);transition:background .15s,opacity .2s}
+  .lg .it:hover{background:var(--rule-soft)}
+  .lg .it i{width:14px;height:14px;display:block}
+  .lg .it small{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap}
+  .lg .it.sub{padding-inline-start:28px;font-size:13px}
+  .lg .it.g{font-weight:600;color:var(--ink)}
+  .lg .it[aria-pressed="true"]{background:var(--rights-soft);color:var(--rights-deep);box-shadow:inset -3px 0 0 var(--rights)}
+  .lg .it.off{opacity:.42}
+  .lg .add{font:inherit;font-family:var(--mono);font-size:14px;border:0;border-radius:0;background:transparent;color:var(--ink-3);cursor:pointer}
+  .lg .add:hover{background:var(--rule-soft);color:var(--ink)}
+  .lg .add[aria-pressed="true"]{color:var(--rights)}
+  .shares{display:grid;gap:8px}
+  .share .top{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2)}
+  .share .top b{font-family:var(--mono);font-weight:500}
+  .bar{display:flex;height:16px;margin-top:3px;background:var(--rule-soft)}
+  .bar button{border:0;border-radius:0;padding:0;cursor:pointer;height:100%;transition:opacity .2s,filter .15s}
+  .bar button:hover{filter:brightness(.92)}
+  .bar.some button.off{opacity:.18}
+
+  /* ===== מספרים ===== */
+  .kpi{grid-area:kpi;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;border-top:1px solid var(--ink);border-bottom:1px solid var(--rule)}
+  .kpi div{padding:6px 12px 6px 0;border-inline-start:1px solid var(--rule)}
+  .kpi div:first-child{border-inline-start:0}
+  .kpi b{display:block;font-family:var(--mono);font-size:clamp(17px,1.5vw,22px);font-weight:500;line-height:1.2}
+  .kpi span{font-size:12px;color:var(--ink-3)}
+
+  /* ===== חדרי העבודה: טבלה, דרישות, קובץ ===== */
+  .low{grid-area:low;min-height:0;display:flex;flex-direction:column}
+  .lowtabs{display:flex;gap:2px;flex:none;overflow-x:auto;scrollbar-width:none}
+  .lowtabs button{white-space:nowrap}
+  .lowtabs button{font:inherit;font-size:13.5px;height:34px;padding:0 14px;border:0;border-radius:0;background:transparent;color:var(--ink-3);cursor:pointer;border-bottom:2px solid transparent}
+  .lowtabs button:hover{color:var(--ink)}
+  .lowtabs button[aria-selected="true"]{color:var(--ink);font-weight:600;border-bottom-color:var(--rights)}
+  .lowpanel{flex:1;min-height:0;overflow:auto;background:#fff;box-shadow:var(--shadow);scrollbar-width:thin}
+  .lowpanel[hidden]{display:none}
+  .lowpanel.pad{padding:14px 16px;display:grid;gap:12px;align-content:start}
+
+  .results-table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:1080px}
+  .results-table th{position:sticky;top:0;background:var(--paper);font-weight:500;font-size:11.5px;color:var(--ink-2);padding:5px 6px;border-bottom:1px solid var(--rule);border-inline-start:1px solid var(--rule-soft);vertical-align:bottom;line-height:1.3;z-index:1}
+  .results-table thead tr:nth-child(2) th{top:28px} .results-table thead tr:nth-child(3) th{top:56px}
+  .results-table td{padding:5px 6px;border-bottom:1px solid var(--rule-soft);border-inline-start:1px solid var(--rule-soft);font-family:var(--mono);font-size:12.5px;text-align:center;white-space:nowrap}
+  .results-table td:nth-child(n+2):nth-child(-n+5){font-family:var(--sans);text-align:right;white-space:normal}
+  .results-table td:nth-child(2){box-shadow:inset -4px 0 0 var(--c,transparent)}
+  .results-table tbody tr:hover td{background:#FBFAF7}
+  .results-table td.go{padding:3px}
+  .to-volume{display:inline-flex;align-items:center;justify-content:center;height:28px;padding:0 10px;background:var(--rights-soft);color:var(--rights-deep);font-family:var(--sans);font-size:12.5px;font-weight:600;text-decoration:none;box-shadow:0 1px 2px rgba(20,22,24,.07);white-space:nowrap}
+  .to-volume:hover{background:var(--rights-mid)}
+  .to-volume[aria-disabled="true"]{opacity:.4;pointer-events:none}
+  .footnote-ref{color:var(--rights);font-size:10px}
+  .footnotes-section{padding:10px 16px;border-top:1px solid var(--rule)}
+  .footnotes-title{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-bottom:4px}
+  .footnote-item{font-size:13px;color:var(--ink-2);padding:2px 0}
+  .footnote-num{font-family:var(--mono);color:var(--rights)}
+  .no-results{padding:16px;color:var(--ink-3)}
+
+  .field.text{grid-template-columns:minmax(0,1fr) 150px}
   .field.text input{font-family:var(--sans);text-align:right;direction:rtl}
-  .drop-zone{position:relative;display:grid;place-items:center;gap:4px;min-height:84px;padding:12px;text-align:center;cursor:pointer;
+  .drop-zone{position:relative;display:grid;place-items:center;gap:4px;min-height:76px;padding:12px;text-align:center;cursor:pointer;
     background:repeating-linear-gradient(45deg,#FBFAF7 0 10px,#F4F2EC 10px 20px);box-shadow:inset 0 0 0 1px var(--rule);transition:box-shadow .15s}
   .drop-zone:hover{box-shadow:inset 0 0 0 1px var(--ink-3)}
   .drop-zone.dragover{box-shadow:inset 0 0 0 3px var(--rights)}
   .drop-zone p{font-size:13.5px;color:var(--ink-2)}
   .drop-zone .file-name{font-family:var(--mono);font-size:11.5px;color:var(--rights);word-break:break-all}
   .drop-zone input{display:none}
-  .mavat-link{font-size:12.5px;color:var(--ink-3);display:inline-block;margin-top:6px}
-  .mavat-link:hover{color:var(--rights)}
-  .action-btn{font:inherit;font-size:14px;border:0;border-radius:0;cursor:pointer;height:var(--btn-h);width:100%;margin-top:10px;
+  .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  .two h3{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);font-weight:400;margin-bottom:6px}
+  .action-btn{font:inherit;font-size:14px;border:0;border-radius:0;cursor:pointer;height:var(--btn-h);width:100%;margin-top:8px;
     background:var(--rights-soft);color:var(--rights-deep);font-weight:600;box-shadow:0 1px 2px rgba(20,22,24,.07);transition:transform .15s,box-shadow .15s,background .15s}
   .action-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-up);background:var(--rights-mid)}
-  .action-btn:active{transform:translateY(1px);box-shadow:none}
   .action-btn:disabled{opacity:.45;cursor:default;transform:none;box-shadow:none}
-  #newExtractionBtn{width:auto;padding:0 16px;background:var(--rule-soft);color:var(--ink-2);font-weight:400}
-  .steps{display:grid;gap:6px;margin:0;padding:0;list-style:none;counter-reset:s}
-  .steps li{display:grid;grid-template-columns:24px minmax(0,1fr);gap:8px;font-size:13.5px;color:var(--ink-2);counter-increment:s}
-  .steps li::before{content:counter(s,decimal-leading-zero);font-family:var(--mono);font-size:12px;color:var(--rights);padding-top:2px}
+  #newExtractionBtn{width:auto;padding:0 16px;background:var(--rule-soft);color:var(--ink-2);font-weight:400;margin:12px 16px}
   .status{font-family:var(--mono);font-size:12px;color:var(--ink-3);min-height:1em}
   .status.error{color:var(--problem)}
-  .program-summary{background:#fff;box-shadow:var(--shadow);padding:14px 16px;flex:none;border-inline-start:4px solid var(--rights)}
-  .program-summary-title{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-bottom:6px}
-  .program-field{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px;padding:3px 0;font-size:14px}
-  .program-field-label{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);padding-top:2px}
-  .table-card{background:#fff;box-shadow:var(--shadow);flex:none}
-  .table-wrapper{overflow-x:auto;max-width:100%}
-  .results-table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:1040px}
-  .results-table th{background:var(--paper);font-weight:500;font-size:11.5px;color:var(--ink-2);padding:6px 6px;border-bottom:1px solid var(--rule);border-inline-start:1px solid var(--rule-soft);vertical-align:bottom;line-height:1.3}
-  .results-table td{padding:6px;border-bottom:1px solid var(--rule-soft);border-inline-start:1px solid var(--rule-soft);font-family:var(--mono);font-size:12.5px;text-align:center;white-space:nowrap}
-  .results-table td:nth-child(n+2):nth-child(-n+5){font-family:var(--sans);text-align:right;white-space:normal}
-  .results-table tbody tr:hover td{background:#FBFAF7}
-  .results-table td.go{padding:4px}
-  .to-volume{display:inline-flex;align-items:center;justify-content:center;height:30px;padding:0 10px;background:var(--rights-soft);color:var(--rights-deep);font-family:var(--sans);font-size:12.5px;font-weight:600;text-decoration:none;box-shadow:0 1px 2px rgba(20,22,24,.07);white-space:nowrap}
-  .to-volume:hover{background:var(--rights-mid)}
-  .to-volume[aria-disabled="true"]{opacity:.4;pointer-events:none}
-  .footnote-ref{color:var(--rights);font-size:10px}
-  .footnotes-section{padding:12px 16px;border-top:1px solid var(--rule)}
-  .footnotes-title{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-bottom:6px}
-  .footnote-item{font-size:13px;color:var(--ink-2);padding:2px 0}
-  .footnote-num{font-family:var(--mono);color:var(--rights)}
-  .no-results{padding:16px;color:var(--ink-3)}
-  .empty{display:grid;gap:14px;padding:24px;background:#fff;box-shadow:var(--shadow)}
-  .empty h2{font-size:22px;font-weight:300}
-  .empty h2 b{font-weight:600}
-  .flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-  .flow div{padding:12px;background:var(--paper)}
-  .flow .n{font-family:var(--mono);font-size:22px;color:var(--rights)}
-  .flow b{display:block;font-size:14.5px}
-  .flow p{font-size:13px;color:var(--ink-2)}
-  .requirement-item{background:#fff;box-shadow:var(--shadow);padding:12px 16px;flex:none}
+  .mavat-link{font-size:12.5px;color:var(--ink-3)}
+  .requirement-item{padding:10px 0;border-bottom:1px solid var(--rule-soft)}
   .requirement-authority{font-weight:600;font-size:14.5px;margin-bottom:4px}
   .requirement-text{font-size:13.5px;color:var(--ink-2);padding:3px 0}
   .requirement-section-ref{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
-  .raw-text-toggle{font-family:var(--mono);font-size:12px;color:var(--ink-3);cursor:pointer;text-decoration:underline;flex:none}
-  .raw-text{display:none;white-space:pre-wrap;font-family:var(--mono);font-size:11.5px;background:#fff;box-shadow:var(--shadow);padding:12px;max-height:320px;overflow:auto;flex:none}
+  .raw-text-toggle{font-family:var(--mono);font-size:12px;color:var(--ink-3);cursor:pointer;text-decoration:underline}
+  .raw-text{display:none;white-space:pre-wrap;font-family:var(--mono);font-size:11.5px;background:var(--paper);padding:12px;max-height:300px;overflow:auto}
   .raw-text.visible{display:block}
-  .section-title{font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
-  @media (max-width:900px){.frame.two{grid-template-columns:minmax(0,1fr)}.flow{grid-template-columns:minmax(0,1fr)}}
+  .program-summary{font-size:13px;color:var(--ink-2)}
+  .program-summary-title{display:none}
+  .program-field{display:inline}
+  .program-field + .program-field::before{content:" · "}
+  .program-field-label{display:none}
+
+  /* ===== מצב ריק ===== */
+  .empty{grid-column:1/-1;grid-row:3/6;display:grid;align-content:center;justify-items:start;gap:18px;padding:32px;background:#fff;box-shadow:var(--shadow)}
+  .empty h2{font-size:clamp(22px,2vw,30px);font-weight:300;max-width:30ch}
+  .empty h2 b{font-weight:600}
+  .flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;width:100%;max-width:980px}
+  .flow div{padding:12px 14px;background:var(--paper)}
+  .flow .n{font-family:var(--mono);font-size:22px;color:var(--rights)}
+  .flow b{display:block;font-size:14.5px}
+  .flow p{font-size:13px;color:var(--ink-2)}
+  .empty .line{width:100%;max-width:520px}
+  body.nodata .map,body.nodata .legendcol,body.nodata .kpi,body.nodata .low,body.nodata .pick{display:none}
+  body:not(.nodata) .empty{display:none}
+
+  @media (max-width:900px){
+    .sheet{height:auto;display:flex;flex-direction:column;padding:12px 16px 24px;gap:14px}
+    .lede{grid-template-columns:minmax(0,1fr)}
+    .filebar{justify-content:flex-start}
+    .map{flex:none} .mapbox{height:320px;flex:none} .map .shares{grid-template-columns:minmax(0,1fr)}
+    .legendcol{overflow:visible}
+    .kpi{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .kpi div:nth-child(4){border-inline-start:0}
+    .low{height:70vh;flex:none}
+    .flow,.two{grid-template-columns:minmax(0,1fr)}
+    .now{margin-inline-start:0}
+  }
 </style>
 </head>
-<body>
+<body class="nodata">
 <header class="topbar">
   <a class="home" href="index.html" aria-label="תכסית ונפח, לדף הבית">
     <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect x="2.5" y="2.5" width="25" height="25" fill="#fff" stroke="#141618" stroke-width="1.5"/><rect x="8" y="8" width="14" height="14" fill="#F3E37C"/><rect x="11" y="11" width="8" height="8" fill="#1F5E6B"/></svg>
@@ -86,65 +183,95 @@
   <ai-menu chat="https://claude.ai/code/session_01UBnSCKjceAQftmEhcfhDHZ"></ai-menu>
 </header>
 
-<main class="page">
-  <section class="lens">
+<main class="sheet">
+  <section class="lede">
     <div>
-      <div class="kicker">המקור · הוראות התוכנית, טבלה 5</div>
-      <h1>הזכויות כתובות בטבלה, <b>הנפח</b> לא</h1>
-      <p class="sub">מעלים את טבלה 5 מקובץ התוכנית, מוצאים את המגרש, ושולחים את השורה לנפח בלחיצה אחת.</p>
+      <div class="kicker" id="kicker">טבלה 5 · זכויות והוראות בנייה</div>
+      <h1 id="insight">הזכויות כתובות בטבלה, <b>הנפח</b> לא</h1>
+      <p class="sub" id="sub">מעלים את טבלה 5, בוחרים מגרשים, ייעודים או שטחים ציבוריים, ושולחים מגרש לנפח.</p>
     </div>
-    <div class="meta"><span>הקובץ נקרא בדפדפן בלבד</span><span>לא נשלח לשום שרת</span></div>
+    <div class="filebar">
+      <div id="programSummary" class="program-summary" style="display:none"></div>
+      <span class="name" id="fileName"></span>
+      <button class="btn" type="button" id="pickFile">טבלה 5 חדשה</button>
+      <button class="btn" type="button" id="loadExample">טבלה לדוגמה</button>
+    </div>
   </section>
 
-  <div class="frame two">
-    <aside class="pane" aria-label="הקבצים">
-      <div class="ph"><span><b>01</b> הקובץ</span></div>
-      <div class="card">
-        <div class="field text"><label for="planNumber">מספר תב"ע<small>לזיהוי בלבד</small></label><input type="text" id="planNumber" placeholder="רע/1/1א"></div>
-        <div class="field text"><label for="plotNumber">מספר מגרש<small>מסנן את השורות</small></label><input type="text" id="plotNumber" placeholder="101"></div>
-        <div class="drop-zone" id="dropZone" style="margin-top:10px">
-          <p>טבלה 5 כ-PDF: גוררים לכאן או לוחצים</p>
-          <span class="file-name" id="fileName"></span>
-          <input type="file" id="fileInput" accept=".pdf">
-        </div>
-        <a class="mavat-link" href="https://mavat.iplan.gov.il/SV3" target="_blank" rel="noopener">איפה מוצאים: מבא"ת, מסמכי התוכנית</a>
-        <button class="action-btn" id="parseBtn" disabled>חילוץ הטבלה</button>
-      </div>
-      <div class="ph"><span><b>02</b> דרישות הגורמים · לא חובה</span></div>
-      <div class="card requirements-section" id="requirementsSection">
-        <div class="drop-zone" id="instructionsDropZone">
-          <p>הוראות התב"ע כ-PDF</p>
-          <span class="file-name" id="instructionsFileName"></span>
-          <input type="file" id="instructionsFileInput" accept=".pdf">
-        </div>
-        <button class="action-btn" id="requirementsBtn" disabled>חילוץ הדרישות</button>
-      </div>
-      <p class="src">החילוץ מזהה עמודות לפי מילות כותרת. טבלה סרוקה כתמונה לא תיקרא: אז מקלידים את המספרים בדף הנפח.</p>
-    </aside>
-
-    <section class="pane" aria-label="הטבלה">
-      <div class="ph"><span><b>03</b> <span class="section-title" id="resultsTitle" style="display:none">השורות מהטבלה · "לנפח" שולח את המגרש לחישוב</span></span><span class="status" id="status"></span></div>
-      <div class="empty" id="emptyState">
-        <h2>שלושה צעדים <b>מהטבלה לנפח</b></h2>
-        <div class="flow">
-          <div><span class="n">01</span><b>מעלים את טבלה 5</b><p>מקובץ הוראות התוכנית במבא"ת.</p></div>
-          <div><span class="n">02</span><b>מסננים למגרש</b><p>מספר המגרש מוצא את השורה שלו.</p></div>
-          <div><span class="n">03</span><b>לוחצים "לנפח"</b><p>שטח, תכסית, זכויות וקומות עוברים לחישוב.</p></div>
-        </div>
-      </div>
-      <div id="programSummary" class="program-summary" style="display:none"></div>
-      <div id="resultsContainer"></div>
-      <div class="status" id="requirementsStatus"></div>
-      <div id="requirementsContainer" style="display:grid;gap:8px"></div>
-      <div class="raw-text-toggle" id="rawToggle" style="display:none">הטקסט הגולמי מה-PDF</div>
-      <div class="raw-text" id="rawText"></div>
-    </section>
+  <div class="empty">
+    <h2>מטבלה 5 <b>לתשריט, לבחירה ולנפח</b></h2>
+    <div class="flow">
+      <div><span class="n">01</span><b>מעלים את טבלה 5</b><p>PDF מקובץ הוראות התוכנית במבא"ת. נקרא בדפדפן בלבד.</p></div>
+      <div><span class="n">02</span><b>בוחרים</b><p>מגרש או מגרשים, ייעוד, פרטי או ציבורי, שטחים פתוחים או מבני חינוך.</p></div>
+      <div><span class="n">03</span><b>לוחצים "לנפח"</b><p>שטח, תכסית, זכויות וקומות עוברים לחישוב ולתלת־ממד.</p></div>
+    </div>
+    <div class="line">
+      <button class="btn primary" type="button" id="pickFile2">העלאת טבלה 5</button>
+      <button class="btn" type="button" id="loadExample2">טבלה לדוגמה</button>
+    </div>
+    <span class="status" id="emptyStatus"></span>
   </div>
+
+  <section class="pick" aria-label="מה מציגים">
+    <div class="grp" role="group" aria-label="עדשה"><span>מציגים</span><span id="lenses" style="display:contents"></span></div>
+    <label class="plots"><span class="lbl">מגרשים</span><input type="text" id="plotNumber" placeholder="למשל 101, 104" aria-label="מספרי מגרשים, מופרדים בפסיק"></label>
+    <span class="now" id="now"></span>
+  </section>
+
+  <section class="map" aria-label="תשריט מופשט: כל מגרש לפי שטחו וייעודו">
+    <div class="mapbox"><svg id="mapSvg" role="img"></svg>
+    <span class="maphint">אריח = מגרש, בגודל השטח שלו · לחיצה מבודדת · Shift מוסיף</span></div>
+    <div class="shares" id="shares"></div>
+  </section>
+
+  <aside class="legendcol" aria-label="מקרא ובורר">
+    <h2><span>מקרא · לחיצה מבודדת, + מוסיף</span><span>מ"ר</span></h2>
+    <div class="lg" id="legend"></div>
+    <p class="src">צבעי הייעוד בקירוב לצבעי התשריט המקובלים. הסיווג לפי מילים בעמודות ייעוד ושימוש.</p>
+  </aside>
+
+  <section class="kpi" id="kpi" aria-label="סיכום הבחירה"></section>
+
+  <section class="low">
+    <div class="lowtabs" role="tablist">
+      <button role="tab" aria-selected="true" data-low="table">הטבלה <span class="status" id="resultsTitle"></span></button>
+      <button role="tab" aria-selected="false" data-low="req">דרישות הגורמים</button>
+      <button role="tab" aria-selected="false" data-low="file">הקובץ</button>
+      <span class="status" id="status" style="margin-inline-start:auto;align-self:center"></span>
+    </div>
+    <div class="lowpanel" data-lowpanel="table"><div id="resultsContainer"></div></div>
+    <div class="lowpanel pad" data-lowpanel="req" hidden>
+      <div class="requirements-section" id="requirementsSection">
+        <div class="two"><div>
+          <h3>הוראות התב"ע כ-PDF</h3>
+          <div class="drop-zone" id="instructionsDropZone"><p>גוררים לכאן או לוחצים</p><span class="file-name" id="instructionsFileName"></span><input type="file" id="instructionsFileInput" accept=".pdf"></div>
+          <button class="action-btn" id="requirementsBtn" disabled>חילוץ הדרישות</button>
+        </div><div><span class="status" id="requirementsStatus"></span><div id="requirementsContainer"></div></div></div>
+      </div>
+    </div>
+    <div class="lowpanel pad" data-lowpanel="file" hidden>
+      <div class="two"><div>
+        <h3>טבלה 5 כ-PDF</h3>
+        <div class="drop-zone" id="dropZone"><p>גוררים לכאן או לוחצים</p><input type="file" id="fileInput" accept=".pdf"></div>
+        <button class="action-btn" id="parseBtn" disabled>חילוץ הטבלה</button>
+        <a class="mavat-link" href="https://mavat.iplan.gov.il/SV3" target="_blank" rel="noopener">איפה מוצאים: מבא"ת, מסמכי התוכנית</a>
+      </div><div>
+        <div class="field text"><label for="planNumber">מספר תב"ע<small>לזיהוי בלבד</small></label><input type="text" id="planNumber" placeholder="רע/1/1א"></div>
+        <p class="src" style="margin-top:8px">החילוץ מזהה עמודות לפי מילות כותרת. טבלה סרוקה כתמונה לא תיקרא: אז מקלידים את המספרים בדף הנפח.</p>
+        <div class="raw-text-toggle" id="rawToggle" style="display:none;margin-top:8px">הטקסט הגולמי מה-PDF</div>
+        <div class="raw-text" id="rawText"></div>
+      </div></div>
+    </div>
+  </section>
 </main>
 
     <script type="module">
-        const pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs');
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
+        // pdf.js is needed only to read a file; without it the example table and saved data still work
+        let pdfjsLib = null;
+        try {
+            pdfjsLib = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs');
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs';
+        } catch (e) { console.warn('pdf.js did not load', e); }
 
         const LEAF_COLUMNS = [
             { id: 'designation', label: 'ייעוד' },
@@ -300,6 +427,7 @@
             resultsTitle.style.display = 'none';
             rawToggle.style.display = 'none';
             rawText.textContent = '';
+            DATA = null; SEL.clear(); document.body.classList.add('nodata');
         }
 
         function restoreFromIndexedDB() {
@@ -331,9 +459,9 @@
                 newExtBtn.id = 'newExtractionBtn';
                 newExtBtn.className = 'action-btn';
                 newExtBtn.textContent = 'חילוץ חדש';
-                newExtBtn.style.marginTop = '16px';
+
                 newExtBtn.addEventListener('click', clearSavedData);
-                resultsContainer.parentNode.insertBefore(newExtBtn, resultsContainer.nextSibling);
+                document.querySelector('[data-lowpanel="file"]').prepend(newExtBtn);
             }
         }
 
@@ -376,6 +504,7 @@
             resultsContainer.innerHTML = '';
             resultsTitle.style.display = 'none';
             removeNewExtractionButton();
+            parseBtn.click();   // a chosen file is read at once
         }
 
         rawToggle.addEventListener('click', () => {
@@ -397,6 +526,7 @@
 
         parseBtn.addEventListener('click', async () => {
             if (!pdfFile) return;
+            if (!pdfjsLib) { status.textContent = 'קורא ה-PDF לא נטען. בדקו חיבור לרשת ורעננו.'; status.className = 'status error'; document.getElementById('emptyStatus').textContent = status.textContent; return; }
 
             const plotNumber = document.getElementById('plotNumber').value.trim();
 
@@ -439,27 +569,11 @@
                     return;
                 }
 
-                let filteredRows = rows;
-                if (plotNumber) {
-                    filteredRows = rows.filter(row =>
-                        row.some(cell => cell.includes(plotNumber))
-                    );
-                }
-
-                if (filteredRows.length === 0 && plotNumber) {
-                    status.textContent = `לא נמצאו שורות עבור מגרש "${plotNumber}". מציג את כל הטבלה.`;
-                    status.className = 'status error';
-                    filteredRows = rows;
-                } else if (plotNumber && filteredRows.length > 0) {
-                    status.textContent = `נמצאו ${filteredRows.length} שורות עבור מגרש ${plotNumber}.`;
-                    status.className = 'status';
-                } else {
-                    status.textContent = `נמצאו ${rows.length} שורות בטבלה (${colCount || '?'} עמודות זוהו).`;
-                    status.className = 'status';
-                }
+                status.textContent = `נמצאו ${rows.length} שורות (${colCount || '?'} עמודות זוהו).`;
+                status.className = 'status';
 
                 renderProgramSummary(programInfo);
-                renderTable(filteredRows, footnotes);
+                renderTable(rows, footnotes);
 
                 // Save data to IndexedDB
                 try {
@@ -829,11 +943,8 @@
             return row;
         }
 
-        function renderTable(rows, footnotes) {
-            if (rows.length === 0) {
-                resultsContainer.innerHTML = '<div class="no-results">לא נמצאו שורות בטבלה.</div>';
-                return;
-            }
+        function tableHtml(rows, footnotes) {
+            if (rows.length === 0) return '<div class="no-results">אין שורות בבחירה הזו. "הכול" מחזיר את כל הטבלה.</div>';
 
             const referencedNums = new Set();
             for (const row of rows) {
@@ -848,7 +959,7 @@
                 }
             }
 
-            let html = '<div class="table-card"><div class="table-wrapper">';
+            let html = '<div>';
             html += `<table class="results-table">`;
             html += '<thead>';
 
@@ -888,7 +999,7 @@
             html += '<tbody>';
 
             for (const row of rows) {
-                html += '<tr>';
+                html += `<tr style="--c:${groupOf(row).color}">`;
                 const q = volumeQuery(row);
                 html += q
                     ? `<td class="go"><a class="to-volume" href="index.html?${q}" title="שטח, תכסית, זכויות וקומות עוברים לחישוב">לנפח</a></td>`
@@ -904,10 +1015,8 @@
                 html += '</tr>';
             }
 
-            html += '</tbody></table></div>';
+            html += '</tbody></table>';
 
-            console.log('Footnotes passed to render:', footnotes);
-            console.log('Referenced nums from cells:', [...referencedNums]);
 
             if (footnotes && footnotes.length > 0) {
                 html += '<div class="footnotes-section">';
@@ -920,9 +1029,7 @@
                 html += '</div>';
             }
 
-            html += '</div>';
-            resultsContainer.innerHTML = html;
-            document.getElementById('emptyState').hidden = true;
+            return html;
         }
 
         // a row of table 5 becomes the volume page's inputs: plot, coverage, above-ground main rights, floors
@@ -1151,6 +1258,211 @@
 
             requirementsContainer.innerHTML = html;
         }
+
+        // ================= the view: one selection, every view derives from it =================
+        // groups follow the usual plan colours approximately; the classification reads the designation and use columns
+        const GROUPS = [
+            { id: 'mixed', label: 'מגורים ומסחר', color: '#E9A23B', pub: false, test: /מגורים.*(מסחר|תעסוקה)|(מסחר|תעסוקה).*מגורים|מעורב/ },
+            { id: 'open', label: 'שטח ציבורי פתוח', color: '#86B36B', pub: true, test: /פתוח|שצ"פ|שצפ|פארק|גינה|ספורט|נופש|ירוק/ },
+            { id: 'road', label: 'דרכים', color: '#D9776F', pub: true, test: /דרך|רחוב|שביל|כביש|מסילה|חניה ציבורית|חניון ציבורי/ },
+            { id: 'pub', label: 'מבני ציבור', color: '#B08A5E', pub: true, test: /ציבור|מוסדות|חינוך|בית ספר|בי"ס|גן ילדים|גני ילדים|דת|קהיל|בריאות|שב"צ/ },
+            { id: 'com', label: 'מסחר ותעסוקה', color: '#A99AD0', pub: false, test: /מסחר|תעסוקה|משרד|מלונאות|תיירות|תעשי/ },
+            { id: 'res', label: 'מגורים', color: '#F1D46B', pub: false, test: /מגורים|דיור/ },
+            { id: 'other', label: 'אחר', color: '#C4C2BC', pub: false, test: /./ },
+        ];
+        const EDU = /חינוך|בית ספר|בי"ס|גן ילדים|גני ילדים|מעון/;
+        const LENSES = [
+            { tok: '', label: 'הכול' }, { tok: 'o:private', label: 'פרטי' }, { tok: 'o:public', label: 'ציבורי' },
+            { tok: 'g:open', label: 'שטח ציבורי פתוח' }, { tok: 'edu', label: 'מבני חינוך' },
+        ];
+        let DATA = null;
+        const SEL = new Set();   // 'g:<group>', 'd:<designation>', 'o:public|private', 'edu', 'p:<plot>'; a row is shown when it matches any token
+        const fmt = (v) => Math.round(v).toLocaleString('he-IL');
+        const pct = (a, b) => (b > 0 ? Math.round(a / b * 100) : 0);
+        const txt = (row) => (row[0] || '') + ' ' + (row[1] || '');
+        function groupOf(row) { const t = txt(row); return GROUPS.find((g) => g.test.test(t)) || GROUPS[GROUPS.length - 1]; }
+        const desig = (row) => String(row[0] || '').replace(/\(\d+\)/g, '').trim() || 'ללא ייעוד';
+        function cellsOf(row) {
+            const out = [];
+            String(row[2] || '').replace(/\(\d+\)/g, '').split(/[,،;\s]+/).filter(Boolean).forEach((part) => {
+                const m = part.match(/^(\d+)[-–](\d+)$/);
+                if (m && +m[2] > +m[1] && +m[2] - +m[1] <= 60) for (let i = +m[1]; i <= +m[2]; i++) out.push(String(i));
+                else out.push(part);
+            });
+            return out;
+        }
+        const areaOf = (row) => cellNum(row[4]);
+        function rightsOf(row) { const main = cellNum(row[5]); if (main > 0) return main; const tot = cellNum(row[9]); return tot > 0 ? tot : areaOf(row) * cellNum(row[10]) / 100; }
+        function matches(row, tok) {
+            const [k, v] = [tok.split(':')[0], tok.slice(tok.indexOf(':') + 1)];
+            if (tok === 'edu') return EDU.test(txt(row));
+            if (k === 'g') return groupOf(row).id === v;
+            if (k === 'd') return desig(row) === v;
+            if (k === 'o') return groupOf(row).pub === (v === 'public');
+            if (k === 'p') return cellsOf(row).includes(v) || (!cellsOf(row).length && String(row[2] || '').includes(v));
+            return false;
+        }
+        const shown = (row) => !SEL.size || [...SEL].some((t) => matches(row, t));
+        function tokLabel(tok) {
+            if (tok === 'edu') return 'מבני חינוך';
+            const l = LENSES.find((x) => x.tok === tok); if (l) return l.label;
+            const [k, v] = [tok.split(':')[0], tok.slice(tok.indexOf(':') + 1)];
+            if (k === 'g') return GROUPS.find((g) => g.id === v).label;
+            if (k === 'p') return 'מגרש ' + v;
+            return v;
+        }
+        // one selector everywhere: a click replaces the selection, + (or Shift) adds, a click on the only choice returns to all
+        function choose(tok, add) {
+            if (!tok) SEL.clear();
+            else if (add) { if (SEL.has(tok)) SEL.delete(tok); else SEL.add(tok); }
+            else if (SEL.size === 1 && SEL.has(tok)) SEL.clear();
+            else { SEL.clear(); SEL.add(tok); }
+            document.getElementById('plotNumber').value = [...SEL].filter((t) => t.startsWith('p:')).map((t) => t.slice(2)).join(', ');
+            renderView();
+        }
+
+        function renderTable(rows, footnotes) {
+            DATA = { rows, footnotes };
+            document.body.classList.remove('nodata');
+            renderView();
+        }
+
+        function renderView() {
+            if (!DATA) return;
+            const rows = DATA.rows, sel = rows.filter(shown), some = SEL.size > 0;
+            const sum = (rs, f) => rs.reduce((s, r) => s + f(r), 0);
+            const A = sum(rows, areaOf), R = sum(rows, rightsOf), a = sum(sel, areaOf), r = sum(sel, rightsOf);
+            const name = some ? [...SEL].map(tokLabel).join(' + ') : 'כל הטבלה';
+            try { history.replaceState(null, '', some ? '#' + encodeURIComponent([...SEL].join('|')) : location.pathname); } catch (e) { /* file:// */ }
+
+            // the lens: what this selection gets out of the plan
+            const pubRows = rows.filter((x) => groupOf(x).pub);
+            document.getElementById('insight').innerHTML = some
+                ? escapeHtml(name) + ': <b>' + pct(a, A) + '%</b> מהקרקע, <b>' + pct(r, R) + '%</b> מהזכויות'
+                : 'הציבור מקבל <b>' + pct(sum(pubRows, areaOf), A) + '%</b> מהקרקע ו-<b>' + pct(sum(pubRows, rightsOf), R) + '%</b> מהזכויות';
+            document.getElementById('sub').textContent = some
+                ? sel.length + ' שורות מתוך ' + rows.length + '. לחיצה על אריח, על פריט במקרא או על פס בוחרת. "הכול" מחזיר.'
+                : 'כל אריח הוא מגרש בגודל השטח שלו. לחיצה מבודדת, Shift או + מוסיפים, ו"לנפח" בטבלה שולח מגרש לחישוב.';
+
+            // the selector bar
+            document.getElementById('lenses').innerHTML = LENSES.map((l) => {
+                const n = l.tok ? rows.filter((x) => matches(x, l.tok)).length : rows.length;
+                const on = l.tok ? SEL.size === 1 && SEL.has(l.tok) : !some;
+                return '<button class="opt' + (l.tok ? '' : ' all') + '" type="button" data-tok="' + l.tok + '" aria-pressed="' + on + '"' + (n ? '' : ' disabled') + '>' + l.label + ' <small class="num">' + n + '</small></button>';
+            }).join('');
+            document.getElementById('now').innerHTML = 'מוצג: <b>' + escapeHtml(name) + '</b> · ' + sel.length + ' שורות';
+
+            // the legend is the selector: group, then its designations
+            const present = GROUPS.filter((g) => rows.some((x) => groupOf(x) === g));
+            let lg = '';
+            present.forEach((g) => {
+                const gr = rows.filter((x) => groupOf(x) === g), ds = [...new Set(gr.map(desig))];
+                const item = (tok, label, area, cls) => '<div class="row"><button class="it ' + cls + (some && !rows.some((x) => matches(x, tok) && shown(x)) ? ' off' : '') + '" type="button" data-tok="' + escapeHtml(tok) + '" aria-pressed="' + SEL.has(tok) + '"><i style="background:' + g.color + '"></i><span>' + escapeHtml(label) + '</span><small>' + fmt(area) + '</small></button>' +
+                    '<button class="add" type="button" data-tok="' + escapeHtml(tok) + '" data-add="1" aria-pressed="' + SEL.has(tok) + '" title="הוספה לבחירה">' + (SEL.has(tok) ? '−' : '+') + '</button></div>';
+                lg += item('g:' + g.id, g.label + (g.pub ? ' · ציבורי' : ''), sum(gr, areaOf), 'g');
+                if (ds.length > 1) ds.forEach((d) => { lg += item('d:' + d, d, sum(gr.filter((x) => desig(x) === d), areaOf), 'sub'); });
+            });
+            const legend = document.getElementById('legend');
+            legend.innerHTML = lg; legend.classList.toggle('some', some);
+
+            // who gets what: land and rights, by group, on one 100% scale
+            const bar = (title, f, tot, part) => '<div class="share"><div class="top"><span>' + title + '</span><b>' + (some ? pct(part, tot) + '% בבחירה' : fmt(tot) + ' מ"ר') + '</b></div><div class="bar' + (some ? ' some' : '') + '">' +
+                present.map((g) => { const v = sum(rows.filter((x) => groupOf(x) === g), f); const on = rows.some((x) => groupOf(x) === g && shown(x));
+                    return v > 0 ? '<button type="button" data-tok="g:' + g.id + '" class="' + (on ? '' : 'off') + '" style="width:' + (v / tot * 100) + '%;background:' + g.color + '" title="' + g.label + ': ' + pct(v, tot) + '%"></button>' : ''; }).join('') + '</div></div>';
+            document.getElementById('shares').innerHTML = bar('הקרקע', areaOf, A, a) + bar('זכויות הבנייה העיליות', rightsOf, R, r);
+
+            // the numbers of the selection
+            const cells = new Set(sel.flatMap(cellsOf));
+            const cov = a > 0 ? sum(sel, (x) => areaOf(x) * cellNum(x[11])) / a : 0;
+            const k = [[cells.size || sel.length, 'מגרשים'], [fmt(a), 'מ"ר קרקע · ' + (a / 1000).toLocaleString('he-IL', { maximumFractionDigits: 1 }) + ' דונם'], [fmt(r), 'מ"ר זכויות עיליות'],
+                [a > 0 ? Math.round(r / a * 100) + '%' : '·', 'אחוזי בנייה, ממוצע'], [cov ? Math.round(cov) + '%' : '·', 'תכסית, ממוצע משוקלל'], [fmt(sum(sel, (x) => cellNum(x[13]))), 'יח"ד']];
+            document.getElementById('kpi').innerHTML = k.map(([v, l]) => '<div><b>' + v + '</b><span>' + l + '</span></div>').join('');
+
+            renderMap(rows);
+            resultsContainer.innerHTML = tableHtml(sel, DATA.footnotes);
+            resultsTitle.style.display = '';
+            resultsTitle.textContent = sel.length + (some ? ' מתוך ' + rows.length : '');
+        }
+
+        // the abstract plan: a treemap, groups first, each plot sized by its area
+        function layout(items, x, y, w, h, out) {
+            if (!items.length) return;
+            if (items.length === 1) { out.push({ ...items[0], x, y, w, h }); return; }
+            const tot = items.reduce((s, i) => s + i.v, 0); let acc = 0, i = 0;
+            while (i < items.length - 1 && acc + items[i].v <= tot / 2) acc += items[i++].v;
+            if (i === 0) { acc = items[0].v; i = 1; }
+            const f = acc / tot, A = items.slice(0, i), B = items.slice(i);
+            if (w >= h) { const wa = w * f; layout(A, x + w - wa, y, wa, h, out); layout(B, x, y, w - wa, h, out); }   // right to left
+            else { const ha = h * f; layout(A, x, y, w, ha, out); layout(B, x, y + ha, w, h - ha, out); }
+        }
+        function renderMap(rows) {
+            const svg = document.getElementById('mapSvg'), box = svg.getBoundingClientRect();
+            const W = Math.max(box.width, 200), H = Math.max(box.height, 160), some = SEL.size > 0;
+            svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+            const groups = GROUPS.map((g) => { const kids = rows.map((row, idx) => ({ row, idx, v: areaOf(row) })).filter((t) => t.v > 0 && groupOf(t.row) === g).sort((p, q) => q.v - p.v);
+                return { g, kids, v: kids.reduce((s, t) => s + t.v, 0) }; }).filter((x) => x.v > 0);
+            const gl = []; layout(groups, 0, 0, W, H - 22, gl);
+            let out = '';
+            gl.forEach((G) => {
+                const tiles = []; layout(G.kids, G.x, G.y, G.w, G.h, tiles);
+                tiles.forEach((t) => {
+                    const row = t.row, on = !some || shown(row), cells = cellsOf(row), label = cells.length > 2 ? cells[0] + '–' + cells[cells.length - 1] : cells.join(', ') || '·';
+                    const tok = cells.length === 1 ? 'p:' + cells[0] : 'd:' + desig(row);
+                    out += '<g class="tile' + (on ? '' : ' dim') + '" data-tok="' + escapeHtml(tok) + '"><title>' + escapeHtml(desig(row) + ' · ' + (row[1] || '') + ' · מגרש ' + (cells.join(', ') || '?') + ' · ' + fmt(t.v) + ' מ"ר') + '</title>' +
+                        '<rect x="' + t.x + '" y="' + t.y + '" width="' + Math.max(t.w, 0) + '" height="' + Math.max(t.h, 0) + '" fill="' + G.g.color + '"/>' +
+                        (t.w > 34 && t.h > 20 ? '<text x="' + (t.x + t.w - 6) + '" y="' + (t.y + 16) + '" text-anchor="start" font-size="12" font-weight="500" fill="#141618" direction="rtl">' + escapeHtml(label) + '</text>' : '') +
+                        (t.w > 60 && t.h > 38 ? '<text x="' + (t.x + t.w - 6) + '" y="' + (t.y + 31) + '" text-anchor="start" font-size="10.5" fill="#3B4045" direction="rtl">' + fmt(t.v) + '</text>' : '') +
+                        (EDU.test(txt(row)) && t.w > 24 && t.h > 24 ? '<circle cx="' + (t.x + 9) + '" cy="' + (t.y + t.h - 9) + '" r="4" fill="none" stroke="#141618" stroke-width="1.5"><title>מבנה חינוך</title></circle>' : '') + '</g>';
+                });
+            });
+            const legendLine = '<text x="' + W + '" y="' + (H - 6) + '" text-anchor="start" font-family="IBM Plex Sans Hebrew,sans-serif" font-size="11.5" fill="#6B7178" direction="rtl">○ מבנה חינוך · אריח עמום: מחוץ לבחירה</text>';
+            svg.innerHTML = out + legendLine;
+        }
+
+        // ---------- events ----------
+        document.addEventListener('click', (e) => {
+            const t = e.target.closest('[data-tok]');
+            if (t && !t.disabled) { choose(t.dataset.tok, !!t.dataset.add || e.shiftKey || e.metaKey || e.ctrlKey); return; }
+            const lt = e.target.closest('[data-low]');
+            if (lt) { document.querySelectorAll('[data-low]').forEach((b) => b.setAttribute('aria-selected', String(b === lt)));
+                document.querySelectorAll('[data-lowpanel]').forEach((p) => { p.hidden = p.dataset.lowpanel !== lt.dataset.low; }); }
+        });
+        document.getElementById('plotNumber').addEventListener('input', (e) => {
+            [...SEL].forEach((t) => SEL.delete(t));
+            e.target.value.split(/[,،;\s]+/).filter(Boolean).forEach((p) => SEL.add('p:' + p));
+            renderView();
+        });
+        ['pickFile', 'pickFile2'].forEach((id) => document.getElementById(id).addEventListener('click', () => fileInput.click()));
+        ['loadExample', 'loadExample2'].forEach((id) => document.getElementById(id).addEventListener('click', () => {
+            renderProgramSummary({ planNumber: '999-0000000', planTitle: 'תוכנית לדוגמה, לא תוכנית אמיתית' });
+            fileName.textContent = 'טבלה לדוגמה';
+            status.textContent = 'דוגמה בדויה ללימוד: ' + EXAMPLE_ROWS.length + ' שורות';
+            SEL.clear(); document.getElementById('plotNumber').value = '';
+            renderTable(EXAMPLE_ROWS, EXAMPLE_NOTES);
+        }));
+        let rzt; addEventListener('resize', () => { clearTimeout(rzt); rzt = setTimeout(() => DATA && renderMap(DATA.rows), 120); });
+        try { decodeURIComponent(location.hash.slice(1)).split('|').filter(Boolean).forEach((t) => SEL.add(t)); } catch (e) { /* bad hash */ }
+
+        // a made-up table 5 for teaching: columns as in LEAF_COLUMNS
+        const R = (d, u, c, size, main, serv, bserv, pctB, cov, units, h, fa, fb) => [d, u, c, '', size, main, serv, '', bserv, '', pctB, cov, '', units, h, fa, fb];
+        const EXAMPLE_ROWS = [
+            R('מגורים ב', 'מגורים', '101', '1,000', '1,600', '400', '900', '200', '40', '24', '26', '8', '1'),
+            R('מגורים ב', 'מגורים', '102', '1,050', '1,680', '420', '950', '200', '40', '25', '26', '8', '1'),
+            R('מגורים ב', 'מגורים', '103', '980', '1,570', '390', '880', '200', '40', '24', '26', '8', '1'),
+            R('מגורים ד', 'מגורים', '104', '2,400', '7,200', '1,800', '2,400', '375', '45', '96', '60', '18', '2'),
+            R('מגורים ד', 'מגורים', '105', '2,200', '6,600', '1,650', '2,200', '375', '45', '88', '60', '18', '2'),
+            R('מגורים ומסחר', 'מגורים, מסחר בקומת הקרקע(1)', '106', '1,800', '5,400', '1,350', '1,800', '375', '50', '60', '45', '14', '2'),
+            R('מסחר ותעסוקה', 'מסחר ומשרדים', '201', '1,500', '3,000', '750', '1,500', '250', '60', '', '20', '5', '2'),
+            R('מבנים ומוסדות ציבור', 'מבנה חינוך, בית ספר יסודי', '301', '4,000', '3,200', '800', '', '100', '40', '', '16', '4', ''),
+            R('מבנים ומוסדות ציבור', 'גני ילדים', '302', '1,200', '720', '180', '', '75', '40', '', '8', '2', ''),
+            R('מבנים ומוסדות ציבור', 'מבנה קהילה ובית כנסת', '303', '900', '720', '180', '', '100', '45', '', '12', '3', ''),
+            R('שטח ציבורי פתוח', 'גינה שכונתית(2)', '401', '2,500', '25', '', '', '1', '1', '', '4', '1', ''),
+            R('שטח ציבורי פתוח', 'פארק ומתקני ספורט', '402', '3,200', '60', '', '', '2', '2', '', '4', '1', ''),
+            R('שטח ציבורי פתוח', 'שביל ירוק', '403', '900', '', '', '', '', '', '', '', '', ''),
+            R('דרך מוצעת', 'דרך', '501', '3,000', '', '', '', '', '', '', '', '', ''),
+            R('דרך מוצעת', 'דרך משולבת', '502', '1,400', '', '', '', '', '', '', '', '', ''),
+        ];
+        const EXAMPLE_NOTES = [{ num: '1', text: 'חזית מסחרית לרחוב, עומק 12 מ\' לפחות.' }, { num: '2', text: 'לפחות 50% מהשטח מגונן וחדיר למים.' }];
     </script>
 </body>
 </html>
