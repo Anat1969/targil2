@@ -25,8 +25,10 @@ jobs:
       - name: Copy the app and push when it changed
         run: |
           cp src/index.html src/taba.html src/app.css site/
+          # the plan store (06.11.2026): read once from "מה נבנה סביבי", served next to taba.html
+          rm -rf site/plans && cp -r src/plans site/plans
           cd site
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html taba.html app.css
+          git add -A index.html taba.html app.css plans
           git diff --cached --quiet || { git commit -q -m "app from ${GITHUB_SHA}"; git push -q origin gh-pages; }
