@@ -88,7 +88,7 @@ ai-menu{flex:none;margin-inline-start:auto}
 
 /* ===== בעיה, פתרון, תובנה ===== */
 .psi{display:grid;gap:8px}
-.psi div{padding:10px 12px;background:#fff;box-shadow:var(--shadow);border-inline-start:4px solid;font-size:13.5px;color:var(--ink-2)}
+.psi div{padding:8px 10px;background:#fff;box-shadow:var(--shadow);border-inline-start:4px solid;font-size:13.5px;color:var(--ink-2)}
 .psi .p{border-color:var(--problem)} .psi .s{border-color:var(--solution)} .psi .i{border-color:var(--marker)}
 .psi b{display:block;color:var(--ink);font-size:14.5px;margin-bottom:2px}
 .psi .t{font-family:var(--mono);font-size:11px;color:var(--ink-3);display:block}
