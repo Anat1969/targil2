@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"${CLAUDE_PROJECT_DIR:-.}\" && node tools/anchors.mjs . && echo 'CODEMAP.md is ready in the repo root. Read it before opening source files, and open files only at the line ranges its anchors point to. Report these numbers in the token-saving line at the end of the session.'; exit 0",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
